@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.database;
+
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.web.base.framework.database
+ *    |_ RoutingDataSource.java
+ * Multiple Datasource Routing Class
+ * </pre>
+ *
+ * @author Han-Woong Lee, Bluedigm
+ * @date 2012. 5. 14. 오후 1:00:53
+ * @version 0.0.1
+ */
+public class RoutingDataSource extends AbstractRoutingDataSource {
+	@Override
+	protected Object determineCurrentLookupKey() {
+		return ContextHolder.getDataSourceType();
+	}
+}

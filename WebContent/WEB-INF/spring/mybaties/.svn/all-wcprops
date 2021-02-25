@@ -1,0 +1,11 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/BDAuth/!svn/ver/2/trunk/src/main/webapp/WEB-INF/spring/mybaties
+END
+context-mybatis.xml
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/BDAuth/!svn/ver/2/trunk/src/main/webapp/WEB-INF/spring/mybaties/context-mybatis.xml
+END

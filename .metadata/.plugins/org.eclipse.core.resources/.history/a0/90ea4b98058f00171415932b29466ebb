@@ -1,0 +1,78 @@
+package com.wooribank.wbt3.sample.common.util;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import com.wooribank.wbt3.web.base.framework.util.string.StringUtil;
+
+public class CommonUtils {
+
+	public static String getDayOfTime(String format){
+		Calendar ca = Calendar.getInstance(Locale.KOREA);
+		Date date = ca.getTime();
+		
+		SimpleDateFormat sf = null;
+		if(!StringUtil.isEmpty(format)){
+			sf = new SimpleDateFormat(format);
+		}else{
+			sf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		}
+		return sf.format(date);
+	}
+	
+	public static String getDayOfTime(){
+		return CommonUtils.getDayOfTime(null);
+	}
+	
+	public static String getDayOfStartTime(){
+		return CommonUtils.getDayOfStartTime(null);
+	}
+	
+	public static String getDayOfStartTime(String format){
+		Calendar ca = Calendar.getInstance(Locale.KOREA);
+		ca.set(Calendar.HOUR_OF_DAY, 0);
+		ca.set(Calendar.MINUTE, 0);
+		ca.set(Calendar.SECOND, 0);
+		Date date = ca.getTime();
+		
+		SimpleDateFormat sf = null;
+		if(!StringUtil.isEmpty(format)){
+			sf = new SimpleDateFormat(format);
+		}else{
+			sf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		}
+		return sf.format(date);
+	}
+	
+	public static String getDayOfEndTime(){
+		return CommonUtils.getDayOfEndTime(null);
+	}
+	
+	public static String getDayOfEndTime(String format){
+		Calendar ca = Calendar.getInstance(Locale.KOREA);
+		ca.set(Calendar.HOUR_OF_DAY, 23);
+		ca.set(Calendar.MINUTE, 59);
+		ca.set(Calendar.SECOND, 59);
+		Date date = ca.getTime();
+		
+		SimpleDateFormat sf = null;
+		if(!StringUtil.isEmpty(format)){
+			sf = new SimpleDateFormat(format);
+		}else{
+			sf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		}
+		return sf.format(date);
+	}
+	
+	public static String getErrorLog(StackTraceElement[] element){
+		StringBuffer sb = new StringBuffer();
+		sb.append("\n");
+		for(int index=0; index<element.length; index++){
+			sb.append(element[index].toString()).append("\n");
+		}
+		
+		return sb.toString();
+	}
+}

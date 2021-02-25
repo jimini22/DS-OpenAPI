@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-4.0.xsd
+http://www.springframework.org/schema/jee
+http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+http://www.springframework.org/schema/oxm 
+http://www.springframework.org/schema/oxm/spring-oxm-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+	default-autowire="byName">
+
+	<context:annotation-config />
+		
+    <mvc:annotation-driven/>
+    
+	<mvc:default-servlet-handler />
+	
+	<!-- Interceptor -->
+	<import resource="classpath:conf/spring/interceptorContext.xml" />
+	
+	<!-- 정규표현식을 이용하여 Web 관련 Controller만 적용한다. -->
+	<context:component-scan base-package="com.bluedigm.web">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+		<context:exclude-filter type="regex" expression="^com\.bluedigm\.web\.sample\.[a-zA-Z\.]*\.controller.*"/>
+	</context:component-scan>
+
+	<!-- Pagination -->
+	<bean id="imageRenderer" class="com.wooribank.wbt3.sample.common.support.pagination.ImagePaginationRenderer" />
+	<bean id="textRenderer" class="com.wooribank.wbt3.sample.common.support.pagination.DefaultPaginationRenderer" />
+	<bean id="paginationManager" class="com.wooribank.wbt3.web.base.framework.web.ui.pagination.DefaultPaginationManager">
+		<property name="rendererType">
+			<map>
+				<entry key="image" value-ref="imageRenderer" />
+				<entry key="text" value-ref="textRenderer" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- VIEW RESOLVER CONFIGURATIONS -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="1" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>

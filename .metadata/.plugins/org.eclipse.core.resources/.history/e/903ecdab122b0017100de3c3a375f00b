@@ -1,0 +1,100 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.book.service;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import com.bluedigm.web.sample.books.model.Book;
+import com.bluedigm.web.sample.books.service.BookService;
+
+/**
+ * <pre>
+ * com.bluedigm.web.sample.book.service
+ *   |_ BookServiceTest.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : Jeon, Gilsu<youmahil@bluedigm.com>
+ * @Date    : 2017. 4. 27. 오후 1:28:19
+ * @Version : 
+ */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+//@ContextConfiguration(locations = {"classpath:conf/spring/applicationContext-database.xml", "classpath:conf/spring/restApplication-servlet.xml"})
+@ContextConfiguration(locations = {"classpath*:conf/spring/*.xml", "classpath*:conf/log/${server.type}/*.xml"})
+//@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+public class BookServiceTest {
+	private static final Logger log = Logger.getLogger(BookServiceTest.class);
+	
+	@Autowired
+    private BookService bookService;
+    
+	@Test
+	public void test() {
+		log.info("--------------- bookService Test : Start ---------------");
+		
+		Book book = new Book();
+		book.setBookId(10);
+		book.setTitle("Test Book 10");
+		book.setPrice(10000);
+		book.setEmail("test@test.com");
+		
+		
+		bookService.createBook(book);
+		
+		List<Book> books = bookService.getBookList();
+		for(int i = 0; i < books.size(); i++){
+			Book resBook = books.get(i);
+			
+			log.debug("*** BOOK [ " + i + "] = " + resBook);
+		}
+			
+		List<Book> listBook = bookService.getBook(book);
+		for(int i = 0; i < listBook.size(); i++){
+			Book resBook = listBook.get(i);
+			
+			log.debug("### BOOK [ " + i + "] = " + resBook);
+		}
+		
+		book.setTitle("Test Book 1-Yaong");
+		bookService.modifyBook(book);
+		
+		List<Book> ulistBook = bookService.getBook(book);
+		for(int i = 0; i < ulistBook.size(); i++){
+			Book resBook = ulistBook.get(i);
+			
+			log.debug("$$$ BOOK [ " + i + "] = " + resBook);
+		}	
+		
+		long key = book.getBookId();
+		bookService.removeBook(key);
+		
+		List<Book> dlistBook = bookService.getBook(book);
+		for(int i = 0; i < dlistBook.size(); i++){
+			Book resBook = dlistBook.get(i);
+			
+			log.debug("@@@ BOOK [ " + i + "] = " + resBook);
+		}	
+		
+		log.info("--------------- bookService Test : End ---------------");
+	}
+
+
+}

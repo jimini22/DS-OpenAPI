@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+xmlns:util="http://www.springframework.org/schema/util" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:oxm="http://www.springframework.org/schema/oxm"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-4.0.xsd
+http://www.springframework.org/schema/jee
+http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+http://www.springframework.org/schema/oxm
+http://www.springframework.org/schema/oxm/spring-oxm-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+default-autowire="byName">
+
+	<context:annotation-config />
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+	
+	<context:component-scan base-package="com.wooribank.wbt3">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+		<context:exclude-filter type="regex" expression="^com\.wooribank\.wbt3\.[a-zA-Z\.]*\.controller.web\.[a-zA-Z\.]*" />
+	</context:component-scan>
+	
+	<!-- Exception Resolver -->
+	<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="com.bluedigm.web.framework.exception.ApplicationException">error/applicationException</prop>
+			</props>
+		</property>
+		<property name="exceptionAttribute" value="exception" />
+		<property name="defaultErrorView" value="error/error" />
+	</bean>
+
+	<!-- JAXB/JSON Setup -->
+	<bean id="jacksonObjectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+		<property name="featuresToEnable">
+			<list>
+				<value type="com.fasterxml.jackson.databind.SerializationFeature">WRAP_ROOT_VALUE</value>
+				<!--<value type="com.fasterxml.jackson.databind.SerializationFeature">CLOSE_CLOSEABLE</value>-->
+				<value type="com.fasterxml.jackson.databind.DeserializationFeature">UNWRAP_ROOT_VALUE</value>
+			</list>
+		</property>
+		<!--<property name="featuresToDisable">
+		<array>
+		<util:constant static-field="com.fasterxml.jackson.databind.MapperFeature$USE_ANNOTATIONS"/>
+		</array>
+		</property>-->
+	</bean>
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="0" />
+		<property name="useNotAcceptableStatusCode" value="true" />
+		<property name="contentNegotiationManager">
+			<bean class="org.springframework.web.accept.ContentNegotiationManager">
+				<constructor-arg>
+					<list>
+						<bean class="org.springframework.web.accept.HeaderContentNegotiationStrategy"></bean>
+						<bean class="org.springframework.web.accept.ParameterContentNegotiationStrategy">
+							<constructor-arg>
+								<map>
+									<entry key="xml" value="application/xml"/>
+									<entry key="json" value="application/json"/>
+								</map>
+							</constructor-arg>
+						</bean>
+						<bean class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
+							<constructor-arg>
+								<map>
+									<entry key="xml" value="application/xml"/>
+									<entry key="json" value="application/json"/>
+								</map>
+							</constructor-arg>
+						</bean>
+						<bean class="org.springframework.web.accept.FixedContentNegotiationStrategy">
+							<constructor-arg value="application/json" />
+						</bean>
+					</list>
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<!-- XML View -->
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView">
+					<constructor-arg>
+						<bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+							<property name="packagesToScan">
+								<list>
+									<value>com.wooribank.wbt3</value>
+								</list>
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>			
+				<!-- JSON View 
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" >
+					<property name="extractValueFromSingleKeyModel" value="true" />
+					<property name="objectMapper" ref="jacksonObjectMapper" />
+				</bean>-->
+
+				<!-- JSON View -->
+				<bean class="com.wooribank.wbt3.sample.common.support.jsonp.JsonPView" >
+					<property name="extractValueFromSingleKeyModel" value="true" />
+					<property name="objectMapper" ref="jacksonObjectMapper" />
+					<property name="contentType" value="application/json" />
+				</bean>
+
+				<!-- JSONP View -->
+				<bean class="com.wooribank.wbt3.sample.common.support.jsonp.JsonPView" >
+					<property name="extractValueFromSingleKeyModel" value="true" />
+					<property name="objectMapper" ref="jacksonObjectMapper" />
+					<property name="contentType" value="application/javascript" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+</beans>

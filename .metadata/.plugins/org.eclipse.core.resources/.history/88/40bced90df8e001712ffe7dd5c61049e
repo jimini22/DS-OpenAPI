@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:p="http://www.springframework.org/schema/p" xmlns:mvc="http://www.springframework.org/schema/mvc" 
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+	default-autowire="byName">
+	
+	<!-- 특정 path 지정 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- 로그인 -->
+			<mvc:mapping path="/*/*.test" /> 
+			<!-- 마이페이지 : 메인 -->
+			<mvc:mapping path="/mypage/mypageMain.do" />
+			<!-- 마이페이지 : 주문/배송조회 -->
+			<mvc:mapping path="/myorder/goOrder.do" />
+			<!-- 마이페이지 : 취소/반품/교환내역 -->
+			<mvc:mapping path="/myorder/goClaim.do" />
+			<!-- 마이페이지 : 쿠폰 -->
+			<mvc:mapping path="/mypage/coupon.do" />
+			<!-- 마이페이지 : 포인트 -->
+			<mvc:mapping path="/mypage/point.do" />
+			<!-- 마이페이지 : 상품권 -->
+			<mvc:mapping path="/mypage/giftCard.do" />
+			<!-- 마이페이지 : 비교상품 -->
+			<mvc:mapping path="/mypage/goodsCompareList.do" />
+			<!-- 마이페이지 : 관심상품 -->
+			<mvc:mapping path="/mypage/wishList.do" />
+			<!-- 마이페이지 : 입고알림상품 -->
+			<!-- 마이페이지 : 상품후기 -->
+			<mvc:mapping path="/mypage/goodsAppraisalList.do" />
+			<!-- 마이페이지 : 상품문의 -->
+			<mvc:mapping path="/mypage/goodsQnaList.do" />
+			<!-- 마이페이지 : 문의내역확인 -->
+			<mvc:mapping path="/mypage/csQnaList.do" />
+			<!-- 마이페이지 : 회원 정보 변경 비밀번호 확인 -->
+			<mvc:mapping path="/mypage/customer/passwordCheck.do" />
+			<!-- 마이페이지 : 회원 정보 변경 -->
+			<mvc:mapping path="/mypage/customer/updateCustomer.do" />
+			<!-- 마이페이지 : 회원 비밀번호 변경 -->
+			<mvc:mapping path="/mypage/customer/updatePassword.do" />
+			<!-- 마이페이지 : 배송지관리 -->
+			<mvc:mapping path="/mypage/customer/myAddressList.do" />
+			<!-- 고객센터 : 비디에게 하고싶은 말 -->
+			<mvc:mapping path="/csCenter/csOpinion.do" />
+			<!-- 상품 상세 : 도움되었어요. -->
+			<mvc:mapping path="/goods/createQnAHelpAjax.do" />
+			<!-- 상품 상세 : 상품문의 저장. -->
+			<mvc:mapping path="/goods/qnaWriteAjax.do" />
+
+			<bean id="authInterceptor" class="com.wooribank.wbt3.sample.interceptor.AuthCheckInterceptor"/>
+		</mvc:interceptor>
+		
+		<mvc:interceptor>
+			<!-- 모든요청 interception -->
+			<mvc:mapping path="/*.do"/>
+			<mvc:mapping path="/*/*.do"/>
+			<mvc:mapping path="/*/*/*.do"/>
+			<bean id="allRequestInterceptor" class="com.wooribank.wbt3.sample.interceptor.AllRequestInterceptor"/>
+		</mvc:interceptor>		
+		
+	</mvc:interceptors>
+	
+</beans>

@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.support;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.web.base.framework.support
+ *    |_ CDATAXMLAdapter.java
+ * XML CDATA Adapter
+ * </pre>
+ *
+ * @author Han-Woong Lee, Bluedigm
+ * @date 2012. 7. 5. 오후 2:37:05
+ * @version 0.0.1
+ */
+public final class CDATAXMLAdapter extends XmlAdapter<String, String>{
+	  @Override  
+	  public String marshal( String v ) throws Exception  
+	  {  
+	   return "<![CDATA[" + v + "]]>";  
+	  }  
+	  
+	  @Override  
+	  public String unmarshal( String v ) throws Exception  
+	  {  
+	   return v;  
+	  }
+}

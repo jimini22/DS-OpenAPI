@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+
+package com.wooribank.wbt3.imm.user.model.request;
+
+import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+
+/**
+ * The Class DCInquiryAnswerReq.
+ */
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class UserPeriodStatisticReq implements Serializable {
+
+
+    private static final long serialVersionUID = 233300080457457051L;
+  
+    @ApiModelProperty(notes = "조회기준년(yyyy)" )
+    private String searchYear;   
+    
+    @ApiModelProperty(notes = "조회월(mm)" )
+    private String searchMonth;   
+    
+    @ApiModelProperty(notes = "가입현황 A | 탈퇴현황 B" )
+    private String searchType;   
+
+}

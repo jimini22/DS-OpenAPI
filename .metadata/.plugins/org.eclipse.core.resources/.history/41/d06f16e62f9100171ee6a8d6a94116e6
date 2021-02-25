@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%-- 
+<%@ taglib prefix="p" uri="http://antop.tistory.com/paging-util" %>
+--%>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/i18n/list.js"></script>
+<div>
+<div>
+	<a href="<%=request.getContextPath()%>"><spring:message code="link.back" /></a>
+	<a href="<%=request.getContextPath()%>/i18n/form.do"><spring:message code="link.register" /></a>
+</div>
+<div>
+<center>
+<table border=1>
+	<thead>
+		<tr>
+			<th><spring:message code="i18n.title.code" /></th>
+			<th><spring:message code="i18n.title.language" /></th>
+			<th><spring:message code="i18n.title.message" /></th>
+			<th><spring:message code="i18n.title.edit" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="i18n" items="${list}">
+		
+			<c:url var="detailUrl" value="/i18n/list.do" >
+				<c:param name="code" value="${i18n.code}" />
+			</c:url>
+
+			<tr>
+				<td><a href="${detailUrl}">${i18n.code}</a></td>
+				<td>${i18n.language}</td>
+				<td>${i18n.message}</td>
+				<td>
+					<c:url var="formUrl" value="/i18n/form.do">
+						<c:param name="code" value="${i18n.code}" />
+						<c:param name="language" value="${i18n.language}" />
+					</c:url>
+					<a href="${formUrl}"><spring:message code="common.modify" /></a>
+					
+					<c:url var="removeUrl" value="/i18n/remove.do">
+						<c:param name="code" value="${i18n.code}" />
+						<c:param name="language" value="${i18n.language}" />
+					</c:url>
+					<a href="${removeUrl}"><spring:message code="common.remove" /></a>
+				</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
+</center>
+</div>
+</div>
+<hr />
+
+<!--  
+<p:paging page="${param.page}" size="10" total="${total}" />
+-->

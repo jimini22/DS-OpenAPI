@@ -1,0 +1,5 @@
+package com.bluedigm.web.batch.sample.launcher;
+
+public class Job1Launcher {
+
+}

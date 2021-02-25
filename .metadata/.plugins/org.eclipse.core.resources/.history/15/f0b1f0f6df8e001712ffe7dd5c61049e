@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.wooribank.wbt.sample.rest.support.jsonp;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+
+/**
+ * <pre>
+ * com.wooribank.wbt.sample.rest.base.framework.view
+ * 		|_JSONPView.java
+ * TODO Javadoc주석작성
+ * </pre>
+ * 
+ * @author [Hanwoong Lee], [Bluedigm]
+ * @date 2013. 9. 12. 오전 10:37:11
+ * @version $Id$
+ */
+public class JsonPView extends MappingJackson2JsonView {
+
+	@Override
+	public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if ("GET".equals(request.getMethod().toUpperCase())) {
+
+			Map<String, String[]> params = request.getParameterMap();
+
+			if (params.containsKey("callback")) {
+				response.getOutputStream().write(new String(params.get("callback")[0] + "(").getBytes());
+				super.render(model, request, response);
+				response.getOutputStream().write(new String(");").getBytes());
+				response.setContentType("application/javascript");
+			}
+
+			else {
+				super.render(model, request, response);
+			}
+		} else {
+			super.render(model, request, response);
+		}
+	}
+}

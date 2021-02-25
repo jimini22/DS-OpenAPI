@@ -1,0 +1,108 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+package com.bluedigm.web.sample.contact.dao.impl;
+
+import java.util.List;
+
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Repository;
+
+import com.wooribank.wbt3.sample.contact.dao.ContactDao;
+import com.wooribank.wbt3.sample.contact.model.Contact;
+import com.wooribank.wbt3.sample.contact.model.SearchContact;
+import com.wooribank.wbt3.web.base.framework.dao.impl.GenericDaoImpl;
+
+
+/**
+ * The Class ContactDaoImpl.
+ */
+@Repository
+public class ContactDaoImpl extends GenericDaoImpl<Contact, Integer> implements ContactDao {
+
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#insertContact(com.wooribank.wbt3.sample.common.contact.model.Contact)
+	 */
+	@Override
+	public int insertContact(Contact contact) {
+		// return super.getSqlSession().insert("Contact.insertContact",contact);
+		return insert("insertContact", contact);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#updateContact(com.wooribank.wbt3.sample.common.contact.model.Contact)
+	 */
+	@Override
+	public int updateContact(Contact contact) {
+		// return super.getSqlSession().update("Contact.updateContact",
+		// contact);
+		return update("updateContact", contact);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#deleteContact(java.lang.Integer)
+	 */
+	@Override
+	public int deleteContact(Integer id) {
+		// return super.getSqlSession().update("Contact.deleteContact", id);
+		return delete("deleteContact", id);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#selectContact(java.lang.Integer)
+	 */
+	@Override
+	public Contact selectContact(Integer id) {
+		// return
+		// (Contact)super.getSqlSession().selectOne("Contact.selectContact",
+		// id);
+		Contact contact = (Contact)selectOne("selectContact", (Object) id);
+		if( contact == null )throw new EmptyResultDataAccessException(1);
+		return contact;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#selectContactList(com.wooribank.wbt3.sample.common.contact.model.SearchContact)
+	 */
+	@Override
+	public List<Contact> selectContactList(SearchContact searchContact) {
+		// return (List<Contact>)
+		// super.getSqlSession().selectList("Contact.selectContactList",
+		// searchContact);
+		return selectList("selectContactList", (Object) searchContact);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#selectContactCount(com.wooribank.wbt3.sample.common.contact.model.SearchContact)
+	 */
+	@Override
+	public int selectContactCount(SearchContact searchContact) {
+		// return
+		// (Integer)super.getSqlSession().selectOne("Contact.selectContactCount",
+		// searchContact);
+		return (Integer) selectOne("selectContactCount", (Object) searchContact);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.contact.dao.ContactDao#selectContactList(java.lang.String)
+	 */
+	@Override
+	public List<Contact> selectContactList(String name) {
+		// return (List<Contact>)
+		// super.getSqlSession().selectList("Contact.selectContactList",
+		// name);
+		SearchContact searchContact = new SearchContact();
+		searchContact.setSearchKeyword(name);
+		searchContact.setRecordCountPerPage(10);
+		searchContact.setPageSize(10);		
+		return selectList("selectContactList", (Object) searchContact);
+	}
+
+}

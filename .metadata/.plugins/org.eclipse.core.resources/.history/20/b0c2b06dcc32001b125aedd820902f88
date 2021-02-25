@@ -1,0 +1,22 @@
+package com.portal.common.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+public class WelcomeController {
+
+ @RequestMapping("/hello")
+ public ModelAndView hello() {
+  String msg = "Hello, World!";
+  return new ModelAndView("index", "msg", msg);
+ }
+ 
+ @RequestMapping("/test1")
+ public ModelAndView test1() {
+  String msg = "Hello, World!";
+  return new ModelAndView("index", "msg", msg);
+ }
+}
+ 

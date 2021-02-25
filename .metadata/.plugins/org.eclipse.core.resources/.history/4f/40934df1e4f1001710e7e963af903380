@@ -1,0 +1,29 @@
+package com.wooribank.wbt3.act.friend.model.request;
+
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import com.wooribank.wbt3.act.common.model.ReqCommon;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class SetFriendChangeListReq extends ReqCommon{
+
+    private static final long serialVersionUID = 5788816947156867862L;
+
+    // 사용자 idx
+    @NotNull(message="useridxList는 null을 허락 하지 않습니다.")
+    private List<Long> useridxList;
+      
+    // 숨김 친구 추가 : add, 숨김 친구 삭제 : del
+    @NotNull(message="action 은 null을 허락 하지 않습니다.")
+    @Pattern(regexp="add|del", message="action 은 add, del 만 허용됩니다.")
+    private String action;
+
+    
+}

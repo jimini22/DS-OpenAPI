@@ -1,0 +1,238 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.nosql.redis.support;
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.DataType;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import com.wooribank.wbt3.web.base.framework.nosql.redis.constants.RedisDataTypes;
+import com.wooribank.wbt3.web.base.framework.nosql.redis.model.RedisKeyTypeVO;
+
+
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.nosql.redis.support
+*   |_ RedisDataTypes.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 18. 오후 10:08:11
+* @Version : 
+*/
+
+
+@Component
+public class RedisDataSupport {
+	@SuppressWarnings("unused")
+	private  final Logger log = LoggerFactory.getLogger(this.getClass());
+	
+	@SuppressWarnings("rawtypes")
+	private RedisTemplate redisTemplate;
+	
+
+	public void setRedisTemplate(@SuppressWarnings("rawtypes") RedisTemplate redisTemplate) {
+		this.redisTemplate = redisTemplate;
+	}
+
+
+	/**
+	 * 
+	 * 개요: NameSpace로 그룹화된 Key 들의 이름과 Redis Data Type Code 문자열 목록을 을 추출한다.
+	 * 처리내용 :
+	 *   1) 
+	 *   2)
+	 *   3)
+	 * @Method Name : getKeyTypesFromNameSpace
+	 * @history
+	 * ---------------------------------------------------------------------------------
+	 *  변경일                    작성자                    변경내용
+	 * ---------------------------------------------------------------------------------
+	 *  2017. 8. 19.     yaong      최초 작성   
+	 * ---------------------------------------------------------------------------------
+	 * @param nsName
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<RedisKeyTypeVO> getKeyTypesFromNameSpace(String nsName){
+		Set keySet = redisTemplate.keys(nsName + ":*");
+		Iterator itKeys = keySet.iterator();
+		
+		List keyList = new ArrayList<>();
+		
+		while(itKeys.hasNext()){
+			String key = (String) itKeys.next();
+			DataType type = redisTemplate.type(key);
+			
+			RedisKeyTypeVO redisKeyTypeVO = new RedisKeyTypeVO();
+			
+			redisKeyTypeVO.setKey(key);
+			redisKeyTypeVO.setRedisType(type.code());
+			
+			keyList.add(redisKeyTypeVO);
+		}
+		
+		return keyList;
+	}
+	
+	/**
+	 * 
+	 * 개요: 제시된 Key를 갖는 REDIS 객체의 값을 추출한다. 
+	 * 처리내용 :
+	 *   1) 
+	 *   2)
+	 *   3)
+	 * @Method Name : get
+	 * @history
+	 * ---------------------------------------------------------------------------------
+	 *  변경일                    작성자                    변경내용
+	 * ---------------------------------------------------------------------------------
+	 *  2017. 8. 18.     yaong      최초 작성   
+	 * ---------------------------------------------------------------------------------
+	 * @param objectKey
+	 * @return 제시된 Key의 REDIS Data Type (string, list, set, zset, hash의 5종 중 1)에 상응하는 Java 객체 
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Object getValueObject(String objectKey){
+		Object result = null;
+		
+		DataType type = redisTemplate.type(objectKey);
+			
+		switch(type.code()){
+			case RedisDataTypes.REDIS_TYPE_HASH :
+				Set hashKeySet = redisTemplate.opsForHash().keys(objectKey);
+				
+				if(hashKeySet != null) {
+					HashMap hashMapValue = new HashMap();
+					
+					Iterator itHashKeys = hashKeySet.iterator();
+					while(itHashKeys.hasNext()){
+						String hashKey = (String) itHashKeys.next();
+						String hashValue = (String) redisTemplate.opsForHash().get(objectKey, hashKey);
+						
+						hashMapValue.put(hashKey, hashValue);
+					}
+					
+					result = hashMapValue;
+				}
+				break;
+			case RedisDataTypes.REDIS_TYPE_LIST : 
+				Long listSize = redisTemplate.opsForList().size(objectKey);
+				
+				if(listSize != null && listSize.longValue() > 0){
+					List listValue = redisTemplate.opsForList().range(objectKey, 0, listSize);
+					result = listValue;
+				}
+				break;
+			case RedisDataTypes.REDIS_TYPE_SET : 
+				Long setSize = redisTemplate.opsForSet().size(objectKey);
+				
+				if(setSize != null && setSize.longValue() > 0){
+					Set setValue = redisTemplate.opsForSet().members(objectKey);
+					result = setValue;
+				}
+				break;
+			case RedisDataTypes.REDIS_TYPE_SORTEDSET :
+				Long zsetSize = redisTemplate.opsForZSet().size(objectKey);
+				
+				if(zsetSize != null && zsetSize.longValue() > 0) {
+					Set zsetValue = redisTemplate.opsForZSet().range(objectKey, 0, zsetSize);
+					result = zsetValue;
+				}
+				break;
+			case RedisDataTypes.REDIS_TYPE_STRING :
+				String strValue = (String) redisTemplate.opsForValue().get(objectKey);
+				
+				if(strValue != null){
+					result = strValue;
+				}
+				break;
+		}
+		
+		return result;
+	 }
+	
+	@SuppressWarnings("unchecked")
+	public Object getHashValue(String objectKey, String hashKey ){
+		return redisTemplate.opsForHash().get(objectKey, hashKey);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void deleteHashEntry(String objectKey, String hashKey ){
+		redisTemplate.opsForHash().delete(objectKey, hashKey);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void addHashEntry(String objectKey, String hashKey, Object value){
+		redisTemplate.opsForHash().put(objectKey, hashKey, value);
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public void deleteFirstListEntry(String objectKey){
+		redisTemplate.opsForList().leftPop(objectKey);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void deleteLastListEntry(String objectKey){
+		redisTemplate.opsForList().rightPop(objectKey);
+	}	
+
+	@SuppressWarnings("unchecked")
+	public void addFirstListEntry(String objectKey, Object value){
+		redisTemplate.opsForList().leftPush(objectKey, value);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void addLastListEntry(String objectKey, Object value){
+		redisTemplate.opsForList().rightPush(objectKey, value);
+	}		
+	
+	@SuppressWarnings("unchecked")
+	public void deleteSetEntry(String objectKey, Object value ){
+		redisTemplate.opsForSet().remove(objectKey, value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addSetEntry(String objectKey, Object ... values ){
+		redisTemplate.opsForSet().add(objectKey, values);
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public void deleteSortedSetEntry(String objectKey, Object value ){
+		redisTemplate.opsForZSet().remove(objectKey, value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addSortedSetEntry(String objectKey, Object value, double score){
+		redisTemplate.opsForZSet().add(objectKey, value, score);
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public void deleteStringEntry(String objectKey, Object value ){
+		redisTemplate.opsForValue().getOperations().delete(objectKey);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addStringEntry(String objectKey, String value ){
+		redisTemplate.opsForValue().set(objectKey, value);
+	}		
+}

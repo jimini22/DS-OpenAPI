@@ -1,0 +1,16 @@
+package com.wooribank.wbt3.sample.common.util;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonHandler {
+		
+	public static <T> T jsonBind(String json, Class<T> clazz) throws Exception{
+		ObjectMapper mapper = new ObjectMapper();	
+		return mapper.readValue(json, clazz);		
+	}
+	
+	public static String toString(Object obj) throws Exception{
+		ObjectMapper mapper = new ObjectMapper();		
+		return mapper.writeValueAsString(obj);		
+	}
+}

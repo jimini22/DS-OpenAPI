@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+package com.wooribank.wbt3.imm.user.mapper;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.wooribank.wbt3.imm.user.model.data.UserMonthStatisticFlatVO;
+import com.wooribank.wbt3.imm.user.model.data.UserMonthStatisticListVO;
+import com.wooribank.wbt3.imm.user.model.data.UserNowStatisticVO;
+import com.wooribank.wbt3.imm.user.model.data.UserStatisticVO;
+import com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq;
+import com.wooribank.wbt3.imm.user.model.request.UserStatisticReq;
+
+
+@Repository
+/**
+ * The Interface UserStatisticMapper.
+ */
+public interface UserStatisticMapper {
+
+    /**
+     * 일반회원관리
+     * 
+     * @param UserStatisticReq
+     * @return List<UserStatisticVO>
+     */
+    public List<UserStatisticVO> selectCommonMember(UserStatisticReq req);
+    
+    /**
+     * 휴먼회원관리
+     * 
+     * @param UserStatisticReq
+     * @return List<UserStatisticVO>
+     */
+    public List<UserStatisticVO> selectSleepMember(UserStatisticReq req);
+    
+    
+    /**
+     * 탈퇴회원관리
+     * 
+     * @param UserStatisticReq
+     * @return List<UserStatisticVO>
+     */
+    public List<UserStatisticVO> selectWithdrawalMember(UserStatisticReq req);
+    
+    
+    /**
+     * 현재일 기준으로 오늘/최근일주일/최근한달 가입| 탈퇴회원 통계조회
+     * 
+     * @param UserStatisticReq
+     * @return List<UserStatisticVO>
+     */
+    public List<UserNowStatisticVO> selectNowPeriodStatic(UserPeriodStatisticReq req);
+    
+    /**
+     * 기준년월로 월별 가입수/탈퇴수  리트스형
+     * 
+     * @param UserPeriodStatisticReq
+     * @return List<UserMonthStatisticListVO>
+     */
+    public List<UserMonthStatisticListVO> selectMonthPeriodStaticList(UserPeriodStatisticReq req);
+    
+    /**
+     * 기준년월로 월별 가입수/탈퇴수  막대형
+     * 
+     * @param UserPeriodStatisticReq
+     * @return List<UserMonthStatisticListVO>
+     */
+    public UserMonthStatisticFlatVO selectMonthPeriodStaticFlat(UserPeriodStatisticReq req);
+	
+}

@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.database;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.web.base.framework.database
+ *    |_ DataSource.java
+ * Multiple Datasource Annotation Class
+ * </pre>
+ *
+ * @author Han-Woong Lee, Bluedigm
+ * @date 2012. 5. 14. 오후 2:02:37
+ * @version 0.0.1
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(java.lang.annotation.ElementType.METHOD)
+public @interface DataSource {
+	DataSourceType value() default DataSourceType.DEFAULT;
+}

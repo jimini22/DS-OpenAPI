@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+xmlns:util="http://www.springframework.org/schema/util" xmlns:jee="http://www.springframework.org/schema/jee"
+xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:oxm="http://www.springframework.org/schema/oxm"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-4.0.xsd
+http://www.springframework.org/schema/jee
+http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+http://www.springframework.org/schema/oxm
+http://www.springframework.org/schema/oxm/spring-oxm-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+default-autowire="byName">
+
+	<!--  properites -->
+	<util:properties id="jdbcProps" location="classpath:/conf/property/${server.type}/jdbc.properties" />
+	
+	<!-- 	  for  @Transactional -->
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true" /> -->
+	<!-- @Service단에서 Transaction 처리도 함께 해주기 위해 transaction manager의 order는 2로 내려준다. -->
+	<tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!--  DataSource DBCP	-->
+	<bean id="defaultDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="#{jdbcProps['jdbc.driverClass']}" />
+		<property name="url" value="#{jdbcProps['jdbc.url']}" />
+		<property name="username" value="#{jdbcProps['jdbc.username']}" />
+		<property name="password" value="#{jdbcProps['jdbc.password']}" />	
+	</bean>
+	
+	<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="#{jdbcProps['jdbc.driverClass']}"/>	
+		<property name="url" value="#{jdbcProps['first.jdbc.url']}" />
+		<property name="username" value="#{jdbcProps['first.jdbc.username']}" />
+		<property name="password" value="#{jdbcProps['first.jdbc.password']}" />
+		<property name="initialSize" value="#{jdbcProps['jdbc.initialSize']}" />
+		<property name="maxActive" value="#{jdbcProps['jdbc.maxActive']}" />
+		<property name="maxIdle" value="#{jdbcProps['jdbc.maxIdle']}" />
+		<property name="minIdle" value="#{jdbcProps['jdbc.minIdle']}" />
+	</bean>
+	
+	<bean id="dataSource2" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="#{jdbcProps['jdbc.driverClass']}"/>	
+		<property name="url" value="#{jdbcProps['second.jdbc.url']}" />
+		<property name="username" value="#{jdbcProps['second.jdbc.username']}" />
+		<property name="password" value="#{jdbcProps['second.jdbc.password']}" />
+		<property name="initialSize" value="#{jdbcProps['jdbc.initialSize']}" />
+		<property name="maxActive" value="#{jdbcProps['jdbc.maxActive']}" />
+		<property name="maxIdle" value="#{jdbcProps['jdbc.maxIdle']}" />
+		<property name="minIdle" value="#{jdbcProps['jdbc.minIdle']}" />
+	</bean>
+	
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="routingDataSource" />
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL ::: "/>
+			</bean>
+		</property>
+	</bean>
+		
+	<!-- DataSource SpringFramework
+	<bean id="defaultDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>-->
+
+	<bean id="routingDataSource" class="com.wooribank.wbt3.web.base.framework.database.RoutingDataSource">
+		<property name="targetDataSources">
+			<map key-type="com.wooribank.wbt3.web.base.framework.database.DataSourceType">
+				<entry key="FIRST" value-ref="dataSource1" />
+				<entry key="SECOND" value-ref="dataSource2" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="defaultDataSource" />
+	</bean>
+
+	<!-- Transaction AOP -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="search*" read-only="true"/>
+            <tx:method name="create*" propagation="REQUIRED" rollback-for="Throwable"/>
+            <tx:method name="modify*" propagation="REQUIRED" rollback-for="Throwable"/>
+            <tx:method name="remove*" propagation="REQUIRED" rollback-for="Throwable"/>
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="Throwable"/>
+        </tx:attributes>
+    </tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="requiredTx" expression="execution(* com.wooribank.wbt3..*Service.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="requiredTx" />
+	</aop:config> 
+		
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/sqlconf/SqlMapConfig.xml" /> 
+		<property name="mapperLocations" value="classpath*:/sql/mapper/**/*.xml" />
+	</bean>
+
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+<!--  	
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.wooribank.wbt3.common.*.dao.*,sql.sample" />
+     </bean>
+-->    	
+
+	<!-- database access sql mapper scanning  -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" 
+        	value="com.wooribank.wbt3.sample.*.mapper.*, com.wooribank.wbt3.common.*.mapper.*, com.wooribank.wbt3.sample.*.dao.*, sql.mapper.*" />
+    </bean>	
+     
+</beans>

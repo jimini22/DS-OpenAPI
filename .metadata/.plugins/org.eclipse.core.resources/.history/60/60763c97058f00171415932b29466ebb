@@ -1,0 +1,13 @@
+package com.wooribank.wbt3.sample.common.i18n.service;
+
+import com.wooribank.wbt3.common.i18n.model.I18nMessage;
+import com.wooribank.wbt3.common.i18n.model.ListVo;
+
+public interface I18nService {
+
+	public I18nMessage inquireMessage(String code, String language);
+
+
+	public ListVo<I18nMessage> inquireAllMessageList();
+
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+ 	<!-- Your Simple Job's Reader / Writer / Processor Implementations -->
+	<bean id="job1Reader" class="com.bluedigm.web.batch.sample.reader.Job1Reader" scope="step">
+		<property name="id" value="#{jobParameters['id']}" />
+	</bean>
+	<bean id="job1Processor" class="com.bluedigm.web.batch.sample.processor.Job1Processor" scope="step" />
+	<bean id="job1Writer" class="com.bluedigm.web.batch.sample.writer.Job1Writer" scope="step" />
+	
+	<!-- Custom Job 1 -->
+	<batch:job id="job1">
+		<batch:step id="step1">
+			<batch:tasklet transaction-manager="transactionManager">
+				<batch:chunk reader="job1Reader" processor="job1Processor" writer="job1Writer" commit-interval="1" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+</beans>

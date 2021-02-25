@@ -1,0 +1,87 @@
+package com.portal.common.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.hanaone.basicInfo.model.CommonCodeMapping;
+import com.hanaone.basicInfo.model.CommonInfo;
+import com.hanaone.basicInfo.model.MemberInfo;
+
+/**
+ * The interface Common code service.
+ */
+public interface CommonCodeService {
+
+	/**
+	 * Select user info.
+	 *
+	 * @param member the member
+	 * @return the member info
+	 * @throws Exception the exception
+     */
+	public MemberInfo selectUserInfo(MemberInfo member)  throws Exception;
+
+	/**
+	 * Select common code list.
+	 *
+	 * @param commonInfo the common info
+	 * @return the map
+	 * @throws Exception the exception
+     */
+	public Map<String,Object> selectCommonCodeList(CommonInfo commonInfo)  throws Exception;
+
+	/**
+	 * Select common code detail.
+	 *
+	 * @param commonInfo the common info
+	 * @return the list
+	 * @throws Exception the exception
+     */
+	public List<CommonInfo>  selectCommonCodeDetail(CommonInfo commonInfo)  throws Exception;
+
+	/**
+	 * Insert common code.
+	 *
+	 * @param commonInfo the common info
+	 * @return the int
+	 * @throws Exception the exception
+     */
+	public int insertCommonCode(CommonInfo commonInfo)  throws Exception;
+
+	/**
+	 * Update common code.
+	 *
+	 * @param commonInfo the common info
+	 * @return the int
+	 * @throws Exception the exception
+     */
+	public int updateCommonCode(CommonInfo commonInfo)  throws Exception;
+
+	/**
+	 * Select mapping code.
+	 *
+	 * @param mapping the mapping
+	 * @return the common code mapping
+	 * @throws Exception the exception
+     */
+	public CommonCodeMapping selectMappingCode(CommonCodeMapping mapping) throws Exception;
+
+	/**
+	 * Select relative sub code by param.
+	 *
+	 * @param mapping the mapping
+	 * @return the list
+	 * @throws Exception the exception
+     */
+	public List<CommonInfo> selectRelativeSubCodeByParam (CommonCodeMapping mapping) throws Exception;
+
+	/**
+	 * Insert mapping code.
+	 *
+	 * @param mapping the mapping
+	 * @return the int
+	 * @throws Exception the exception
+     */
+	public int insertMappingCode (CommonCodeMapping mapping) throws Exception;
+	
+}

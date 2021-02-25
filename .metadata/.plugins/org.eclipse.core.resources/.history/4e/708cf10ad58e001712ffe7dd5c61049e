@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.web.ui.pagination;
+
+/**
+ * @Class Name : DefaultPaginationRenderer.java
+ * @Description : 페이징 리스트의 기본적인 포맷을 제공한다.  
+ * 이를 위해 AbstractPaginationRenderer의 클래스 변수들의 값을 세팅한다.  
+ * 화면에서 아래와 같이 display 된다.  
+ * 
+ * [처음][이전] 1 2 3 4 5 6 7 8 [다음][마지막]
+ * 
+ * 클래스 변수들이 각 element와 다음과 같이 매핑이 된다.
+ * firstPageLabel = [처음]
+ * previousPageLabel = [이전]
+ * currentPageLabel = 현재 페이지 번호
+ * otherPageLabel = 현재 페이지를 제외한 페이지 번호
+ * nextPageLabel = [다음]
+ * lastPageLabel = [마지막]
+ * 
+ * @Modification Information
+ * @
+ * @  수정일         수정자                   수정내용
+ * @ -------    --------    ---------------------------
+ * @ 2009. 2. 4.    함철          최초 생성
+ *
+ *  @author 실행환경 개발팀 함철
+ *  @since 2009. 2. 4.
+ *  @version 1.0
+ *  
+ */
+public class DefaultPaginationRenderer extends AbstractPaginationRenderer {
+	
+	public DefaultPaginationRenderer() {
+		firstPageLabel = "<a href=\"#\" onclick=\"{0}({1}); return false;\">{2}... </a>&#160;"; 
+        previousPageLabel = "<a href=\"#\" onclick=\"{0}({1}); return false;\"><<</a>&#160;";
+        currentPageLabel = "<strong>{0}</strong>&#160;";
+        otherPageLabel = "<a href=\"#\" onclick=\"{0}({1}); return false;\">{2}</a>&#160;";
+        nextPageLabel = "<a href=\"#\" onclick=\"{0}({1}); return false;\">>></a>&#160;";
+        lastPageLabel = "<a href=\"#\" onclick=\"{0}({1}); return false;\"> ...{2}</a>&#160;";
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.util.ui.pagination.AbstractPaginationRenderer#renderPagination(com.wooribank.wbt3.web.base.framework.util.ui.pagination.PaginationInfo, java.lang.String)
+	 */
+	@Override
+	public String renderPagination(PaginationInfo paginationInfo,
+			String jsFunction) {
+		
+		return super.renderPagination(paginationInfo, jsFunction);
+	}
+
+}

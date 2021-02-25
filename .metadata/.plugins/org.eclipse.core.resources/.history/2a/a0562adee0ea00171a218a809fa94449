@@ -1,0 +1,744 @@
+package com.wooribank.wbt3.act.friend.controller.rest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wooribank.wbt3.act.common.service.ActSessionService;
+import com.wooribank.wbt3.act.friend.model.request.AddFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.ChangeFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.ChangeUserNameReq;
+import com.wooribank.wbt3.act.friend.model.request.ClearNewFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.CreateFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.FindFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.RemoveFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.RemoveRecommendFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SearchChangedProfileFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SearchRecommendFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendBlockReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendDeleteReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendFavoriteReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendHideReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendNewReq;
+import com.wooribank.wbt3.act.friend.model.request.SyncContactReq;
+import com.wooribank.wbt3.act.friend.model.response.AddFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.ChangeUserNameRes;
+import com.wooribank.wbt3.act.friend.model.response.ClearNewFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.DistanceFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.FindFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.FriendsGroupRes;
+import com.wooribank.wbt3.act.friend.model.response.FriendsSimpleInfoRes;
+import com.wooribank.wbt3.act.friend.model.response.ListFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.RemoveRecommendFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SearchChangedProfileFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SearchRecommendFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendBlockRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendDeleteRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendFavoriteRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendHideRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendNewRes;
+import com.wooribank.wbt3.act.friend.model.response.SyncContactRes;
+import com.wooribank.wbt3.act.friend.service.FriendService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import springfox.documentation.annotations.ApiIgnore;
+
+/**
+ * <pre>
+* com.wooribank.wbt3.act.friend.controller.rest
+*   |_ UserFriendRestController.java
+ * </pre>
+ * 
+ * 1. 업무명 : 친구 관리 2. 단위 업무명 : 친구 관리
+ * 
+ * @Class : UserFriendRestController
+ * @Author : 최판광(BD)
+ * @Since : 2017. 10. 19. 오전 9:46:13
+ * @Version : 1.0 Copyright (c) WOORI BANK.
+ *          -------------------------------------------------------------------
+ *          Modification Information
+ *          -------------------------------------------------------------------
+ *          수정일 수정자 수정 내용 2017. 11. 01 전희진(BD) 개발
+ *          -------------------------------------------------------------------
+ *          2017. 10. 19. 최판광(BD) [WBT3] 최초 생성
+ */
+@Slf4j
+@RestController
+@RequestMapping(value = "act/friend")
+@Api(value = "UserFriendRestController", description = "회원 > 친구관리")
+@PropertySource({ "classpath:conf/property/${server.type}/application.properties" })
+// @PropertySource(name = "property", value =
+// {"file:${home.dir}/${component.name}/conf/property/${server.type}/system.properties"})
+public class UserFriendRestController{
+
+    @Autowired
+    private FriendService friendService;
+    
+    @Autowired
+    private ActSessionService actSessionService;
+
+    /**
+     * 개요: 3.1.1 친구 목록 동기화
+     * 
+     * @history
+     * @Method : syncContact
+     * @param SyncContactReq
+     *            : deviceKey, certiKey, list(휴대폰 전화번호 리스트), osType, language,
+     *            locale, version
+     * @return
+     */
+    @ApiOperation(value = "3.1.1 친구 목록 동기화")
+    @RequestMapping(value = "/sync/contact", method = RequestMethod.POST)
+    public SyncContactRes syncContact(@Valid @RequestBody SyncContactReq req,
+            @RequestHeader(value = "certiKey", required = true) String certiKey,
+            @RequestHeader(value = "deviceKey", required = true) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+        log.debug("SyncContactRes {}", "start");
+
+        SyncContactRes res = new SyncContactRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+
+        req.setCertiKey(certiKey);
+        req.setDeviceKey(deviceKey);
+
+        res = friendService.syncContact(req);
+
+        log.debug("SyncContactRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.2 친구 추가
+     * useridxList 로 넘어온 친구리스트를 가지고 회원정보(친구정보) 를 조회한다.
+     * 조회한 리스트 정보에서  숨김/차단/삭제 일경우 친구로 업데이트한다.
+     * 친구일경우 패스한다.
+     * 등록친구가 아닌경우 WBT3_IMM002TM 인서트한다.
+     * 등록후 myUserInfo, 친구리스트조회 (addFriendInfoList) 한다.
+     * @history
+     * @Method : addFriend
+     * @param AddFriendReq
+     *            : useridx, deviceKey, certiKey, osType, language, locale,
+     *            version
+     * @return
+     */
+    @ApiOperation(value = "3.1.2 친구 추가")
+    @RequestMapping(value = "/adds", method = RequestMethod.POST)
+    public AddFriendRes addFriend(@Valid @RequestBody AddFriendReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("addFriend start [{}]", certiKey);
+
+        AddFriendRes res = new AddFriendRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);        
+        
+        req.setCertiKey(certiKey);
+        res = friendService.addFriend(req);
+
+        log.debug("addFriend end {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.3 친구찾기
+     * 검색아이디(searchId)로 단건조회한다. 
+     * 조회한 useridx롤 프로필리스트정보를 조회한다.
+     *
+     * @history
+     * @Method : findFriend
+     * @param findFriendReq
+     *            : id, certiKey, deviceKey, language, locale, version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.3 친구 찾기")
+    @RequestMapping(value = "/finds", method = RequestMethod.POST)
+    public FindFriendRes findFriend(@Valid @RequestBody FindFriendReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("findFriend {}", "start");
+       
+        FindFriendRes res = new FindFriendRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.findFriend(req);
+
+        log.debug("findFriend {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.4 새친구 목록 추가/삭제
+     * 
+     * @history
+     * @Method : setFriendNew
+     * @param setFriendNewReq
+     *            : id, certiKey, deviceKey, language, locale, version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.4 새친구 목록 추가/삭제")
+    @RequestMapping(value = "/recentlys", method = RequestMethod.POST)
+    public SetFriendNewRes setFriendNew(@RequestBody SetFriendNewReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SetFriendNewRes {}", "start");
+
+        SetFriendNewRes res = new SetFriendNewRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+       
+        req.setCertiKey(certiKey);
+        res = friendService.setFriendNew(req);
+
+        log.debug("SetFriendNewRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.5 새친구 리스트 초기화
+     * useridx 로 WBT3_IMM002TM 의 NEW_ADD_FRND_YN = 'N' 로  업데이트한다.
+     * 
+     * @history
+     * @Method : clearNewFriend
+     * @param ClearNewFriendReq
+     *            : id, certiKey, deviceKey, language, locale, version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.5 새친구 리스트 초기화")
+    @RequestMapping(value = "/recentlys/clear", method = RequestMethod.POST)
+    public ClearNewFriendRes clearNewFriend(@RequestBody ClearNewFriendReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("ClearNewFriend  {}", "start");
+
+        ClearNewFriendRes res = new ClearNewFriendRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.clearNewFriend(req);
+
+        log.debug("ClearNewFriend  {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.6 차단 목록 추가/삭제
+     * action 값이  add 일때 친구관리유형코드(FRND_MNG_TPCD = 3 ) 업데이트
+     * action 값이  del  일때 친구관리유형코드(FRND_MNG_TPCD = 1 ) 업데이트
+     * @history
+     * @Method : setFriendBlock
+     * @param SetFriendBlockReq
+     *            : useridx, action, certiKey, deviceKey, language, locale,
+     *            version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.6 차단 목록 추가/삭제")
+    @RequestMapping(value = "/blocks", method = RequestMethod.POST)
+    public SetFriendBlockRes setFriendBlock(@Valid @RequestBody SetFriendBlockReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SetFriendBlockRes {}", "start");
+
+        SetFriendBlockRes res = new SetFriendBlockRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.setFriendBlock(req);
+
+        log.debug("SetFriendBlockRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.7 삭제 친구 목록 추가/삭제
+     * action 값이  add 일때 친구관리유형코드(FRND_MNG_TPCD = 4 ) 업데이트
+     * action 값이  del  일때 친구관리유형코드(FRND_MNG_TPCD = 1 ) 업데이트
+     * @history
+     * @Method : setFriendDelete
+     * @param SetFriendDeleteReq
+     *            : useridx, action, certiKey, deviceKey, language, locale,
+     *            version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.7 삭제 친구 목록 추가/삭제")
+    @RequestMapping(value = "/removes", method = RequestMethod.POST)
+    public SetFriendDeleteRes setFriendDelete(@Valid @RequestBody SetFriendDeleteReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SetFriendDeleteRes {}", "start");
+
+        SetFriendDeleteRes res = new SetFriendDeleteRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.setFriendDelete(req);
+
+        log.debug("SetFriendDeleteRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.8 즐겨찾기 친구 등록/삭제
+     * 초기화(즐겨찾기 친구여부 N, 회원정렬순번 0 으로 업데이트
+     * useridxList의 정보를 가지고 즐겨찾기친구여부와 친구회원정렬순번을 업데이트한다.
+     * 
+     * @history
+     * @Method : setFriendFavorite
+     * @param SetFriendFavoriteReq
+     *            : useridx, action, certiKey, deviceKey, language, locale,
+     *            version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.8 즐겨찾기 친구 등록/삭제")
+    @RequestMapping(value = "/favorites", method = RequestMethod.POST)
+    public SetFriendFavoriteRes setFriendFavorite(@Valid @RequestBody SetFriendFavoriteReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+        log.debug("SetFriendFavoriteRes {}", "start");
+
+        SetFriendFavoriteRes res = new SetFriendFavoriteRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.setFriendFavorite(req);
+
+        log.debug("SetFriendFavoriteRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.9 숨김 친구 등록/삭제
+     * action 값이  add 일때 친구관리유형코드(FRND_MNG_TPCD = 2 ) 업데이트
+     * action 값이  del  일때 친구관리유형코드(FRND_MNG_TPCD = 1 ) 업데이트
+     * @history
+     * @Method : setFriendHide
+     * @param SetFriendHideReq
+     *            : useridx, action, certiKey, deviceKey, language, locale,
+     *            version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.9 숨김 친구 등록/삭제")
+    @RequestMapping(value = "/hides", method = RequestMethod.POST)
+    public SetFriendHideRes setFriendHide(@Valid @RequestBody SetFriendHideReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SetFriendHideRes {}", "start");
+
+        SetFriendHideRes res = new SetFriendHideRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+
+        req.setCertiKey(certiKey);
+        res = friendService.setFriendHide(req);
+
+        log.debug("SetFriendHideRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.10 친구의 대화명 변경
+     * useridx,userName 로 WBT3_IMM002TM  FRND_ALS_NM 별칭명 업데이트
+     * @history
+     * @Method : changeUserName
+     * @param ChangeUserNameReq
+     *            : useridx, userName, certiKey, deviceKey, language, locale,
+     *            version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.10 친구의 대화명 변경")
+    @RequestMapping(value = "/name/change", method = RequestMethod.POST)
+    public ChangeUserNameRes changeUserName(@Valid @RequestBody ChangeUserNameReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("ChangeUserNameRes {}", "start");
+
+        ChangeUserNameRes res = new ChangeUserNameRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+
+        req.setCertiKey(certiKey);
+        res = friendService.changeUserName(req);
+
+        log.debug("ChangeUserNameRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.11 추천친구 목록 조회(recommendFriends2)
+     * searchType이 0인경우 일반회원 1인경우 꿀파트너 조회
+     * 일반회원조회기준 내친구중에서 나를 친구로 등록하지않은 회원조회
+     * 꿀파트너는 조회기준 공시계정,비즈홈(4,5) 중에서 내가 친구로 등록하지 않은 회원조회 
+     * @history
+     * @Method : recommendFriends2
+     * @param SearchRecommendFriendsReq
+     *            : certiKey, deviceKey, language, locale, version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.11 추천친구 목록 조회")
+    @RequestMapping(value = "/recommends", method = RequestMethod.POST)
+    public SearchRecommendFriendsRes recommendFriends2(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SearchRecommendFriendsRes {}", "start");
+
+        SearchRecommendFriendsRes res = new SearchRecommendFriendsRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.searchRecommendFriends(req);
+
+        log.debug("SearchRecommendFriendsRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.12 추천친구 목록 검색(resRecommendFriendsFind)
+     * keyword로 searchType이 0인경우 일반회원 1인경우 꿀파트너 조회
+     * 기준은 3.1.11 참조
+     * 페이징처리 있음 
+     * @history
+     * @Method : resRecommendFriendsFind
+     * @param FindRecommendFriendsReq
+     *            : certiKey,keyword, limit, page
+     * @return SearchRecommendFriendsRes
+     */
+    @ApiOperation(value = "3.1.12 추천친구 목록 검색")
+    @RequestMapping(value = "/recommend/finds", method = RequestMethod.POST)
+    public SearchRecommendFriendsRes resRecommendFriendsFind(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("FindRecommendFriendsRes {}", "start");
+
+        SearchRecommendFriendsRes res = new SearchRecommendFriendsRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res=friendService.findRecommendFriends(req);
+
+        log.debug("FindRecommendFriendsRes {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.13 추천친구 목록 삭제(removeRecommendFriend2)
+     * (삭제대상)
+     * @history
+     * @Method : removeRecommendFriend
+     * @param RemoveRecommendFriendsReq
+     * @return
+     */
+    @ApiOperation(value = "3.1.13 추천친구 목록 삭제")
+    @RequestMapping(value = "/recommend/remove", method = RequestMethod.POST)
+    public RemoveRecommendFriendsRes removeRecommendFriend(@Valid@RequestBody RemoveRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request)
+            throws Exception {
+
+        log.debug("removeRecommendFriend {}", "start");
+
+        RemoveRecommendFriendsRes res = new RemoveRecommendFriendsRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res=friendService.removeRecommendFriend(req);
+
+        log.debug("removeRecommendFriend {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.14 (신규) 친구 그룹 생성 (createFriendsGroup)
+     * groupName 생성할 그룹명 WBT3_IMM013TM 생성 일반회원은 관리번호가 100번대로 시작
+     * useridxList 그룹내 친구리스트 WBT3_IMM002TM 기준으로 친구그룹관리번호  = 1기준 정보로 저장
+     * @history
+     * @Method : createFriendsGroup
+     * @param CreateFriendsGroupReq
+     *            : groupName, osType, language, locale, version
+     * @return
+     */
+    @ApiOperation(value = "3.1.14 (신규) 친구 그룹 생성")
+    @RequestMapping(value = "/group/create", method = RequestMethod.POST)
+    public FriendsGroupRes createFriendsGroup(@Valid@RequestBody CreateFriendsGroupReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("createFriendsGroup {}", "start");
+
+        FriendsGroupRes res = new FriendsGroupRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+
+        req.setCertiKey(certiKey);
+        res = friendService.createFriendsGroup(req);
+
+        log.debug("createFriendsGroup {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.15 (신규) 친구 그룹 삭제 (removeFriendsGroup)
+     * 삭제할 그룹아이디로 WBT3_IMM002TM 물리적 삭제 
+     *  삭제할 그룹아이디로 WBT3_IMM013TM 물리적 삭제
+     * @history
+     * @Method : removeFriendsGroup
+     * @param RemoveFriendsGroupReq
+     *            : groupName, osType, language, locale, version
+     * @return FriendsGroupRes
+     */
+    @ApiOperation(value = "3.1.15 (신규) 친구 그룹 삭제")
+    @RequestMapping(value = "/group/remove", method = RequestMethod.POST)
+    public FriendsGroupRes removeFriendsGroup(@Valid@RequestBody RemoveFriendsGroupReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("removeFriendsGroup {}", "start");
+
+        FriendsGroupRes res = new FriendsGroupRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.removeFriendsGroup(req);
+
+        log.debug("removeFriendsGroup {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.16 (신규) 친구 그룹 변경 (changeFriendsGroup)
+     * 
+     * @history
+     * @Method : changeFriendsGroup
+     * @param ChangeFriendsGroupReq
+     *            : groupName, osType, language, locale, version
+     * @return : FriendsGroupRes
+     */
+    @ApiOperation(value = "3.1.16 (신규) 친구 그룹 변경")
+    @RequestMapping(value = "/group/modify", method = RequestMethod.POST)
+    public FriendsGroupRes changeFriendsGroup(@Valid@RequestBody ChangeFriendsGroupReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("changeFriendsGroup {}", "start");
+        FriendsGroupRes res = new FriendsGroupRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.changeFriendsGroup(req);
+        log.debug("changeFriendsGroup {}", "end");
+
+
+        return res;
+    }
+    
+    
+    /**
+     * 개요: 3.1.17 (신규) 프로필 변경 친구 조회 (change)
+     * 
+     * @history
+     * @Method : searchChangedProfileFriends
+     * @param SearchChangedProfileFriendsReq
+     *            : groupName, osType, language, locale, version
+     * @return : SearchChangedProfileFriendsRes
+     */
+    @ApiOperation(value = "3.1.17 (신규) 프로필 변경 친구 조회")
+    @RequestMapping(value = "/change", method = RequestMethod.POST)
+    public SearchChangedProfileFriendsRes searchChangedProfileFriends(@Valid@RequestBody SearchChangedProfileFriendsReq req,
+                                            @RequestHeader(value = "certiKey", required = false) String certiKey,
+                                            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+                                            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("searchChangedProfileFriends {}", "start");
+        SearchChangedProfileFriendsRes res = new SearchChangedProfileFriendsRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.searchChangedProfileFriends(req);
+        log.debug("searchChangedProfileFriends {}", "end");
+
+
+        return res;
+    }
+    
+    /**
+     * 개요: 3.1.18 친구리스트조회 
+     * 
+     * @history
+     * @Method : listFriends
+     * @param SearchRecommendFriendsReq
+     *            : certiKey, deviceKey, language, locale, version, osType
+     * @return
+     */
+    @ApiOperation(value = "3.1.18 친구리스트조회")
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    public ListFriendRes searchListFriends(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("SearchListFriends {}", "start");
+
+        ListFriendRes res = new ListFriendRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.searchListFriends(req);
+
+        log.debug("SearchListFriends {}", "end");
+
+        return res;
+    }
+    
+    /**
+     * 개요: 3.1.19 친구위치정보 조회 
+     * 
+     * @history
+     * @Method : listFriends
+     * @param SearchRecommendFriendsReq
+     *            : certiKey, deviceKey, language, locale, version, osType
+     * @return DistanceFriendRes
+     */
+    @ApiOperation(value = "3.1.19 친구위치정보 조회")
+    @RequestMapping(value = "/location", method = RequestMethod.POST)
+    public DistanceFriendRes friendsLocationList(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("FriendsLocationList {}", "start");
+
+        DistanceFriendRes res = new DistanceFriendRes();
+        
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res = friendService.friendsLocationList(req);
+
+        log.debug("FriendsLocationList {}", "end");
+
+        return res;
+    }
+    
+    
+    /**
+     * 개요: 3.1.20 근거리 추천친구 조회(RecommandFriendsLocationList)
+     * 
+     * @history
+     * @Method : resRecommendFriendsFind
+     * @param SearchRecommendFriendsReq
+     *            : certiKey,keyword, limit, page
+     * @return DistanceFriendRes
+     */
+    @ApiOperation(value = "3.1.20 근거리 추천친구 조회")
+    @RequestMapping(value = "/location/recommend", method = RequestMethod.POST)
+    public DistanceFriendRes recommandFriendsLocationList(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("RecommandFriendsLocationList {}", "start");
+
+        DistanceFriendRes res = new DistanceFriendRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        res=friendService.recommandFriendsLocationList(req);
+
+        log.debug("RecommandFriendsLocationList {}", "end");
+
+        return res;
+    }
+
+    /**
+     * 개요: 3.1.21 근거리 추천친구 조회(RecommandFriendsLocationList)
+     * 
+     * @history
+     * @Method : resRecommendFriendsFind
+     * @param SearchRecommendFriendsReq
+     *            : certiKey,keyword, limit, page
+     * @return DistanceFriendRes
+     */
+    @ApiOperation(value = "3.1.21 전체친구의 기본항목 리스트 조회")
+    @RequestMapping(value = "/list/simpleinfo", method = RequestMethod.POST)
+    public FriendsSimpleInfoRes searchFriendSimpleInfo(@Valid@RequestBody SearchRecommendFriendsReq req,
+            @RequestHeader(value = "certiKey", required = false) String certiKey,
+            @RequestHeader(value = "deviceKey", required = false) String deviceKey,
+            @ApiIgnore HttpServletRequest request) throws Exception {
+
+        log.debug("searchFriendSimpleInfo {}", "start");
+
+        FriendsSimpleInfoRes res = new FriendsSimpleInfoRes();
+
+        certiKey = actSessionService.checkUserSession(request,certiKey);
+        
+        req.setCertiKey(certiKey);
+        req.setDeviceKey(deviceKey);
+        res=friendService.searchFriendSimpleInfo(req);
+
+        log.debug("searchFriendSimpleInfo {}", "end");
+
+        return res;
+    }
+}

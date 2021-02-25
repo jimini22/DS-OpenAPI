@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.portal.common.mapper.CommonCodeMapper">
+
+	<select id="topPage">
+		SELECT A.* 
+		  FROM 
+		       (SELECT @ROWNUM:=@ROWNUM + 1 AS ROW , 
+		              A.* 
+		         FROM  
+		              (
+	</select>
+	
+	<select id="bottomPage">
+	             ) A,(SELECT @ROWNUM := 0) B 
+		       ) A 
+		 WHERE A.ROW BETWEEN ${fistIndex} AND ${lastIndex}
+	</select>
+
+
+	<select id="selectCommonCodeList" resultType="com.portal.common.model.CommonInfo" parameterType="com.portal.common.model.CommonInfo">
+		select 
+		sno,name,det,addr,tel from student_tb
+	</select>
+	
+	
+	
+	
+</mapper>

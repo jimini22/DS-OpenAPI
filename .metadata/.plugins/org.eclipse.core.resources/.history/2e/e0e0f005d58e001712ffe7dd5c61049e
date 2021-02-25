@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.core;
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.core
+*   |_ ExceptionCodeBaseConstants.java
+* </pre>
+* 
+* 클래스 역할 설명 : Exception 별 Message Code 시작 문자열 정의
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 23. 오후 11:20:35
+* @Version : 
+*/
+public class ExceptionCodeBaseConstants {
+	/**
+	 * Admin Module Error Code Base String
+	 */
+	public static final String ADMIN_BASE	=	"EADM";
+	/**
+	 * RESTful API Module Error Code Base String
+	 */	
+	public static final String API_BASE		=	"EAPI";
+	/**
+	 * Batch Module Error Code Base String
+	 */		
+	public static final String BATCH_BASE	=	"EBAT";
+	/**
+	 * BusinessI Module Error Code Base String
+	 */		
+	public static final String BIZ_BASE		=	"EBIZ";
+	/**
+	 * Common Module Error Code Base String
+	 */	
+	public static final String COMMON_BASE	=	"ECMN";
+	/**
+	 * Front Module Error Code Base String
+	 */	
+	public static final String FRONT_BASE	=	"EFRO";
+	/**
+	 * Library Module Error Code Base String
+	 */	
+	public static final String LIBRARY_BASE	=	"ELIB";
+
+}

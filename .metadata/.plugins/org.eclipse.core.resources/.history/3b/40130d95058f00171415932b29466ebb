@@ -1,0 +1,40 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+package com.wooribank.wbt3.sample.books.dao.impl;
+
+import java.util.HashMap;
+
+import org.springframework.stereotype.Repository;
+
+import com.wooribank.wbt3.sample.books.dao.MagazineDao;
+import com.wooribank.wbt3.sample.books.model.Magazine;
+import com.wooribank.wbt3.web.base.framework.dao.impl.GenericDaoImpl;
+
+
+/**
+ * The Class MagazineDaoImpl.
+ */
+@Repository
+public class MagazineDaoImpl extends GenericDaoImpl<Magazine, HashMap<String, Object>> implements MagazineDao {
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.MagazineDao#selectMagazine(java.lang.Integer, java.lang.String)
+	 */
+	@Override
+	public Magazine selectMagazine(Integer primaryKey, String category) {
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("magazineId", primaryKey);
+		map.put("category", category);
+
+		return (Magazine) selectOne("selectMagazine", (Object) map);
+	}
+
+}

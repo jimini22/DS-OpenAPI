@@ -1,0 +1,7 @@
+package com.wooribank.wbt3.sample.common.i18n.support;
+
+public interface MessageSource {
+
+	public String getMessage(String code, String locale);
+
+}

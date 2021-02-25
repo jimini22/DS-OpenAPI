@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+ 	<!-- Scheduler For Custom Jobs -->
+    <bean id="myScheduler1" class="com.bluedigm.web.batch.sample.scheduler.MyScheduler1">
+        <property name="job" ref="job1" />
+        <property name="launcher" ref="jobLauncher"/>
+    </bean>
+
+    <bean id="myScheduler2" class="com.bluedigm.web.batch.sample.scheduler.MyScheduler2">
+        <property name="job" ref="flat2dbContactLoad" />
+        <property name="launcher" ref="jobLauncher"/>
+    </bean>
+    
+	<!-- Custom Scheduling for Custom Jobs, using crontab style -->  
+	<!--  
+	<task:scheduled-tasks>
+		<task:scheduled ref="myScheduler1" method="runJob" cron="*/5 * * * * *"/>
+		<task:scheduled ref="myScheduler2" method="runJob" cron="*/10 * * * * *"/>
+	</task:scheduled-tasks>
+	-->
+</beans>

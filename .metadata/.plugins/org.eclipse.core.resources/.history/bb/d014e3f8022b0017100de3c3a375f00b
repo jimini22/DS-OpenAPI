@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.book.service;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+/**
+ * <pre>
+ * com.bluedigm.web.sample.book.service
+ *   |_ BookServiceTest.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : Jeon, Gilsu<youmahil@bluedigm.com>
+ * @Date    : 2017. 4. 27. 오후 1:28:19
+ * @Version : 
+ */
+
+public class BookServiceTest {
+
+	protected void setUp() throws Exception {
+		mock = createMock(SampleBiz.class);
+		sampleService = new SampleServiceImpl();
+		sampleService.setSampleBiz(mock);
+	}
+	
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

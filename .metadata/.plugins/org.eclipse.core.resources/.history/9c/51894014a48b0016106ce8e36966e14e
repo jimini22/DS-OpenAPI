@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-4.0.xsd
+http://www.springframework.org/schema/jee
+http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+http://www.springframework.org/schema/oxm 
+http://www.springframework.org/schema/oxm/spring-oxm-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+	default-autowire="byName"> 
+
+	<!-- messageSource에 사용될 message properties 파일을 등록 -->
+	<util:list id="messageBasenames" list-class="java.util.LinkedList">
+		<!--  
+		<value>classpath:/conf/messages/info/messages</value>
+		-->
+		<value>classpath:/conf/messages/sample/sample</value>
+	</util:list>
+	
+	<!-- *.properties Access Bean -->
+	<util:properties id="appPropConfig" location="classpath*:/conf/property/${server.type}/*.properties"/>
+		
+	<util:map id="dataSourceMapNames" key-type="com.bluedigm.web.base.framework.database.DataSourceType">
+		<!-- <entry key="FIRST" value-ref="firstDataSource" />
+		<entry key="SECOND" value-ref="secondDataSource" /> -->
+	</util:map>
+</beans>

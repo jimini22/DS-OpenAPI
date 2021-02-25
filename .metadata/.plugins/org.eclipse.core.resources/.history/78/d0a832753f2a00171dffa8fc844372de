@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.bluedigm.web.sample</groupId>
+    <artifactId>bdweb-sample</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+	<artifactId>bdweb-splibinst</artifactId>
+	<packaging>jar</packaging>
+	<name>Install Your Special Library to Local Maven Repository</name>
+	<dependencies>
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.1</version>
+				<executions>
+          			<!-- Oracle JDBC Driver : Start-->
+					<execution>
+						<id>install-oracle-jdbc-lib</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<groupId>com.oracle</groupId>
+							<artifactId>ojdbc6</artifactId>
+							<version>11.1.0.7.0</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/special-libs/ojdbc6-11.1.0.7.0.jar</file>
+						</configuration>
+					</execution>
+          			<!-- Oracle JDBC Driver : End -->
+          
+					<!-- MSSQL JDBC Driver : Start -->
+					<execution>
+						<id>install-sqljdbc4-lib</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<groupId>com.microsoft.sqlserver</groupId>
+							<artifactId>sqljdbc4</artifactId>
+							<version>4.0</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/special-libs/sqljdbc4.jar</file>
+						</configuration>
+					</execution>
+					<!-- MSSQL JDBC Driver : End -->
+																	
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>local</id>
+			<properties>
+			</properties>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<properties>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+			</properties>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+		</profile>
+	</profiles>
+</project>

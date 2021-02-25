@@ -1,0 +1,30 @@
+package com.portal.common.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.hanaone.basicInfo.service.CommonCodeService;
+
+
+
+@Controller
+public class WelcomeController {
+	
+	@Autowired
+	private CommonCodeService commonCodeService;
+
+ @RequestMapping("/hello")
+ public ModelAndView hello() {
+  String msg = "Hello, World!";
+  return new ModelAndView("index", "msg", msg);
+ }
+ 
+ @RequestMapping("/test1")
+ public ModelAndView test1() {
+  String msg = "Hello, World!";
+  return new ModelAndView("index", "msg", msg);
+ }
+}
+ 

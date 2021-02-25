@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wooribank.wbt3.act.friend.mapper.FriendMapper">
+
+	<!--
+		3.1.1 친구 목록 동기화 : useridx 로 새친구 목록 삭제
+		@param : useridx
+		@return : FriendGroupInfoVO
+	-->
+	<update id="deleteNewFriends" parameterType = "long" >
+		
+		<![CDATA[
+		
+			UPDATE 
+				WBT3_IMM002TM 
+			SET
+				NEW_ADD_FRND_YN = 'N'
+			
+			WHERE
+				MBH_IDX_NO = #{useridx}	AND			/* 회원_인덱스_번호 */
+				NEW_ADD_FRND_YN = 'Y'				/* 신규_추가_친구_여부 */
+		]]>
+	</update>
+
+
+	<!--
+		3.1.2 친구 추가 : useridx 의 친구 목록에 friends = [friendidx...] 를 추가한다.  
+		@param : friendsIndexList
+		@return : int
+	-->
+	<insert id="insertFriendInfo" parameterType="com.wooribank.wbt3.act.friend.model.data.FriendGroupInfoVO" >
+		<![CDATA[
+			
+			INSERT INTO WBT3_IMM002TM( /* 위비톡친구기본 TABLE */
+					 MBH_IDX_NO				/* 회원 인덱스 번호 */
+					,FRND_MBH_IDX_NO		/* 친구 회원 인덱스 번호 */
+					,FRND_GRP_MNG_NO		/* 친구 그룹 관리 번호 */
+					,CNAD_FRND_YN			/* 연락처_친구_여부 */
+					,FRND_MNG_TPCD			/* 친구 관리 유형 코드 */
+					,FRND_ALS_NM		    /* 친구 별칭 명 */
+					,FAVT_FRND_YN			/* 즐겨찾기 친구 여부 */
+					,NEW_ADD_FRND_YN		/* 신규 추가 친구 여부 */ 
+					,FRND_MBH_SORT_SQNO	    /* 신규 회원 정렬 순번 */
+					,FRND_RGS_DTM			/* 친구 등록 일시 */
+			) SELECT
+					#{useridx}											/* 회원 인덱스 번호 */
+					,#{friendsUserIndexNum}	 						    /* 친구 회원 인덱스 번호 */		
+					,#{friendsGroupManageNum}					 	    /* 친구 그룹 관리 번호 */
+					,#{contactFriendYN}						 			/* 연락처_친구_여부 */
+					,#{friendsManageTypeCode}					 	    /* 친구 관리 유형 코드 */
+					,#{friendNickName}								 	/* 친구 별칭 명 */
+					,#{favoriteFriendYN}								/* 즐겨찾기 친구 여부 */
+					,#{newFriendYN}									 	/* 신규 추가 친구 여부 */
+					,ifnull(MAX(FRND_MBH_SORT_SQNO), 0) + 1	            /* 신규 회원 정렬 순번 */
+					,DATE_FORMAT(NOW(), '%Y%m%d%l%i%s' )	            /* 친구 등록 일시 */
+				FROM 
+					WBT3_IMM002TM
+				WHERE MBH_IDX_NO = #{useridx}
+		]]>
+	</insert>
+	
+
+		
+	<!--
+		3.1.3 : 친구 찾기
+		@param : FriendGroupInfoVO
+		@return : UserInfo
+	-->
+	<select id="selectFriend" parameterType ="com.wooribank.wbt3.act.friend.model.data.FriendGroupInfoVO" resultType="com.wooribank.wbt3.act.common.model.UserInfo">
+			SELECT 
+					USERINFO.MBH_IDX_NO									AS useridx,   							/*회원 인덱스 번호*/ 
+			        USERINFO.HP_NO										AS phoneNo,								/*핸드폰 번호*/
+			        USERINFO.PRFL_ALS									AS userName,							/*대화 명*/
+			        USERINFO.MBH_ID										AS userId,								/*회원 ID*/
+			        USERINFO.SRCH_XUSE_ID                               AS searchId,                            /*검색_전용_ID*/
+			        USERINFO.PRFL_SRCH_ALW_YN                           AS profileSearchFlag,                   /*프로파일_검색_허용_여부*/
+			        USERINFO.PRFL_OPBL_YN								AS publicProfileFlag,					/*프로파일 공개 여부*/
+			        USERINFO.WBBT_MBH_TPCD								AS idType, 								/*위비톡 회원 유형 코드*/
+			        /* 수정된 사용자 이름 editedName null 이면 친구의 프로파일 별칭 보여준다.*/
+					IF(FRIENDINFO.FRND_ALS_NM IS NULL , USERINFO.PRFL_ALS ,FRIENDINFO.FRND_ALS_NM) AS editedName,         
+			        USERINFO.PRFL_MSG_TEXT								AS profileMessage,						/*프로파일 메시지 내용*/
+			        USERINFO.PRFL_OPBL_ALS								AS publicProfileNmae,					/*공개프로파일 대화명*/
+			        USERINFO.PRFL_OPBL_MSG_TEXT							AS publicProfileMessage,   				/*공개프로필 메세지*/
+			        USERINFO.MBH_AMD_DTM								AS lastModifiedDate, 					/*마지막 수정일*/	
+			        IF(USERINFO.MBH_SCSS_DTM IS NULL OR USERINFO.MBH_SCSS_DTM='', 'N', 'Y')	AS isDropOut,  	/*탈퇴여부*/
+					/*, FIREND.FRND_MNG_TPCD   1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구 */  
+			 		CASE
+						WHEN FRIENDINFO.FRND_MNG_TPCD = '1' THEN 'Y' ELSE 'N' END 			AS friendFlag,        
+					CASE
+						WHEN USERINFO.MGPE_YN = 'Y' THEN 1 ELSE 0 END 							AS idAttribute 	/*어드민 계정의 속성- 0:무속성, 1:어드민 계정, 2:이벤트 계정*/            
+					,FRIENDINFO.FRND_MNG_TPCD													AS friendType	/*1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구*/
+			FROM WBT3_IMM001TM AS USERINFO
+			LEFT JOIN(
+						SELECT 
+								FRIEND.FRND_MBH_IDX_NO	AS friendIdx,
+								FRIEND.FRND_ALS_NM,
+			                    FRIEND.FRND_MNG_TPCD	
+						FROM WBT3_IMM001TM AS USER
+						JOIN WBT3_IMM002TM AS FRIEND
+						ON	 USER.MBH_IDX_NO=FRIEND.MBH_IDX_NO 		
+						AND  FRIEND.FRND_GRP_MNG_NO=1       
+			            AND  FRIEND.MBH_IDX_NO=#{useridx}
+					 ) 		AS FRIENDINFO
+			ON		USERINFO.MBH_IDX_NO			= FRIENDINFO.friendIdx
+			WHERE	USERINFO.SRCH_XUSE_ID 	    = #{searchId}
+			AND		USERINFO.PRFL_SRCH_ALW_YN 	= 'Y'
+	</select>	
+	
+	
+	
+   <!--
+        3.1.5 새 친구 리스트 초기화
+        @param : long useridx
+        @return : int
+    --> 
+    <update id="updateNewAddFrndYn" parameterType="long">
+         
+          UPDATE 
+                WBT3_IMM002TM
+          SET
+                NEW_ADD_FRND_YN ='N'
+          WHERE 
+                MBH_IDX_NO = #{useridx}
+                
+    </update>
+    
+	
+	
+	<!--
+		3.1.8 : 즐겨찾기 친구 등록 삭제 : 상태 초기화
+		@param : useridx
+		@return : FriendGroupInfoVO
+	-->
+	<update id="updateInitializeFavoriteFriends" parameterType="com.wooribank.wbt3.act.friend.model.data.FavoriteFriendInfoVO">
+		
+		<![CDATA[
+           
+            UPDATE 
+                WBT3_IMM002TM
+           
+            SET  
+				FAVT_FRND_YN		 =	#{favoriteFriendYN}		    /* 즐겨찾기 친구 여부 */
+				,FRND_MBH_SORT_SQNO  =  #{friendMemberSortSequance}	/* 친구 회원 정렬 순번 */
+           
+            WHERE
+	   			MBH_IDX_NO  		 = #{useridx}	
+	   			
+		]]>
+		
+	</update>
+	
+	
+	
+	<!--
+		3.1.8 : 즐겨찾기 친구 등록 삭제 : 상태값 변경
+		@param : useridx
+		@return : FriendGroupInfoVO
+	-->
+	<update id="updateFavoriteFriendsState" parameterType="com.wooribank.wbt3.act.friend.model.data.FavoriteFriendInfoVO">
+		<![CDATA[
+			   UPDATE 
+			   			WBT3_IMM002TM
+			   SET  
+						FAVT_FRND_YN		 =	#{favoriteFriendYN}			 /* 즐겨찾기 친구 여부 */
+						,FRND_MBH_SORT_SQNO  =  #{friendMemberSortSequance}	 /* 친구 회원 정렬 순번 */
+			   WHERE
+			   			MBH_IDX_NO = #{useridx}	AND							 /* 회원 인덱스 번호 */
+			   			FRND_MBH_IDX_NO = #{friendIndex}					 /* 친구 회원 인덱스 번호 */
+		]]>
+	</update>	
+	
+	
+	
+	<!-- 
+      3.1.11 추천친구 목록 조회 : 추천 친구리스트 가져온다
+      @param : useridx
+      @return : UserInfo
+    -->
+    <select id="selectRecommendFriendsList" parameterType="Long" resultType="com.wooribank.wbt3.act.common.model.UserInfo">
+		SELECT 
+		        USERINFO.MBH_IDX_NO                                         AS useridx,             /*회원 인덱스 번호*/ 
+		        USERINFO.HP_NO                                              AS phoneNo,             /*핸드폰 번호*/
+		        USERINFO.PRFL_ALS                                           AS userName,            /*대화 명*/
+		        USERINFO.MBH_ID                                             AS userId,              /*회원 ID*/
+		        USERINFO.PRFL_OPBL_YN                                       AS publicProfileFlag,   /*프로파일 공개 여부*/
+		        USERINFO.WBBT_MBH_TPCD                                      AS idType,              /*위비톡 회원 유형 코드*/
+		    
+		        /* 수정된 사용자 이름 editedName null 이면 친구의 프로파일 별칭 보여준다.*/
+		        
+		        USERINFO.PRFL_ALS                                           AS editedName,          /*프로파일 별칭*/
+		        USERINFO.PRFL_MSG_TEXT                                      AS profileMessage,      /*프로파일 메시지 내용*/
+		        USERINFO.PRFL_OPBL_ALS                                      AS publicProfileNmae,   /*공개프로파일 대화명*/
+		        USERINFO.PRFL_OPBL_MSG_TEXT                                 AS publicProfileMessage,/*공개프로필 메세지*/
+		        USERINFO.MBH_AMD_DTM                                        AS lastModifiedDate,    /*마지막 수정일*/   
+		       
+		        IF(USERINFO.MBH_SCSS_DTM IS NULL OR USERINFO.MBH_SCSS_DTM='', 'N', 'Y') AS isDropOut, /*탈퇴여부*/
+		        
+		        /*FIREND.FRND_MNG_TPCD   1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구   */
+		        'N'                                                           AS friendFlag,        
+		        CASE
+		              WHEN USERINFO.MGPE_YN = 'Y' THEN 1 ELSE 0 END         AS idAttribute  /*어드민 계정의 속성- 0:무속성, 1:어드민 계정, 2:이벤트 계정*/            
+		        ,NULL                                                       AS friendType   /*1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구*/
+		FROM   
+                WBT3_IMM001TM AS USERINFO
+		WHERE   
+                USERINFO.MBH_IDX_NO IN ( 
+                
+									SELECT USERINFO.MBH_IDX_NO
+									FROM    WBT3_IMM002TM USERINFO
+									WHERE   USERINFO.FRND_MBH_IDX_NO = #{useridx}
+									AND     USERINFO.FRND_GRP_MNG_NO = 1
+									AND     USERINFO.MBH_IDX_NO NOT IN
+									      (
+									          SELECT   FRIENDINFO.FRND_MBH_IDX_NO
+									          FROM     WBT3_IMM002TM FRIENDINFO
+									          WHERE    FRIENDINFO.MBH_IDX_NO = #{useridx}
+									          AND      FRIENDINFO.FRND_GRP_MNG_NO = 1
+									      ) 
+	                                )
+    </select>
+	
+	
+	
+ 	<!--
+		3.1.14 (신규) 친구 그룹 생성 : 위비톡친구그룹기본 테이블
+		@param : CreateFriendsGroupVO
+		@return : int
+	-->
+	<insert id="insertFriendsGroupOnWibeeGroup"  parameterType = "com.wooribank.wbt3.act.friend.model.data.CreateFriendsGroupVO">
+			   INSERT INTO WBT3_IMM013TM (
+						MBH_IDX_NO				/* 회원_인덱스_번호			INT(11) */
+						,FRND_GRP_MNG_NO        /* 친구_그룹_관리_번호		INT(5) */
+						,GRP_NM					/* 그룹명					VARCHAR(50) */
+						,GRP_SORT_SQNO			/* 그룹_정렬_순번 			INT(5) */
+				) SELECT 
+						#{useridx}	
+					  	, ifnull(MAX(FRND_GRP_MNG_NO), 0) + 1
+					    , #{groupName}			
+			      	    , ifnull(MAX(GRP_SORT_SQNO), 0) + 1 
+			     FROM
+			     		 WBT3_IMM013TM
+			     WHERE MBH_IDX_NO = #{useridx}
+	</insert>
+
+
+
+    <!--
+        3.1.14 (신규) 그룹에 친구 추가 : 위비톡친구기본 테이블
+        @param : CreateFriendsGroupVO
+        @return : int
+    -->
+    <insert id="insertFriendsOnWibeeGroup"  parameterType = "com.wooribank.wbt3.act.friend.model.data.FriendGroupInfoVO">
+            INSERT INTO WBT3_IMM002TM( /* 위비톡친구기본 TABLE */
+                     MBH_IDX_NO             /* 회원 인덱스 번호 */
+                    ,FRND_MBH_IDX_NO        /* 친구 회원 인덱스 번호 */
+                    ,FRND_GRP_MNG_NO        /* 친구 그룹 관리 번호 */
+                    ,CNAD_FRND_YN           /* 연락처_친구_여부 */
+                    ,FRND_MNG_TPCD          /* 친구 관리 유형 코드 */
+                    ,FRND_ALS_NM            /* 친구 별칭 명 */
+                    ,FAVT_FRND_YN           /* 즐겨찾기 친구 여부 */
+                    ,NEW_ADD_FRND_YN        /* 신규 추가 친구 여부 */ 
+                    ,FRND_MBH_SORT_SQNO     /* 신규 회원 정렬 순번 */
+                    ,FRND_RGS_DTM           /* 친구 등록 일시 */
+            ) SELECT
+                    #{useridx}                                          /* 회원 인덱스 번호 */
+                    ,FRND_MBH_IDX_NO                                     /* 친구 회원 인덱스 번호 */      
+                    ,(
+                        SELECT MAX(FRND_GRP_MNG_NO)
+                        FROM WBT3_IMM013TM
+                        WHERE MBH_IDX_NO = #{useridx}
+                     )                                                  /* 친구 그룹 관리 번호 */
+                    ,CNAD_FRND_YN                                       /* 연락처_친구_여부 */
+                    ,FRND_MNG_TPCD                                      /* 친구 관리 유형 코드 */
+                    ,FRND_ALS_NM                                        /* 친구 별칭 명 */
+                    ,FAVT_FRND_YN                                        /* 즐겨찾기 친구 여부 */
+                    ,NEW_ADD_FRND_YN                                     /* 신규 추가 친구 여부 */
+                    ,#{friendUserOrderNum}                              /* 신규 회원 정렬 순번 */
+                    ,#{friendRegistDateTime}                                                /* 친구 등록 일시 */
+                FROM 
+                        WBT3_IMM002TM
+                WHERE   MBH_IDX_NO = #{useridx}
+                AND     FRND_GRP_MNG_NO='1'
+                AND     FRND_MBH_IDX_NO=#{friendsUserIndexNum}
+    </insert>
+
+
+	
+	<!--
+		useridx 로 친구 그룹 관리 번호 조회 : 위비톡친구그룹기본 테이블
+		@param : useridx
+		@return : FriendGroupInfoVO
+	-->
+	<select id="selectFriendsGroupInfo" parameterType = "long"  resultType="com.wooribank.wbt3.act.friend.model.data.GroupInfoVO">
+		<![CDATA[
+			SELECT
+					 MBH_IDX_NO				as useridx						/* 회원 인덱스 번호 */
+					,FRND_GRP_MNG_NO		as groupId						/* 친구_그룹_관리_번호 */
+					,GRP_NM					as groupName					/* 그룹명 */
+			 FROM 
+						WBT3_IMM013TM 
+             WHERE 
+             			MBH_IDX_NO = #{useridx}
+             AND	 	FRND_GRP_MNG_NO>=2
+             ORDER BY GRP_SORT_SQNO 		 
+		]]>
+	</select>
+	
+	
+	
+	 <!--
+		3.1.15 : 친구 그룹 삭제 : 위비톡 친구그룹 기본 테이블
+		WBT3_IMM013TM에서 회원의 해당그룹을 삭제한다.
+		@param : RemoveFriendsGroupReq
+		@return : int
+	-->
+	<delete id="deleteFriendsGroupOnFriendGroup" parameterType = "com.wooribank.wbt3.act.friend.model.data.GroupInfoVO">
+		<![CDATA[
+			   DELETE FROM
+			   			WBT3_IMM013TM
+			   WHERE
+			   			MBH_IDX_NO = #{useridx}							    /* 회원 인덱스 번호 */
+			   AND  	FRND_GRP_MNG_NO = #{groupId}                        /* 친구 그룹 관리 번호 */
+			   AND	FRND_GRP_MNG_NO <> 1	
+		]]>
+	</delete>
+	
+	
+	
+	 <!--
+		3.1.15 : 친구 그룹 삭제 : 위비톡 친구 기본 테이블
+		WBT3_IMM002TM에서 회원의 해당그룹에 있는 친구들을 삭제
+		@param : RemoveFriendsGroupReq
+		@return : int
+	-->
+	<delete id="deleteFriendsGroupOnFriend" parameterType = "com.wooribank.wbt3.act.friend.model.data.GroupInfoVO">
+		<![CDATA[
+		   DELETE FROM
+		   			WBT3_IMM002TM
+		   WHERE
+		   			MBH_IDX_NO      = #{useridx} AND	
+		   			FRND_GRP_MNG_NO = #{groupId}		
+     		
+		]]>
+	</delete>
+	
+	
+	
+ 	<!--
+		3.1.16 : 친구 그룹 변경 : 위비톡친구그룹기본 테이블 
+											그룹정보 변경처리
+		WBT3_IMM013TM에서 회원의 해당 그룹의 그룹 명을 변경한다.									
+		@param : GroupInfoVO
+		@return : int
+	-->
+	<update id="updateFriendsGroupOnFriendGroup" parameterType = "com.wooribank.wbt3.act.friend.model.data.GroupInfoVO">
+		<![CDATA[
+		   UPDATE 
+		   			WBT3_IMM013TM
+		   SET  
+					GRP_NM = #{groupName}			/* 그룹명 */
+		   WHERE
+		   			MBH_IDX_NO = #{useridx}			/* 회원 인덱스 번호 */
+		   AND  	FRND_GRP_MNG_NO = #{groupId};   /* 친구 그룹 관리 번호 */
+		]]>
+	</update>
+	
+	
+	
+ 	<!--
+		3.1.16 : 친구 그룹 변경 : 위비톡 친구그룹기본 테이블
+									그룹 정렬 변경
+		WBT3_IMM013TM에서 회원의 그룹 정렬을 업데이트한다							
+		@param : GroupInfoVO
+		@return : int
+	-->
+	<update id="updateFriendsGroupOnFriendGroupSort" parameterType = "com.wooribank.wbt3.act.friend.model.data.FriendGroupInfoVO">
+	   <![CDATA[
+		   UPDATE 
+		   			WBT3_IMM013TM
+		   SET  
+					GRP_SORT_SQNO=#{groupOrderNum}			 /* 그룹 정렬 순번 */       
+		   WHERE
+		   			MBH_IDX_NO = #{useridx}					 /* 회원 인덱스 번호 */
+		 	AND	FRND_GRP_MNG_NO = #{friendsGroupManageNum};  /* 친구 그룹 관리 번호 */
+	   ]]>
+	</update>
+	
+	
+	
+ 	<!--
+		3.1.16 : 친구 그룹 변경 : 위비톡 친구기본 테이블
+		WBT3_IMM002TM에서 회원의 해당 그룹의 친구들의 정보를 다시 인서트한다.
+		@param : GroupInfoVO
+		@return : int
+	-->
+	<insert id="insertFriendInGroup" parameterType="com.wooribank.wbt3.act.friend.model.data.GroupInfoVO">
+		INSERT INTO WBT3_IMM002TM
+		(
+			MBH_IDX_NO,
+			FRND_MBH_IDX_NO,
+			FRND_GRP_MNG_NO,
+			CNAD_FRND_YN,
+			FRND_MNG_TPCD,
+			FRND_NM,
+			FRND_ALS_NM,
+			FAVT_FRND_YN,
+			NEW_ADD_FRND_YN,
+			FRND_MBH_SORT_SQNO,
+			FRND_RGS_DTM
+		)
+		SELECT
+				MBH_IDX_NO,
+				FRND_MBH_IDX_NO,
+				#{groupId},
+				CNAD_FRND_YN,
+				FRND_MNG_TPCD,
+				FRND_NM,
+				FRND_ALS_NM,
+				FAVT_FRND_YN,
+				NEW_ADD_FRND_YN,
+				
+		        (  
+					SELECT (IFNULL(MAX(FRND_MBH_SORT_SQNO),0) + 1) AS ORDERNUM 
+					FROM   WBT3_IMM002TM 
+					WHERE  MBH_IDX_NO = #{useridx} AND FRND_GRP_MNG_NO = #{groupId}   
+		        ) AS FRND_MBH_SORT_SQNO,
+		        
+				DATE_FORMAT(NOW(), '%Y%m%d%l%i%s' )
+		FROM 
+		        WBT3_IMM002TM
+		WHERE 
+				MBH_IDX_NO      = #{useridx}       AND	 
+				FRND_MBH_IDX_NO = #{friendUseridx} AND  
+				FRND_GRP_MNG_NO = 1
+	</insert>
+
+
+
+    <!--
+        3.1.17 (신규) 프로필 변경 친구 조회
+        @param : ChangedProfileFriendsDataVO
+        @return : ChangedProfileFriendsInfoVO
+    -->
+    <select id="selectChangedProfileFriends" parameterType="com.wooribank.wbt3.act.friend.model.data.ChangedProfileFriendsDataVO"
+                                                      resultType="com.wooribank.wbt3.act.friend.model.data.ChangedProfileFriendsInfoVO">
+    
+		SELECT
+		    FRND_MBH_IDX_NO   AS useridx  /* 친구_회원_인덱스_번호 int(11) */
+		
+		FROM
+		    WBT3_IMM001TM     AS USER,
+		    WBT3_IMM002TM     AS FRIEND            
+        
+        WHERE 
+            FRIEND.FRND_MBH_IDX_NO = USER.MBH_IDX_NO AND 
+            FRIEND.MBH_IDX_NO      = #{useridx}             AND /* 친구의 회원_인덱스_번호 int(11)*/
+            FRIEND.FRND_GRP_MNG_NO = #{friendGroupNo}       AND /* 친구_그룹_관리_번호 (기본그룹 : 1, 생성그룹 : 2 .....)  int(5)*/
+            FRIEND.FRND_MNG_TPCD   = #{friendMsgCode}       AND /* 친구_관리_유형코드 (1:친구, 2:숨김친구, 3:차단친구, 4:차단친구) varchar(50)*/
+            USER.MBH_AMD_DTM    > #{searchDate}                 /* 회원_수정_일시 varchar(20)*/
+            
+    </select>
+	
+	
+	
+	<!--
+		친구리스트조회
+		@param : 
+		@return : long
+	-->
+	<select id="selectFriends"  flushCache="true" useCache="false" parameterType="com.wooribank.wbt3.act.friend.model.data.FriendInfoVO" resultType="long">
+	
+		SELECT
+			FRIEND.FRND_MBH_IDX_NO AS useridx
+		FROM 
+            WBT3_IMM001TM USER
+			
+			INNER JOIN WBT3_IMM002TM FRIEND
+			
+			ON ( 
+				USER.MBH_IDX_NO = FRIEND.MBH_IDX_NO
+				
+				<if test="friendsGroupManageNum lt 2">
+				AND FRIEND.FRND_GRP_MNG_NO = 1
+				</if>
+				
+				<if test="friendsGroupManageNum gt 1">
+				AND FRIEND.FRND_GRP_MNG_NO = #{friendsGroupManageNum}
+				</if>				
+				
+				AND FRIEND.FRND_MNG_TPCD = #{friendsManageTypeCode} /* 1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구 */
+				
+				<if test='favoriteFriendYN != null and favoriteFriendYN.equals("Y") '>
+				AND FRIEND.FAVT_FRND_YN = #{favoriteFriendYN}
+				</if>
+				
+				<if test='newFriendYN != null and newFriendYN.equals("Y") '>
+				AND FRIEND.NEW_ADD_FRND_YN = #{newFriendYN}
+				</if>
+			)
+		WHERE 
+		      USER.MBH_IDX_NO = #{useridx}
+		
+		ORDER BY 
+		      FRIEND.FRND_MBH_SORT_SQNO
+	</select>
+
+
+
+	<!--
+		친구 관리 유형코드 업데이트
+		@param : FriendMngVO
+		@return : 
+	-->	
+	<update id="updateFriendMngCode" parameterType="com.wooribank.wbt3.act.friend.model.data.FriendMngVO" >
+		
+		UPDATE
+            WBT3_IMM002TM
+		SET
+			FRND_MNG_TPCD = #{friendsManageTypeCode}
+		WHERE
+			MBH_IDX_NO = #{useridx} AND 
+			FRND_MBH_IDX_NO = #{friendUseridx}	
+			
+	</update>
+	
+
+
+	<!--
+		친구의 대화명 변경
+		@param : ChangeUserNameReq
+		@return : 
+	-->		
+	<update id="updateUserName" parameterType="com.wooribank.wbt3.act.friend.model.data.FriendMngVO">
+		
+		UPDATE 
+            WBT3_IMM002TM
+		SET
+            FRND_ALS_NM = #{userName}
+		WHERE 
+            MBH_IDX_NO      = #{useridx} AND 
+            FRND_MBH_IDX_NO = #{friendUseridx};
+	</update>
+	
+		
+		
+	<!--
+		친구 연락처 별칭 빈값으로 업데이트
+		@param : long
+		@return : 
+	-->	
+	<update id="updateFirendReset" parameterType="long" >
+		
+		UPDATE 
+            WBT3_IMM002TM
+		SET
+            FRND_NM = null
+		WHERE 
+            MBH_IDX_NO = #{useridx};
+            	
+	</update>
+	
+	
+	
+    <!-- 4. 연락_친구_여부 Y 이고 연락처_별칭_명 이 null 인 친구는 연락_친구_여부 를 N 으로  친구_별칭_수정_명(FRND_ALS_NM) null 로 변경 -->
+	<update id="updateNullFirendFlagSet" parameterType="long" >
+		
+		UPDATE 
+		      WBT3_IMM002TM
+		SET
+			CNAD_FRND_YN = 'N',
+			FRND_ALS_NM = null
+		WHERE 
+			MBH_IDX_NO = #{useridx} AND 
+			CNAD_FRND_YN = 'Y'      AND 
+			FRND_NM is null;	
+			
+	</update>
+	
+
+
+    <!-- 연락처 별칭 명은 단말기의 연락처 이름으로 등록, 친구구분코드가 삭제친구(4) 면 친구로 변경(1) -->
+	<update id="updateCnadFrndY" parameterType="com.wooribank.wbt3.act.friend.model.data.PhoneInfoVO" >
+				
+		UPDATE
+		    WBT3_IMM002TM
+		SET
+		    FRND_NM = #{name}
+		    ,CNAD_FRND_YN= 'Y'
+		    ,FRND_MNG_TPCD = IF(FRND_MNG_TPCD = '4','1', FRND_MNG_TPCD)
+		WHERE 
+		    MBH_IDX_NO = #{useridx} AND 
+		    FRND_MBH_IDX_NO = #{firendUseridx}
+				 
+	</update>
+	
+	
+	
+    <!-- 3-2 기존 친구일 경우 : 연락처 친구 여부 N 일 경우 수정된 연락처 별칭 명은 null -->
+	<update id="updateCnadFrndN" parameterType="com.wooribank.wbt3.act.friend.model.data.PhoneInfoVO" >
+				
+		UPDATE 
+		    WBT3_IMM002TM
+		SET
+		    FRND_ALS_NM = null
+		WHERE 
+			MBH_IDX_NO = #{useridx} AND 
+			FRND_MBH_IDX_NO = #{firendUseridx} AND 
+			CNAD_FRND_YN= 'N';
+				
+	</update>
+
+    
+    
+    <!-- 연락처 친구 여부 N으로 친구관리 유형 코드 1 로 업데이트 -->
+    <update id="updateDelFriendInfo" parameterType="com.wooribank.wbt3.act.friend.model.data.PhoneInfoVO" >
+                
+		UPDATE 
+		    WBT3_IMM002TM
+		SET
+		    CNAD_FRND_YN= 'N',
+		    FRND_MNG_TPCD = '1'
+		WHERE 
+			MBH_IDX_NO = #{useridx} AND
+			FRND_MBH_IDX_NO = #{firendUseridx};
+                
+    </update>
+    
+    
+    
+    <update id="updateSyncDate" parameterType="com.wooribank.wbt3.act.friend.model.request.SyncContactReq" >
+    
+		UPDATE 
+		    WBT3_IMM009TS
+		SET 
+		    CNAD_SYN_DTM = ''
+		WHERE 
+		    DVC_IDX_NO =
+				(
+				  SELECT DVC_IDX_NO
+				  FROM WBT3_IMM008TS
+				  WHERE
+				      MBH_IDX_NO        = #{useridx} AND 
+				      DVC_KVL_TEXT      = #{deviceKey} AND 
+				      DVC_TKN_VAL_TEXT  = #{certiKey}
+				)            
+          
+    </update>
+    
+    
+</mapper>

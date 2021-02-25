@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.wooribank.wbt3.imm.user.controller.rest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq;
+import com.wooribank.wbt3.imm.user.model.request.UserStatisticReq;
+import com.wooribank.wbt3.imm.user.model.response.UserNowStatisticRes;
+import com.wooribank.wbt3.imm.user.model.response.UserStatisticRes;
+import com.wooribank.wbt3.imm.user.service.UserStatisticService;
+
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+
+
+
+
+@Slf4j
+@RestController
+@RequestMapping(value = "/userStatic")
+@PropertySource({"classpath:conf/property/${server.type}/application.properties"})
+//@PropertySource(name = "property", value = {"file:${home.dir}/${component.name}/conf/property/${server.type}/system.properties"})
+public class UserStatisticRestController {
+
+    @Autowired
+    private UserStatisticService userStatisticService;
+    
+    
+    
+    @ApiOperation(value="회원 검색")
+    @RequestMapping(value = "/commonSearch", method = RequestMethod.POST)
+    public UserStatisticRes retriveCommonMember(@RequestBody UserStatisticReq req){
+        log.debug("retriveCommonMember {}", "start");
+        
+        int page        = req.getPage();
+        int limit    = req.getLimit();
+        int nowRowIndex = page*limit;
+        req.setNowRowIndex(nowRowIndex);
+        
+        log.debug("retriveCommonMember {}", "end");
+        return userStatisticService.retriveCommonMember(req);
+     
+    }
+    
+    @ApiOperation(value="휴먼회원 검색")
+    @RequestMapping(value = "/sleepSearch", method = RequestMethod.POST)
+    public UserStatisticRes retriveSleepMember(@RequestBody UserStatisticReq req){
+        log.debug("retriveWithdrawalMember {}", "start");
+        
+        int page        = req.getPage();
+        int limit    = req.getLimit();
+        int nowRowIndex = page*limit;
+        req.setNowRowIndex(nowRowIndex);
+        
+        log.debug("retriveSleepMember {}", "end");
+        return userStatisticService.retriveSleepMember(req);
+     
+    }
+    
+    @ApiOperation(value="탈퇴회원 검색")
+    @RequestMapping(value = "/withdrawalSearch", method = RequestMethod.POST)
+    public UserStatisticRes retriveWithdrawalMember(@RequestBody UserStatisticReq req){
+        log.debug("retriveWithdrawalMember {}", "start");
+        
+        int page        = req.getPage();
+        int limit    = req.getLimit();
+        int nowRowIndex = page*limit;
+        req.setNowRowIndex(nowRowIndex);
+        log.debug("retriveWithdrawalMember {}", "end");
+        return userStatisticService.retriveWithdrawalMember(req);
+     
+    }
+    
+    @ApiOperation(value="현재기준으로 최근일주일/한달 가입/탈퇴회원조회")
+    @RequestMapping(value = "/nowPeriodStaticSearch", method = RequestMethod.POST)
+    public UserNowStatisticRes nowPeriodStatic(@RequestBody UserPeriodStatisticReq req){
+        log.debug("nowPeriodStatic {}", "start");
+        
+        UserNowStatisticRes returnRes = userStatisticService.nowPeriodStatic(req);
+        log.debug("nowPeriodStatic {}", "end");
+        
+        return returnRes;
+     
+    }
+}

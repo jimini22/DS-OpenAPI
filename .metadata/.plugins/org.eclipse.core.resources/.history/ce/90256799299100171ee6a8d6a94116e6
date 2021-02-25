@@ -1,0 +1,45 @@
+##############################################
+# Property Guide
+#
+##############################################
+
+#RESTful API Server Url
+restapi.server.url=http://127.0.0.1:8080/wbt3-sample-web
+
+#SpringBatch Server Url
+batch.server.url=http://127.0.0.1:6080/wbt3-sample-batch
+
+# System Default Encoding
+system.default.encoding=UTF-8
+
+# Message Reload Second
+message.reload.second=5
+
+# Multipart File Upload Path
+multipart.fileupload.path=C:/filetmp
+
+# Paging Start index
+property.pagination.pageindex=1
+# Unit Per Page 
+property.pagination.pageunit=10
+# Item Count Per Page 
+property.pagination.pagesize=10
+#firstIndex
+property.pagination.firstindex=1
+#lastIndex
+property.pagination.lastindex=1
+# Item Count Per Page 
+property.pagination.recordcountperpage=10
+
+#ehcache
+ehcache.evict.expired.elements=5
+
+###################################################
+# file upload 
+###########################################
+
+#file base path
+upload.base.path=/tmp/filestorage
+
+redis.host=127.0.0.1
+redis.port=6379

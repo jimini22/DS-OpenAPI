@@ -1,0 +1,1511 @@
+package com.wooribank.wbt3.act.friend.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wooribank.wbt3.act.common.constants.CommonConstantsCode;
+import com.wooribank.wbt3.act.common.constants.FriendErrorConstantsCode;
+import com.wooribank.wbt3.act.common.constants.UserErrorConstantsCode;
+import com.wooribank.wbt3.act.common.exception.ApiFriendException;
+import com.wooribank.wbt3.act.common.exception.InvalidProcessException;
+import com.wooribank.wbt3.act.common.model.MyUserInfo;
+import com.wooribank.wbt3.act.common.model.PhoneInfo;
+import com.wooribank.wbt3.act.common.model.UserInfo;
+import com.wooribank.wbt3.act.friend.mapper.FriendMapper;
+import com.wooribank.wbt3.act.friend.model.data.ChangedProfileFriendsDataVO;
+import com.wooribank.wbt3.act.friend.model.data.ChangedProfileFriendsInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.ContactMemberVO;
+import com.wooribank.wbt3.act.friend.model.data.CreateFriendsGroupVO;
+import com.wooribank.wbt3.act.friend.model.data.DistanceInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.FavoriteFriendInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.FriendGroupInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.FriendInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.FriendMngVO;
+import com.wooribank.wbt3.act.friend.model.data.GroupInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.PhoneInfoVO;
+import com.wooribank.wbt3.act.friend.model.data.SimpleFriendInfoVO;
+import com.wooribank.wbt3.act.friend.model.request.AddFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.ChangeFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.ChangeUserNameReq;
+import com.wooribank.wbt3.act.friend.model.request.ClearNewFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.CreateFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.FindFriendReq;
+import com.wooribank.wbt3.act.friend.model.request.RemoveFriendsGroupReq;
+import com.wooribank.wbt3.act.friend.model.request.RemoveRecommendFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SearchChangedProfileFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SearchRecommendFriendsReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendBlockReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendChangeListReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendDeleteReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendFavoriteReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendHideReq;
+import com.wooribank.wbt3.act.friend.model.request.SetFriendNewReq;
+import com.wooribank.wbt3.act.friend.model.request.SyncContactReq;
+import com.wooribank.wbt3.act.friend.model.response.AddFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.ChangeUserNameRes;
+import com.wooribank.wbt3.act.friend.model.response.ClearNewFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.DistanceFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.FindFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.FriendsGroupRes;
+import com.wooribank.wbt3.act.friend.model.response.FriendsSimpleInfoRes;
+import com.wooribank.wbt3.act.friend.model.response.ListFriendRes;
+import com.wooribank.wbt3.act.friend.model.response.RemoveRecommendFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SearchChangedProfileFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SearchRecommendFriendsRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendBlockRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendDeleteRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendFavoriteRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendHideRes;
+import com.wooribank.wbt3.act.friend.model.response.SetFriendNewRes;
+import com.wooribank.wbt3.act.friend.model.response.SyncContactRes;
+import com.wooribank.wbt3.act.friend.service.FriendService;
+import com.wooribank.wbt3.act.member.mapper.MemberInfoMapper;
+import com.wooribank.wbt3.act.member.model.data.MyUserInfoCheckVO;
+import com.wooribank.wbt3.act.member.model.data.UserInfoListVO;
+import com.wooribank.wbt3.act.member.service.MemberInfoService;
+import com.wooribank.wbt3.common.constants.SystemConstants;
+import com.wooribank.wbt3.common.session.model.MultiProfile;
+import com.wooribank.wbt3.web.base.framework.util.string.DateUtil;
+import com.wooribank.wbt3.web.base.framework.util.string.StringUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+* <pre>
+* com.wooribank.wbt3.act.friend.service.impl
+*   |_ FriendServiceImpl.java
+* </pre>
+* 
+* 1. 업무명         :
+* 2. 단위 업무명  : 
+* @Class     : FriendServiceImpl
+* @Author    : 최판광(BD)
+* @Since     : 2017. 11. 30. 오후 6:00:06
+* @Version   : 1.0 
+* Copyright (c) WOORI BANK.
+* -------------------------------------------------------------------
+* Modification Information
+* -------------------------------------------------------------------
+* 수정일                                                     수정자                                         수정 내용
+* -------------------------------------------------------------------
+* 2017. 11. 30.                    최판광(BD)              [WBT3] 최초 생성
+*/
+
+@Slf4j
+@Service
+public class FriendServiceImpl implements FriendService {
+
+    @Autowired
+    private FriendMapper            friendMapper;
+
+    @Autowired
+    private MemberInfoMapper        memberMapper;
+
+    @Autowired
+    private MemberInfoService       memberInfoService;
+
+    @Autowired
+    private MemberInfoMapper        memberInfoMapper;
+
+    // 3.1.1 친구 목록 동기화
+    @Transactional
+    public SyncContactRes syncContact(SyncContactReq req) throws InvalidProcessException {
+        SyncContactRes res = new SyncContactRes();
+
+        // certiKey로 useridx를 조회한다.
+        // 단말기 사용자의 useridx
+        // 회원의 인덱스
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        // 1. 입력된 연락처로 회원정보 조회(단말기 연락처친구)
+        List<PhoneInfo> addContactList = req.getAddContactList();
+
+        // 삭제된 친구 목록
+        List<Long> delUserList = req.getDelUserList();
+        
+        Map<String,Object> syncInfo = new HashMap<String,Object>();
+        syncInfo.put("addContactList", addContactList);
+        syncInfo.put("delUserList", delUserList);
+        syncInfo.put("useridx", useridx);
+        syncInfo.put("certiKey", req.getCertiKey());
+        syncInfo.put("deviceKey", req.getDeviceKey());
+        
+        //친구동기화
+        this.syncFriendInfo(syncInfo);
+        
+     
+        // 동기화 후 친구 리스트 조회
+        
+        MyUserInfo myUserInfo = new MyUserInfo();
+
+        // 숨김 친구 리스트
+        List<Long> hideFriends = this.recieveHideFriends(useridx);
+        myUserInfo.setHideFriends(hideFriends);
+        
+        // 차단한 친구 리스트
+        List<Long> blockFriends = this.recieveBlockFriends(useridx);
+        myUserInfo.setBlockFriends(blockFriends);
+        
+        // 내가 삭제한 친구
+        List<Long> deletedFriends = this.recieveDeletedFriends(useridx);
+        myUserInfo.setDeleteFriends(deletedFriends);
+        
+        // 즐겨찾기 친구 리스트
+        List<Long> favoriteFriends = this.recieveFavoriteFriends(useridx);
+        myUserInfo.setFavoriteFriends(favoriteFriends);
+        
+        // 친구 리스트
+        List<Long> friends = this.recieveFriends(useridx);
+        myUserInfo.setFriends(friends);
+        
+        // 새친구 리스트
+        List<Long> newFriends = this.recieveNewFriends(useridx);
+        myUserInfo.setNewFriends(newFriends);
+
+        //그룹
+        List<GroupInfoVO> groupList = this.recieveGroupList(useridx);
+        myUserInfo.setGroupList(groupList);
+        
+        
+        res.setRet(true);
+        res.setMyUserInfo(myUserInfo);
+        
+
+        return res;
+    }
+
+    // 디바이스 주소록에 저장된 사용자 중에서 회원 목록을 추출
+    // param : contact 디바이스 주소록 [ {'phone' : '821022947313', 'name' : '민경대'}
+    // ..., {...} ]
+    @SuppressWarnings("unused")
+    private ArrayList<T> extractMembers(T self, T contacts) {
+
+        String contactUserName;
+        String contactPhoneNumber;
+        ArrayList<ContactMemberVO> contactMembers;
+
+        return null;
+    }
+
+    // 3.1.2 친구 추가 (addFriends)
+    @Transactional
+    @Override
+    public AddFriendRes addFriend(AddFriendReq addFriendReq) throws InvalidProcessException {
+
+        AddFriendRes res = new AddFriendRes();
+
+        // 회원의 인덱스
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(addFriendReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+
+        // 업데이트 카운팅
+        int updateCnt = 0;
+        // 인서트 카운팅
+        int insertCnt = 0;
+
+        // 회원 조회를 위한 VO
+        UserInfoListVO userInfoListVO = new UserInfoListVO();
+        userInfoListVO.setCertiKey(addFriendReq.getCertiKey());
+        userInfoListVO.setUseridxList(addFriendReq.getUseridxList());// 친구의 인덱스
+                                                                     // 번호
+
+        // 조회한 회원 정보
+        List<UserInfo> userInfoList = memberInfoService.recieveUserInfoListVO(userInfoListVO);
+
+        // 추가하려는 친구 리스트가 있으면
+        if (userInfoList != null && userInfoList.size() > 0) {
+            // 친구 리스트의 한건 씩
+            for (int idx = 0; idx < userInfoList.size(); idx++) {
+
+                // 조회한 친구의 정보에서 FriendFlag가 친구이면(FriendFlag가 true이면)
+                // 친구 추가를 안해도 된다.
+                
+                String frindType = StringUtil.null2string(userInfoList.get(idx).getFriendType(),"0");
+                //1.친구 2.숨김 3.차단 4.삭제
+                log.debug("====frindType=====: {}", frindType);
+                if(Integer.parseInt(frindType) > 1){
+                    // friendType > 1로 변경
+                    FriendMngVO friendMngVO = new FriendMngVO();
+                    friendMngVO.setUseridx(useridx);// 회원의 useridx
+                    friendMngVO.setFriendUseridx(userInfoList.get(idx).getUseridx());     // 친구의 useridx
+                    friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);    // 친구 관리 유형코드:1(친구)
+                    updateCnt = friendMapper.updateFriendMngCode(friendMngVO);            // 친구 관리 유형코드를 1(친구)로 업데이트
+                    log.debug("====삭제친구(4) -> 친구 업데이트(1)===== ");
+                    log.debug("====updateCnt=====: {}", updateCnt);
+                    
+                } else if (Integer.parseInt(frindType) == 1){ // 친구일때
+                    continue;
+                } else { // 등록친구가 아닐때
+                    long maxSeq = friendMapper.selectMaxSortSqno(useridx);
+                    //friendUserOrderNum
+                    FriendGroupInfoVO friendGroupInfoVO = new FriendGroupInfoVO();
+                    friendGroupInfoVO.setUseridx(useridx);                                              // 회원 인덱스 번호
+                    friendGroupInfoVO.setFriendsUserIndexNum(userInfoList.get(idx).getUseridx());   // 친구 회원 인덱스 번호
+                    friendGroupInfoVO.setFriendsGroupManageNum((long) 1);                               // 친구그룹관리 번호
+                    friendGroupInfoVO.setContactFriendYN(CommonConstantsCode.NO_FLAG);                  // 연락처 친구여부
+                    friendGroupInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);            // 친구 관리 유형 코드
+                    friendGroupInfoVO.setFavoriteFriendYN(CommonConstantsCode.NO_FLAG);                 // 즐겨찾기 친구 여부
+                    friendGroupInfoVO.setFriendNickName(null);         // 친구 별칭명
+                    friendGroupInfoVO.setFriendUserOrderNum(maxSeq);
+                    friendGroupInfoVO.setNewFriendYN(CommonConstantsCode.YES_FLAG);                     // 신규 추가 친구 여부
+                    friendGroupInfoVO.setFriendRegistDateTime(DateUtil.getCurrentDateTimeAsString());
+   
+                    // 친구 추가 (insert)
+                    insertCnt = friendMapper.insertFriendInfo(friendGroupInfoVO);
+                    log.debug("====친구 추가(1)===== ");
+                    log.debug("====insertCnt=====: {}", insertCnt);
+                }
+                
+            }
+        }else{
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);   
+        }
+        
+        //조회할 나의 useridx와 certiKey
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(addFriendReq.getCertiKey());
+        
+        MyUserInfo myUserInfo = new MyUserInfo();
+       //조회해온 myUserInfo
+        myUserInfo=memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+        
+        // 추가된 친구리스트 셋팅
+        res.setAddFriendInfoList(memberInfoService.recieveUserInfoListVO(userInfoListVO));
+        res.setMyUserInfo(myUserInfo);
+        res.setRet(true);
+        res.setMsg("");
+
+        return res;
+    }
+
+    // 3.1.3 친구 찾기 (findFriend)
+    @Override
+    public FindFriendRes findFriend(FindFriendReq findFriendReq) throws InvalidProcessException {
+
+        FindFriendRes res = new FindFriendRes();
+
+        // certiKey로 useridx를 조회한다.
+        // 회원의 인덱스
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(findFriendReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        // 검색할 친구의 검색아이디
+        String searchId = findFriendReq.getSearchId();
+
+        // 회원의 useridx를 셋팅한다.
+        // 검색할 친구의 검색아이디를 셋팅한다.
+        FriendGroupInfoVO friendGroupInfoVO = new FriendGroupInfoVO();
+        friendGroupInfoVO.setUseridx(useridx);
+        friendGroupInfoVO.setSearchId(searchId);
+
+        // 검색아이디로 친구 정보 조회
+        UserInfo userInfo = friendMapper.selectFriend(friendGroupInfoVO);
+        
+        //검색 결과가 존재하지 않는다.
+        //검색 결과에 대한 사용자 정보가 존재하지 않는다.
+        if(userInfo==null){
+            res.setRet(false);
+            res.setMsg("");
+            return res;
+            
+        }
+        //개인정보이전 미동의 사용자이다.
+        
+        
+        //검색을 허용하지 않는 계정이다
+        if(CommonConstantsCode.NO_FLAG.equals(userInfo.getProfileSearchFlag())){
+            res.setRet(false);
+            res.setMsg("");
+            return res;
+        }
+        
+        
+        //Admin사이트에서 사용여부에 N을 체크한 관리자 계정은 검색을 허용하지 않는다.(?)
+       
+        
+        //이름이 정상적으로 존재하는 사용자만 검색결과로 전달한다.
+        if(StringUtil.isEmpty(userInfo.getUserName())){
+            res.setRet(false);
+            res.setMsg("");
+            return res;
+        }
+
+        
+        List<MultiProfile> multiProfile = null;
+        // userInfo의 useridx를 이용하여 프로필(사진)정보를 조회한다.
+        multiProfile = memberInfoService.receiveProfileList(userInfo.getUseridx());
+        userInfo.setMultiProfile(multiProfile);
+
+        res.setUserInfo(userInfo);
+        res.setRet(true);
+        res.setMsg("");
+
+        return res;
+
+    }
+
+    // 3.1.4 새친구 목록 추가/삭제 (setFriendNew)
+    @Override
+    public SetFriendNewRes setFriendNew(SetFriendNewReq req) throws InvalidProcessException {
+
+        SetFriendNewRes res = new SetFriendNewRes();
+
+        res.setRet(true);
+        res.setMsg("");
+
+        return res;
+    }
+
+    // 3.1.5 새친구 리스트 초기화 (clearNewFriends)
+    @Transactional
+    @Override
+    public ClearNewFriendRes clearNewFriend(ClearNewFriendReq req) throws InvalidProcessException{
+
+        ClearNewFriendRes res = new ClearNewFriendRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+
+        friendMapper.updateNewAddFrndYn(useridx);
+
+        res.setRet(true);
+        res.setMsg("");
+
+        return res;
+    }
+
+    
+    // 3.1.6 차단친구 등록/삭제
+    @Transactional
+    public SetFriendBlockRes setFriendBlock(SetFriendBlockReq setFriendBlockReq) throws InvalidProcessException{
+
+        SetFriendBlockRes res = new SetFriendBlockRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(setFriendBlockReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+
+        FriendMngVO friendMngVO = new FriendMngVO();
+        // 본인의 useridx
+        friendMngVO.setUseridx(useridx);
+        // 차단친구로 등록할 회원의 useridx
+        friendMngVO.setFriendUseridx(setFriendBlockReq.getUseridx());
+        // 등록/삭제 여부
+        friendMngVO.setAction(setFriendBlockReq.getAction());
+
+        if (CommonConstantsCode.ADD_STR.equals(setFriendBlockReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.THREE_STR);
+            //나머지 그룹정보 삭제
+            friendMapper.deleteFriendMng(friendMngVO);
+        } else if (CommonConstantsCode.DEL_STR.equals(setFriendBlockReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+        }
+        
+        //친구의 유형코드를 업데이트한다
+        friendMapper.updateFriendMngCode(friendMngVO);
+
+        // myUserInfo를 조회하기위한 VO
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(setFriendBlockReq.getCertiKey());
+
+        // myUserInfo조회
+        MyUserInfo myUserInfo = memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+
+        // 모임 휴대폰 계정사용자 이용 적용 관련
+
+        res.setRet(true);
+        res.setMsg("");
+        res.setMyUserInfo(myUserInfo);
+
+        return res;
+    }
+    
+    
+    // 3.1.7 삭제친구 등록/삭제
+    @Transactional
+    public SetFriendDeleteRes setFriendDelete(SetFriendDeleteReq setFriendDeleteReq) throws InvalidProcessException{
+
+        SetFriendDeleteRes res = new SetFriendDeleteRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(setFriendDeleteReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+
+        FriendMngVO friendMngVO = new FriendMngVO();
+        // 본인의 useridx
+        friendMngVO.setUseridx(useridx);
+        // 삭제친구로 등록할 회원의 useridx
+        friendMngVO.setFriendUseridx(setFriendDeleteReq.getUseridx());
+        // 등록/삭제 여부
+        friendMngVO.setAction(setFriendDeleteReq.getAction());
+
+        if (CommonConstantsCode.ADD_STR.equals(setFriendDeleteReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.FOUR_STR);
+            //나머지 그룹정보 삭제
+            friendMapper.deleteFriendMng(friendMngVO);
+        } else if (CommonConstantsCode.DEL_STR.equals(setFriendDeleteReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+        }
+        
+        //친구의 유형코드를 업데이트한다
+        friendMapper.updateFriendMngCode(friendMngVO);
+
+        // myUserInfo를 조회하기위한 VO
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(setFriendDeleteReq.getCertiKey());
+
+        // myUserInfo조회
+        MyUserInfo myUserInfo = memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+
+        // 모임 휴대폰 계정사용자 이용 적용 관련
+
+        res.setRet(true);
+        res.setMsg("");
+        res.setMyUserInfo(myUserInfo);
+
+        return res;
+    }
+    
+
+    // 3.1.8 즐겨찾기 친구 등록/삭제 (setFriendFavorite)
+    @Transactional
+    @Override
+    public SetFriendFavoriteRes setFriendFavorite(SetFriendFavoriteReq req) throws InvalidProcessException {
+
+        SetFriendFavoriteRes res = new SetFriendFavoriteRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        //해당회원의 즐겨찾기 친구 초기화 
+        friendMapper.updateInitializeFavoriteFriends(new FavoriteFriendInfoVO(useridx, "N", 0));
+        
+        // set favorite friends states : 즐겨찾기 친구여부 업데이트 , 친구회원정렬순번 업데이트
+        for (int idx = 0; idx < req.getUseridxList().size(); idx++) {
+            friendMapper.updateFavoriteFriendsState(new FavoriteFriendInfoVO(useridx, req.getUseridxList().get(idx), "Y", ((int) idx + 1)));
+        }
+        
+
+        // myUserInfo를 조회하기위한 VO
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(req.getCertiKey());
+
+        // myUserInfo조회
+        MyUserInfo myUserInfo = memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+
+        res.setRet(true);
+        res.setMsg("");
+        res.setMyUserInfo(myUserInfo);
+        
+        return res;
+    }
+    
+    //3.1.9 숨김친구 등록/삭제
+    @Transactional
+    public SetFriendHideRes setFriendHide(SetFriendHideReq setFriendHideReq) throws InvalidProcessException{
+        SetFriendHideRes res = new SetFriendHideRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(setFriendHideReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+
+        FriendMngVO friendMngVO = new FriendMngVO();
+        // 본인의 useridx
+        friendMngVO.setUseridx(useridx);
+        // 숨김친구로 등록할 회원의 useridx
+        friendMngVO.setFriendUseridx(setFriendHideReq.getUseridx());
+        // 등록/삭제 여부
+        friendMngVO.setAction(setFriendHideReq.getAction());
+
+        if (CommonConstantsCode.ADD_STR.equals(setFriendHideReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.TWO_STR);
+            //나머지 그룹정보 삭제
+            friendMapper.deleteFriendMng(friendMngVO);
+        } else if (CommonConstantsCode.DEL_STR.equals(setFriendHideReq.getAction())) {
+            friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+        }
+
+        //친구의 유형코드를 업데이트한다
+        friendMapper.updateFriendMngCode(friendMngVO);
+        
+        // myUserInfo를 조회하기위한 VO
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(setFriendHideReq.getCertiKey());
+
+        // myUserInfo조회
+        MyUserInfo myUserInfo = memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+
+        // 모임 휴대폰 계정사용자 이용 적용 관련
+
+        res.setRet(true);
+        res.setMsg("");
+        res.setMyUserInfo(myUserInfo);
+
+        return res;
+    }
+    
+    //3.1.10 친구의 대화명 변경
+    @Transactional
+    public ChangeUserNameRes changeUserName(ChangeUserNameReq changeUserNameReq) throws InvalidProcessException{
+
+        ChangeUserNameRes res = new ChangeUserNameRes();
+
+        
+        String certiKey = changeUserNameReq.getCertiKey();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(changeUserNameReq.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        long friendIdx = changeUserNameReq.getUseridx();
+        String userName = changeUserNameReq.getUserName();
+        if("".equals(userName)){
+            userName =  null;
+        }
+
+        FriendMngVO friendMngVO = new FriendMngVO();
+        // 사용자의 idx 셋팅
+        friendMngVO.setUseridx(useridx);
+        // 대화명을 변경할 친구의 idx셋팅
+        friendMngVO.setFriendUseridx(friendIdx);
+        // 변경할 대화명 셋팅
+        friendMngVO.setUserName(userName);
+        log.debug("changeUserNameReq.getUseridx():{}", changeUserNameReq.getUseridx());
+        log.debug("changeUserNameReq.getUserName():{}", changeUserNameReq.getUserName());
+
+        friendMapper.updateUserName(friendMngVO);
+
+        // userInfo를 조회해 온다.
+        List<Long> useridxList = new ArrayList<>();
+        useridxList.add(friendIdx);
+
+        UserInfoListVO userInfoListVO = new UserInfoListVO();
+        userInfoListVO.setCertiKey(certiKey);
+        userInfoListVO.setUseridx(useridx);
+        userInfoListVO.setUseridxList(useridxList);
+
+        List<UserInfo> userInfoList = null;
+        userInfoList = memberInfoService.recieveUserInfoListVO(userInfoListVO);
+
+        UserInfo userInfo = userInfoList.get(0);
+
+        res.setRet(true);
+        res.setUserInfo(userInfo);
+
+        return res;
+    }
+
+
+
+    // 3.1.11 추천친구 목록 조회 (searchRecommendFriends)
+    @Override
+    public SearchRecommendFriendsRes searchRecommendFriends(SearchRecommendFriendsReq req) throws InvalidProcessException {
+        SearchRecommendFriendsRes res = new SearchRecommendFriendsRes();
+        
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        String searchType = StringUtil.null2string(req.getSearchType(),"0"); //일반회원
+        
+        List<UserInfo> recommendFriendList = null;
+        
+        if(CommonConstantsCode.ZERO_STR.equals(searchType)){
+            recommendFriendList = friendMapper.selectRecommendFriendsList(useridx);
+        }else{ // 꿀파트너 조회
+            recommendFriendList = friendMapper.selectRecommendBizFriendsList(useridx);
+        }
+
+        List<MultiProfile> multiProfile =null;
+        for (UserInfo userInfo : recommendFriendList) {
+            //userInfoList안에 userInfo의 useridx를 이용하여 프로필(사진)정보를 조회한다.
+            multiProfile=memberInfoService.receiveProfileList(userInfo.getUseridx());
+            userInfo.setMultiProfile(multiProfile);
+        }
+        
+        res.setRet(true);
+        res.setUserInfoList(recommendFriendList);
+
+        return res;
+    }
+
+    // 3.1.12 추천친구 목록 검색 (findRecommendFriend)
+    @Override
+    public SearchRecommendFriendsRes findRecommendFriends(SearchRecommendFriendsReq req) throws InvalidProcessException {
+        
+        SearchRecommendFriendsRes res = new SearchRecommendFriendsRes();
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        String searchType = StringUtil.null2string(req.getSearchType(),"0"); //일반회원
+        int limit = req.getLimit();
+        int page = req.getPage();
+        int nowRowIndex = page * limit;
+
+        FriendMngVO friendMngVo = new FriendMngVO();
+        friendMngVo.setLimit(limit);
+        friendMngVo.setNowRowIndex(nowRowIndex);
+        friendMngVo.setUseridx(useridx);
+        friendMngVo.setKeyword(req.getKeyword() );
+        friendMngVo.setSearchType(searchType);
+        
+        List<UserInfo> recommendFriendList = friendMapper.selectRecommendFindFriendsList(friendMngVo);
+        
+        List<MultiProfile> multiProfile =null;
+        for (UserInfo userInfo : recommendFriendList) {
+            //userInfoList안에 userInfo의 useridx를 이용하여 프로필(사진)정보를 조회한다.
+            multiProfile=memberInfoService.receiveProfileList(userInfo.getUseridx());
+            userInfo.setMultiProfile(multiProfile);
+        }
+        
+        res.setRet(true);
+        res.setUserInfoList(recommendFriendList);
+
+        return res;
+    }
+
+    // 3.1.13 추천친구 리스트 삭제 (removeRecommendFriend)
+    @Override
+    public RemoveRecommendFriendsRes removeRecommendFriend(RemoveRecommendFriendsReq req) throws InvalidProcessException {
+        
+        RemoveRecommendFriendsRes res = new RemoveRecommendFriendsRes();
+        res.setRet(true);
+        res.setMsg("미구현");
+        return res;
+    }
+
+    // 3.1.14 (신규) 친구 그룹 생성 (createFriendsGroup)
+    @Transactional
+    @Override
+    public FriendsGroupRes createFriendsGroup(CreateFriendsGroupReq req) throws InvalidProcessException {
+
+        // response VO
+        FriendsGroupRes res = new FriendsGroupRes();
+
+        //그룹에 추가할 친구idx 리스트
+        List<Long> useridxList = req.getUseridxList();
+        
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        // mapper VO
+        CreateFriendsGroupVO createFriendsGroupVO = new CreateFriendsGroupVO();
+        createFriendsGroupVO.setUseridx(useridx);//회원 useridx
+        createFriendsGroupVO.setGroupName(req.getGroupName());//생성할 그룹_명
+
+        // 1. userindex 로 위비톡친구그룹기본 에 그룹생성
+        //WBT3_IMM013TM
+        friendMapper.insertFriendsGroupOnWibeeGroup(createFriendsGroupVO);
+        log.debug("createFriendsGroupVO.getGroupId() : {}",createFriendsGroupVO.getGroupId());
+        
+        
+        
+        //WBT3_IMM002TM에 새로 생성된 FRND_GRP_MNG_NO로 
+        //useridxList(그룹에 추가할 친구idx)를 추가한다.
+        FriendGroupInfoVO friendGroupInfoVO = new FriendGroupInfoVO();
+        
+        for(int ii=0; ii<useridxList.size(); ii++){
+            friendGroupInfoVO = new FriendGroupInfoVO();
+            friendGroupInfoVO.setUseridx(useridx);// 회원 인덱스 번호
+            friendGroupInfoVO.setFriendsUserIndexNum(useridxList.get(ii)); //친구 회원 인덱스 번호
+            friendGroupInfoVO.setFriendUserOrderNum((long)ii+1);//회원 정렬 순번
+            friendGroupInfoVO.setFriendRegistDateTime(DateUtil.getCurrentDateTimeAsString());//친구 등록일시
+              
+            //새로 생성된 FRND_GRP_MNG_NO로 추가
+            //1번 그룹에 있는 회원(친구)의 정보를 조회하여 추가한다.
+            friendMapper.insertFriendsOnWibeeGroup(friendGroupInfoVO);
+        }
+        
+        List<GroupInfoVO> friendGroup =this.recieveGroupList(useridx); 
+        
+        res.setGroupList(friendGroup);
+        res.setRet(true);
+        res.setMsg("");
+
+        return res;
+    }
+
+    // 3.1.15 (신규) 친구 그룹 삭제 (removeFriendsGroup)
+    @Transactional
+    @Override
+    public FriendsGroupRes removeFriendsGroup(RemoveFriendsGroupReq req) throws InvalidProcessException {
+
+        FriendsGroupRes res = new FriendsGroupRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        GroupInfoVO groupInfoVO = new GroupInfoVO();
+        groupInfoVO.setUseridx(useridx);//회원 인덱스 번호
+        groupInfoVO.setGroupId(req.getGroupId());//친구 그룹 관리 번호
+        
+        //WBT3_IMM002TM에서 회원의 해당그룹에 있는 친구들을 삭제
+        friendMapper.deleteFriendsGroupOnFriend(groupInfoVO);
+        //WBT3_IMM013TM에서 회원의 해당그룹을 삭제한다.
+        friendMapper.deleteFriendsGroupOnFriendGroup(groupInfoVO);
+        
+        
+        List<GroupInfoVO> friendGroup =this.recieveGroupList(useridx); 
+        
+        res.setGroupList(friendGroup);
+        res.setRet(true);
+        res.setMsg("");
+        return res;
+    }
+
+    
+    
+    // 3.1.16 (신규) 친구 그룹 변경 (changeFriendsGroup)
+    @Transactional
+    @Override
+    public FriendsGroupRes changeFriendsGroup(ChangeFriendsGroupReq req) throws InvalidProcessException {
+
+        FriendsGroupRes res = new FriendsGroupRes();
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+
+
+        //그룹정렬 변경처리
+        if(req.getGroupIdsOrder()!=null){
+            
+            for (int ii = 0; ii < req.getGroupIdsOrder().size(); ii++) {
+                FriendGroupInfoVO data = new FriendGroupInfoVO();
+                data.setUseridx(useridx);//회원 useridx
+                data.setFriendsGroupManageNum(req.getGroupIdsOrder().get(ii));//친구 구룹 관리 번호
+                data.setGroupOrderNum((long) (ii+1));//그룹 정렬 순번
+                
+                //WBT3_IMM013TM에서 회원의 그룹 정렬을 업데이트한다   
+                friendMapper.updateFriendsGroupOnFriendGroupSort(data);
+            }           
+        }
+        
+        GroupInfoVO groupInfoVO = req.getGroupInfo();
+
+        //그룹정보 변경처리
+        if(groupInfoVO != null){
+            groupInfoVO.setUseridx(useridx);
+            //WBT3_IMM013TM에서 회원의 해당 그룹의 그룹 명을 변경한다.    
+            friendMapper.updateFriendsGroupOnFriendGroup(groupInfoVO);
+            
+            if (CommonConstantsCode.ADD_STR.equals( groupInfoVO.getAction())) {
+                for(int ii =0 ; groupInfoVO.getUseridxList() != null && ii < groupInfoVO.getUseridxList().size()  ;ii++){
+                    groupInfoVO.setFriendUseridx(groupInfoVO.getUseridxList().get(ii));
+                    //중복data 확인
+                    ArrayList<FriendGroupInfoVO> frindList = friendMapper.selectGroupFriendOrder(groupInfoVO);
+                   
+                    if(frindList.size()  == 0){
+                        friendMapper.insertFriendInGroup(groupInfoVO);
+                    }
+                }
+              
+            }
+            //그룹내 회원들을 물리적으로 삭제후 나머지 그룹내 회원들의 시퀀스정보 수정
+            else if (CommonConstantsCode.DEL_STR.equals( groupInfoVO.getAction())) {
+                for(int ii =0 ;  groupInfoVO.getUseridxList() != null && ii < groupInfoVO.getUseridxList().size()  ;ii++){
+                    groupInfoVO.setFriendUseridx(groupInfoVO.getUseridxList().get(ii));
+                    friendMapper.deleteFriendsGroupOnFriend(groupInfoVO); 
+                }
+                //차후 정렬을 위한 수정요건이 있을시 TBD
+                //friendMapper.selectGroupFriendOrder(groupInfoVO);
+            }
+        }
+        
+        List<GroupInfoVO> friendGroup =this.recieveGroupList(useridx);         
+        res.setGroupList(friendGroup);
+        res.setRet(true);
+        
+        return res;
+    }
+    
+    
+    // 3.1.17 (신규) 프로필 변경 친구 조회
+    @Override
+    public SearchChangedProfileFriendsRes searchChangedProfileFriends(SearchChangedProfileFriendsReq req) throws InvalidProcessException {
+
+        SearchChangedProfileFriendsRes res = new SearchChangedProfileFriendsRes();
+        
+        // certiKey로 useridx를 조회
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        String searchDate = req.getSearchDate(); // yyyyMMddHHmmSS
+       
+        if(StringUtil.isEmpty(searchDate) || searchDate.length() != 14){
+            throw new ApiFriendException(SystemConstants.WBT3_ACH, FriendErrorConstantsCode.FRIEND_ERROR_CODE_40000);
+        }
+        
+        
+        ChangedProfileFriendsDataVO info = new ChangedProfileFriendsDataVO();
+       
+        info.setUseridx(useridx);                    // 회원_인덱스_번호 int(11)
+        info.setFriendGroupNo(1);                    // 친구_그룹_관리_번호 (기본그룹 : 1, 생성그룹 : 2 .....)  
+        info.setFriendMsgCode(CommonConstantsCode.NOMAL_FRIEND_CODE); // 친구_관리_유형코드 (1:친구, 2:숨김친구, 3:차단친구, 4:삭제친구)
+        info.setSearchDate(req.getSearchDate());     // 검색 기준 시간 (yyyMMddhhmmss)
+        
+        
+        List<ChangedProfileFriendsInfoVO> resFriendInfoList = friendMapper.selectChangedProfileFriends(info);
+        
+        List<Long> infoList = new ArrayList<Long>();
+        
+        for(int idx=0; idx<resFriendInfoList.size(); idx++){
+           
+            ChangedProfileFriendsInfoVO profileInfo = new ChangedProfileFriendsInfoVO();
+            
+            if(resFriendInfoList.get(idx).getUseridx() > 0){
+
+                profileInfo.setUseridx(resFriendInfoList.get(idx).getUseridx());    //검색된 친구의 회원인덱스
+                
+                infoList.add(idx, profileInfo.getUseridx());
+            }
+        }
+        
+        //Resposne Data
+        res.setRet(false);
+        res.setMsg("fail");
+        
+        if(infoList.size() > 0){
+            res.setUseridxList(infoList);
+            res.setRet(true);
+            res.setMsg("success");
+        }
+        
+        return res;
+    }
+    
+    // 3.1.18  친구리스트조회
+    @Override
+    public ListFriendRes searchListFriends(SearchRecommendFriendsReq req) throws InvalidProcessException {
+        // TODO Auto-generated method stub
+      
+        // 회원의 인덱스
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        
+        ListFriendRes myFriendInfo = new ListFriendRes();
+
+        // 숨김 친구 리스트
+        List<Long> hideFriends = this.recieveHideFriends(useridx);
+        myFriendInfo.setHideFriends(hideFriends);
+        
+        // 차단한 친구 리스트
+        List<Long> blockFriends = this.recieveBlockFriends(useridx);
+        myFriendInfo.setBlockFriends(blockFriends);
+        
+        // 내가 삭제한 친구
+        List<Long> deletedFriends = this.recieveDeletedFriends(useridx);
+        myFriendInfo.setDeleteFriends(deletedFriends);
+        
+        // 즐겨찾기 친구 리스트
+        List<Long> favoriteFriends = this.recieveFavoriteFriends(useridx);
+        myFriendInfo.setFavoriteFriends(favoriteFriends);
+        
+        // 친구 리스트
+        List<Long> friends = this.recieveFriends(useridx);
+        myFriendInfo.setFriends(friends);
+        
+        // 새친구 리스트
+        List<Long> newFriends = this.recieveNewFriends(useridx);
+        myFriendInfo.setNewFriends(newFriends);
+
+        //그룹
+        List<GroupInfoVO> groupList = this.recieveGroupList(useridx);
+        myFriendInfo.setGroupList(groupList);
+        
+        
+        myFriendInfo.setRet(true);
+   
+        return myFriendInfo;
+        
+       
+    }
+    
+ // 3.1.19  친구 위치정보 가져오기
+    @Override
+    public DistanceFriendRes friendsLocationList(SearchRecommendFriendsReq req) throws InvalidProcessException {
+        // TODO Auto-generated method stub
+        
+        DistanceFriendRes res = new DistanceFriendRes();
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        List<DistanceInfoVO> locationiFriendList = friendMapper.selectFriendLocationList(useridx);
+        
+        res.setFriendLocations(locationiFriendList);
+        res.setRet(true);
+        
+        return res;
+    }
+    
+    // 3.1.20 추천 친구 위치정보 가져오기(친구가 아닌 전체대상)
+    @Override
+    public DistanceFriendRes recommandFriendsLocationList(SearchRecommendFriendsReq req)
+            throws InvalidProcessException {
+        // TODO Auto-generated method stub
+        DistanceFriendRes res = new DistanceFriendRes();
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        String searchType = StringUtil.null2string(req.getSearchType(),"0"); //일반회원
+        int limit = req.getLimit();
+        int distanceRange = req.getDistanceRange() ;
+        
+
+        FriendMngVO friendMngVo = new FriendMngVO();
+        friendMngVo.setLimit(limit);
+        friendMngVo.setDistanceRange(distanceRange);;
+        friendMngVo.setUseridx(useridx);
+        friendMngVo.setSearchType(searchType);
+        
+        List<DistanceInfoVO> locationiFriendList = friendMapper.selectRecommandFriendLocationList(friendMngVo);
+        res.setFriendLocations(locationiFriendList);
+        res.setRet(true);
+        
+        return res;
+    }
+    
+    // 3.1.21 나의 전체친구의 기본항목 리스트 가지고 오기 
+    @Override
+    public FriendsSimpleInfoRes searchFriendSimpleInfo(SearchRecommendFriendsReq req) throws InvalidProcessException {
+        // TODO Auto-generated method stub
+        FriendsSimpleInfoRes res = new FriendsSimpleInfoRes();
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        // 1. 입력된 연락처로 회원정보 조회(단말기 연락처친구)
+        List<PhoneInfo> addContactList = req.getAddContactList();
+
+        // 삭제된 친구 목록
+        List<Long> delUserList = req.getDelUserList();
+        
+        Map<String,Object> syncInfo = new HashMap<String,Object>();
+        syncInfo.put("addContactList", addContactList);
+        syncInfo.put("delUserList", delUserList);
+        syncInfo.put("useridx", useridx);
+        syncInfo.put("certiKey", req.getCertiKey());
+        syncInfo.put("deviceKey", req.getDeviceKey());
+        
+        //친구동기화
+        this.syncFriendInfo(syncInfo);
+        
+        int limit = req.getLimit();
+        int page = req.getPage();
+        int nowRowIndex = page * limit;
+
+        FriendMngVO friendMngVo = new FriendMngVO();
+        friendMngVo.setLimit(limit);
+        friendMngVo.setNowRowIndex(nowRowIndex);
+        friendMngVo.setUseridx(useridx);
+        
+        long totCnt = friendMapper.selectFriendCnt(useridx);
+        List<SimpleFriendInfoVO> friendList = friendMapper.selectFriendSimpleList(friendMngVo);
+        
+        res.setFriendListTotalCnt(totCnt);
+        res.setFriendList(friendList);
+        
+        //그룹
+        List<GroupInfoVO> groupList = this.recieveGroupList(useridx);
+        res.setGroupList(groupList);
+ 
+        return res;
+    }
+    
+    // 3.1.22,23,24 숨김/차단/삭제 리스트로 처리
+    @Transactional
+    @Override
+    public SetFriendHideRes setFriendChangeList(SetFriendChangeListReq req) throws InvalidProcessException {
+        // TODO Auto-generated method stub
+        
+        SetFriendHideRes res = new SetFriendHideRes();
+
+        // certiKey로 useridx를 조회한다.
+        UserInfo userIdxInfo = new UserInfo();
+        userIdxInfo = memberMapper.useridxFromCerti(req.getCertiKey());
+        
+        long useridx;
+
+        if (userIdxInfo == null ) {
+            throw new InvalidProcessException(SystemConstants.WBT3_ACH, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_10000, UserErrorConstantsCode.USER_ERROR_COMMON_CODE_MESSAGE_10000);
+        } else {
+            useridx = userIdxInfo.getUseridx();
+        }
+        
+        List<Long> useridxList = req.getUseridxList();
+        
+        for(Long userFriendidx : useridxList){
+            FriendMngVO friendMngVO = new FriendMngVO();
+            // 본인의 useridx
+            friendMngVO.setUseridx(useridx);
+            // 삭제친구로 등록할 회원의 useridx
+            friendMngVO.setFriendUseridx(userFriendidx);
+            // 등록/삭제 여부
+            friendMngVO.setAction(req.getAction());
+            
+            
+            if (CommonConstantsCode.ADD_STR.equals(req.getAction())) {
+                friendMngVO.setFriendsManageTypeCode(req.getDiv());
+                //나머지 그룹정보 삭제
+                friendMapper.deleteFriendMng(friendMngVO);
+            }else if (CommonConstantsCode.DEL_STR.equals(req.getAction())) {
+                friendMngVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+            }
+            
+            //친구의 유형코드를 업데이트한다
+            friendMapper.updateFriendMngCode(friendMngVO);
+        
+        }
+        
+
+        // myUserInfo를 조회하기위한 VO
+        MyUserInfoCheckVO myUserInfoCheckVO = new MyUserInfoCheckVO();
+        myUserInfoCheckVO.setUseridx(useridx);
+        myUserInfoCheckVO.setCertiKey(req.getCertiKey());
+
+        // myUserInfo조회
+        MyUserInfo myUserInfo = memberInfoService.recieveMyUserInfoForCerti(myUserInfoCheckVO);
+
+        // 모임 휴대폰 계정사용자 이용 적용 관련
+
+        res.setRet(true);
+        res.setMsg("");
+        res.setMyUserInfo(myUserInfo);
+
+        return res;
+    }
+
+    //====================================================================================
+
+    @Override
+    public SimpleFriendInfoVO retriveFriend(int useridx) {
+        return friendMapper.selectFriend(useridx);
+    }
+
+    public List<UserInfo> recieveUserInfoList(long useridx) {
+        // 친구 목록
+        List<UserInfo> userInfoList = new ArrayList();
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setRealName("chanhopark");
+        userInfo.setUserId("chanhopark");
+        userInfo.setIdType("0");
+        userInfo.setIsDropOut("N");
+        userInfo.setFriendFlag("N");
+        userInfo.setPublicProfileFlag("Y");
+        userInfo.setPhoneNo("821023532332");
+
+        userInfoList.add(userInfo);
+
+        userInfo = new UserInfo();
+
+        userInfo.setRealName("gildonghong");
+        userInfo.setUserId("gildonghong");
+        userInfo.setIdType("0");
+        userInfo.setIsDropOut("N");
+        userInfo.setFriendFlag("N");
+        userInfo.setPublicProfileFlag("Y");
+        userInfo.setPhoneNo("821023532332");
+        userInfoList.add(userInfo);
+
+        return userInfoList;
+    }
+
+    // 숨김 친구 리스트
+    public List<Long> recieveHideFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====숨김친구====");
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        friendInfoVO.setUseridx(useridx);
+        friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.TWO_STR);
+
+        List<Long> hideFriends = friendMapper.selectFriends(friendInfoVO);
+
+        return hideFriends;
+    }
+
+    // 차단한 친구 리스트
+    public List<Long> recieveBlockFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====차단친구====");
+        List<Long> blockFriends = new ArrayList<Long>();
+
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        friendInfoVO.setUseridx(useridx);
+        friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.THREE_STR);
+
+        blockFriends = friendMapper.selectFriends(friendInfoVO);
+
+        return blockFriends;
+    }
+
+    // 내가 삭제한 친구
+    public List<Long> recieveDeletedFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====삭제친구====");
+        List<Long> deletedFriends = new ArrayList<Long>();
+
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        friendInfoVO.setUseridx(useridx);
+        friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.FOUR_STR);
+
+        deletedFriends = friendMapper.selectFriends(friendInfoVO);
+
+        return deletedFriends;
+    }
+
+    // 즐겨찾기 친구 리스트
+    public List<Long> recieveFavoriteFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====즐겨찾기 친구====");
+        List<Long> favoriteFriends = new ArrayList<Long>();
+        
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        friendInfoVO.setUseridx(useridx);
+        friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+        friendInfoVO.setFavoriteFriendYN(CommonConstantsCode.YES_FLAG);       
+        
+        favoriteFriends = friendMapper.selectFriends(friendInfoVO);
+
+        return favoriteFriends;
+    }
+
+    // 친구 리스트
+    public List<Long> recieveFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====친구====");
+        List<Long> friends = new ArrayList<Long>();
+        
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        friendInfoVO.setUseridx(useridx);
+        // 설계변경으로 친구리스트는 모든친구들을 조회한다.
+       // friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+
+        friends = friendMapper.selectFriends(friendInfoVO);
+
+        return friends;
+    }
+
+    // 새친구 리스트
+    public List<Long> recieveNewFriends(long useridx) throws InvalidProcessException {
+        log.debug("=====새 친구====");
+        List<Long> newFriends = new ArrayList<Long>();
+
+        FriendInfoVO friendInfoVO = new FriendInfoVO();
+        
+        friendInfoVO.setUseridx(useridx);
+        friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+        friendInfoVO.setNewFriendYN(CommonConstantsCode.YES_FLAG);
+
+        newFriends = friendMapper.selectFriends(friendInfoVO);
+
+
+        return newFriends;
+    }
+
+
+    
+    //친구 그룹 정보 리스트
+    @Override
+    public List<GroupInfoVO> recieveGroupList(long useridx) throws InvalidProcessException {
+        List<GroupInfoVO> groupList = new ArrayList<GroupInfoVO>();
+        
+        //WBT3_IMM013TM에서 회원의 그룹관리 번호와 , 그룹명을 가져온다.
+        groupList=friendMapper.selectFriendsGroupInfo(useridx);
+        
+        for(int ii=0; ii<groupList.size(); ii++){
+            
+            FriendInfoVO friendInfoVO = new FriendInfoVO();
+            
+            friendInfoVO.setUseridx(useridx);
+            friendInfoVO.setFriendsGroupManageNum(groupList.get(ii).getGroupId());
+            //그룹은 친구만 조회(숨김, 차단, 삭제 제외)
+            friendInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+            log.debug("groupId:{}",groupList.get(ii).getGroupId());
+            log.debug("groupId:{}",friendInfoVO.getFriendsGroupManageNum());
+            groupList.get(ii).setGroupFriends(friendMapper.selectFriends(friendInfoVO));
+
+        }
+        
+        return groupList;
+    }
+    
+    //친구목록 동기화  
+    @SuppressWarnings("unchecked")
+    public void syncFriendInfo(Map<String,Object> syncInfo) throws InvalidProcessException{
+        log.debug("=====친구목록 동기화 ====");
+        int uptRtn = 0;
+        boolean isSync =  false;
+        
+       
+        List<PhoneInfo> addContactList = syncInfo.get("addContactList") ==  null ? null  : (List<PhoneInfo>) syncInfo.get("addContactList");
+        List<Long> delUserList = syncInfo.get("delUserList") == null ? null : (List<Long>) syncInfo.get("delUserList")  ;
+        long useridx = (long) syncInfo.get("useridx");
+        String certiKey = (String) syncInfo.get("certiKey");
+        String deviceKey = (String) syncInfo.get("deviceKey");
+        
+        if(addContactList != null && addContactList.size() > 0){
+            isSync =  true;
+            for (int i = 0; i < addContactList.size(); i++) {
+
+                PhoneInfo phoneInfo = (PhoneInfo) addContactList.get(i);
+                String phoneNo = phoneInfo.getPhone();
+
+                // 휴대폰 번호로 위비톡 회원인지 조회
+                SimpleFriendInfoVO friendInfo = memberInfoMapper.selectUserInfoForPhoneNo(phoneNo);
+
+                // 위비톡 회원이면 추가 아닐 경우 update
+                if(friendInfo != null){
+                    long friendUseridx = friendInfo.getUseridx();
+                    //1그룹의 useridx의  max 순번 + 1
+                    long maxSeq = friendMapper.selectMaxSortSqno(useridx);
+                    if (friendUseridx > 0) {
+        
+                        PhoneInfoVO phoneInfoVO = new PhoneInfoVO();
+        
+                        phoneInfoVO.setUseridx(useridx);
+                        phoneInfoVO.setName(phoneInfo.getName());
+                        phoneInfoVO.setFirendUseridx(friendUseridx);
+        
+                        // 연락처 별칭 명은 단말기의 연락처 이름으로 등록, 친구구분코드가 삭제친구(4) 면 친구로 변경(1) 
+                        // 그룹에 관계없이 업데이트
+                        uptRtn = friendMapper.updateCnadFrndY(phoneInfoVO);
+                      
+                        if (uptRtn < 1) {
+                            // 현재 친구가 아니면
+                            // 3-1 신규일 경우 1번그룹에만 친구 등록 연락처 별칭 명은 단말기에서 받은 이름으로 등록
+        
+                            FriendGroupInfoVO friendGroupInfoVO = new FriendGroupInfoVO();
+        
+                            friendGroupInfoVO.setUseridx(useridx);
+                            friendGroupInfoVO.setFriendsUserIndexNum(friendUseridx);
+        
+                            friendGroupInfoVO.setFriendsGroupManageNum(1L);
+                            friendGroupInfoVO.setContactFriendYN(CommonConstantsCode.YES_FLAG);
+                            friendGroupInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+                            friendGroupInfoVO.setFriendNickName("");
+                            friendGroupInfoVO.setFavoriteFriendYN(CommonConstantsCode.NO_FLAG);
+                            friendGroupInfoVO.setNewFriendYN(CommonConstantsCode.YES_FLAG);
+                            friendGroupInfoVO.setFriendUserOrderNum(maxSeq);
+                            friendMapper.insertFriendInfo(friendGroupInfoVO);
+                        }
+        
+                    } else {
+        
+                        FriendGroupInfoVO friendGroupInfoVO = new FriendGroupInfoVO();
+        
+                        friendGroupInfoVO.setUseridx(useridx);
+                        friendGroupInfoVO.setFriendsUserIndexNum(friendUseridx);
+                        friendGroupInfoVO.setFriendsGroupManageNum(1L);
+                        friendGroupInfoVO.setContactFriendYN(CommonConstantsCode.YES_FLAG);
+                        friendGroupInfoVO.setFriendsManageTypeCode(CommonConstantsCode.ONE_STR);
+                        friendGroupInfoVO.setFriendNickName("");
+                        friendGroupInfoVO.setFavoriteFriendYN(CommonConstantsCode.NO_FLAG);
+                        friendGroupInfoVO.setNewFriendYN(CommonConstantsCode.YES_FLAG);
+                        friendGroupInfoVO.setFriendUserOrderNum(maxSeq);
+                        friendMapper.insertFriendInfo(friendGroupInfoVO);
+        
+                    }
+                }   
+            }
+        }
+        
+        if(delUserList != null && delUserList.size() > 0){
+            isSync =  true;
+            for (int i = 0; i < delUserList.size(); i++) {
+                
+                Long delUser = delUserList.get(i);
+                
+                PhoneInfoVO infoVO = new PhoneInfoVO();
+                infoVO.setUseridx(useridx);
+                infoVO.setFirendUseridx(delUser);
+                
+                // delList 친구 업데이트 (연락처 친구여부를 N, 친구명을 NULL 처리 
+                friendMapper.updateDelFriendInfo(infoVO);
+                
+            }
+        }
+        
+        if(isSync){
+            SyncContactReq reqVO = new SyncContactReq();
+            reqVO.setDeviceKey(deviceKey);
+            reqVO.setCertiKey(certiKey);
+            reqVO.setUseridx(useridx);
+            // 6. 친구 동기화 시간 업데이트
+            uptRtn = friendMapper.updateSyncDate(reqVO);
+            
+        }
+        
+        
+    }
+
+
+
+}

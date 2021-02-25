@@ -1,0 +1,5 @@
+package com.bluedigm.web.batch.sample.writer;
+
+public class Job1Writer {
+
+}

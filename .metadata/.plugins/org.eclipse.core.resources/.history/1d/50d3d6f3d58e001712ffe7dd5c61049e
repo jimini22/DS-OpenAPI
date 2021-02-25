@@ -1,0 +1,148 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.i18n.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.bluedigm.web.sample.i18n.model.I18nMessage;
+import com.bluedigm.web.sample.i18n.model.I18nMessageMapVo;
+import com.bluedigm.web.sample.i18n.model.ListVo;
+import com.bluedigm.web.sample.i18n.service.I18nService;
+import com.bluedigm.web.sample.i18n.support.MessageSource;
+import com.wooribank.wbt3.web.base.framework.nosql.redis.constants.RedisDataTypes;
+import com.wooribank.wbt3.web.base.framework.nosql.redis.model.RedisKeyTypeVO;
+import com.wooribank.wbt3.web.base.framework.nosql.redis.support.RedisDataSupport;
+
+/**
+* <pre>
+* com.bluedigm.web.sample.i18n.service.impl
+*   |_ I18nRedisResourceServiceImpl.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 15. 오후 2:33:27
+* @Version : 
+*/
+
+public class I18nRedisResourceServiceImpl implements I18nService, MessageSource {
+	
+	private RedisDataSupport redisDataSupport;
+
+	public void setRedisDataSupport(RedisDataSupport redisDataSupport) {
+		this.redisDataSupport = redisDataSupport;
+	}
+
+	
+	@Override
+	public String getMessage(String code, String locale) {
+		I18nMessage i18nDtl = inquireMessage(code, locale);
+		if (i18nDtl == null) {
+			return null;
+		}
+
+		return i18nDtl.getMessage();
+	}
+
+	@Override
+	public I18nMessage inquireMessage(String code, String language) {
+		
+		String nsDiv = ":";
+		String nsMsgKey = "i18n_msg" + nsDiv + code;
+		
+		//String msgDetail = (String) redisTemplate.opsForHash().get(msgKey, language);
+		String msgDetail = (String) redisDataSupport.getHashValue(nsMsgKey, language);
+		
+		I18nMessage i18nMessage = new I18nMessage();
+		
+		i18nMessage.setCode(code);
+		i18nMessage.setLanguage(language);
+		i18nMessage.setMessage(msgDetail);
+
+		return i18nMessage;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public ListVo<I18nMessage> inquireAllMessageList() {
+		
+		/*
+		String nsKeys = "i18n_msg:*";
+		
+		Set keySet = redisTemplate.keys(nsKeys);
+		Iterator itKeys = keySet.iterator();
+		
+		List list = new ArrayList<>();
+		
+		while(itKeys.hasNext()){
+			String key = (String) itKeys.next();
+			DataType type = redisTemplate.type(key);
+			
+			if(type.code().equals("hash")){
+				Set hashKeySet = redisTemplate.opsForHash().keys(key);
+				Iterator itHashKeys = hashKeySet.iterator();
+				while(itHashKeys.hasNext()){
+					String hashKey = (String) itHashKeys.next();
+					String message = (String) redisTemplate.opsForHash().get(key, hashKey);
+					
+					I18nMessage i18nMessage = new I18nMessage();
+					i18nMessage.setCode(key);
+					i18nMessage.setLanguage(hashKey);
+					i18nMessage.setMessage(message);
+					
+					list.add(i18nMessage);
+				}
+			}
+		}
+		*/
+		
+		List i18nList = new ArrayList<>();
+		
+		String nsName = "i18n_msg";
+		List<RedisKeyTypeVO> keyTypesList = redisDataSupport.getKeyTypesFromNameSpace(nsName);
+		for( int i = 0; i < keyTypesList.size(); i++){
+			RedisKeyTypeVO keyTypes = (RedisKeyTypeVO) keyTypesList.get(i);
+			
+			String objectKeyName = keyTypes.getKey();
+			String redisType = keyTypes.getRedisType();
+			
+			if(redisType.equals(RedisDataTypes.REDIS_TYPE_HASH)){
+				HashMap hashValue =  (HashMap) redisDataSupport.getValueObject(objectKeyName);
+				Iterator itHashValue = hashValue.keySet().iterator();
+
+				while(itHashValue.hasNext()){
+					String hashKey = (String) itHashValue.next();
+					String message = (String) hashValue.get(hashKey);
+					
+					I18nMessage i18nMessage = new I18nMessage();
+					i18nMessage.setCode(objectKeyName);
+					i18nMessage.setLanguage(hashKey);
+					i18nMessage.setMessage(message);
+					
+					i18nList.add(i18nMessage);
+				}				
+			}
+		}
+
+		ListVo<I18nMessage> listVo = new ListVo();
+		listVo.setList(i18nList);
+		listVo.setTotal(i18nList.size());
+		
+		return listVo;
+	}
+
+}

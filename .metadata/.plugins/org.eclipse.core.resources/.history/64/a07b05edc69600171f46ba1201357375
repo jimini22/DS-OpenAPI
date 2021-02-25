@@ -1,0 +1,155 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.wooribank.wbt3.sample.application.rest;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import com.wooribank.wbt3.sample.books.model.Book;
+
+/**
+* <pre>
+* com.wooribank.wbt3.sample
+*   |_ RestTemplateCall.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 25. 오후 10:16:40
+* @Version : 
+*/
+
+public class RestTemplateCall {
+
+	/**
+	 * 개요:
+	 * 처리내용 :
+	 *   1) 
+	 *   2)
+	 *   3)
+	 * @Method Name : main
+	 * @history
+	 * ---------------------------------------------------------------------------------
+	 *  변경일                    작성자                    변경내용
+	 * ---------------------------------------------------------------------------------
+	 *  2017. 8. 25.     yaong      최초 작성   
+	 * ---------------------------------------------------------------------------------
+	 * @param args
+	 */
+
+	public static void main(String[] args) {
+		
+		String confPathConfig = "classpath*:/conf/spring/applicationContext-rest.xml";		
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(confPathConfig);
+		RestTemplate restTemplate = applicationContext.getBean("restTemplate", RestTemplate.class);
+		
+		String getBooksUri = "http://127.0.0.1:8080/wbt3-accnt-web/books/1";
+		Book book1 = restTemplate.getForObject(getBooksUri, Book.class);
+		
+		System.out.println("book1=" + book1);
+		
+		
+		String requestUri = "http://127.0.0.1:8080/wbt3-accnt-web/books/10";
+        HttpHeaders reqHeaders = new HttpHeaders();
+
+        HttpEntity<String> reqEntity = new HttpEntity<String>(reqHeaders);
+        
+        ResponseEntity<Book> resEntity = restTemplate.exchange(requestUri, HttpMethod.DELETE, reqEntity, Book.class);
+        System.out.println("resEntity=" + resEntity);
+        
+        HttpHeaders resHeaders = resEntity.getHeaders();
+        System.out.println("resHeaders=" + resHeaders);
+        
+        Book resBody = resEntity.getBody();
+        System.out.println("resBody=" + resBody);
+        
+/*		
+		HttpHeaders reqHeaders = new HttpHeaders();
+		//reqHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		reqHeaders.set("Accept", "application/json;charset=UTF-8");
+		System.out.println("reqHeaders=" + reqHeaders);
+		
+		HttpEntity<String> reqGetEntity = new HttpEntity<String>(reqHeaders);
+		
+		ResponseEntity<Book> resGetEntity = restTemplate.exchange(getBooksUri, HttpMethod.GET, reqGetEntity, Book.class);
+		System.out.println("resGetEntity=" + resGetEntity);
+		
+		HttpHeaders resHeaders = resGetEntity.getHeaders();
+		System.out.println("resHeaders=" + resHeaders);
+		
+		Book book2 = resGetEntity.getBody();
+		System.out.println("book2=" + book2);
+*/
+/*
+		String requestUri = "http://127.0.0.1:8080/wbt3-accnt-web/books";
+        Book freshBook = new Book();
+        freshBook.setBookId(8);
+        freshBook.setTitle("8번째 책");
+        freshBook.setPrice(10000);
+        freshBook.setEmail("mongmong@mong.com");		
+		
+        HttpHeaders reqHeaders = new HttpHeaders();
+        reqHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        
+        System.out.println("reqHeaders=" + reqHeaders);
+        
+        HttpEntity<Book> reqEntity = new HttpEntity<Book>(freshBook, reqHeaders);
+        
+        ResponseEntity<Book> resEntity = restTemplate.exchange(requestUri, HttpMethod.PUT, reqEntity, Book.class);
+        System.out.println("resEntity=" + resEntity);
+        
+        HttpHeaders resHeaders = resEntity.getHeaders();
+        System.out.println("resHeaders=" + resHeaders);
+        
+        Book book2 = resEntity.getBody();
+        System.out.println("book2=" + book2);		
+*/
+/*		
+        String postBooksUri = "http://127.0.0.1:8080/wbt3-accnt-web/books";
+        Book freshBook = new Book();
+        freshBook.setBookId(8);
+        freshBook.setTitle("8번째 책");
+        freshBook.setPrice(10000);
+        freshBook.setEmail("yaong@yaong.com");
+        
+        HttpEntity<Book> reqPostEntity = new HttpEntity<Book>(freshBook);
+        
+        Book resPostBook = restTemplate.postForObject(postBooksUri, reqPostEntity, Book.class);
+        
+        System.out.println("resPostBook=" + resPostBook);		
+		
+
+		
+        String putBooksUri = "http://127.0.0.1:8080/wbt3-accnt-web/books";
+        Book changeBook = new Book();
+        changeBook.setBookId(8);
+        changeBook.setTitle("8번째 책");
+        changeBook.setPrice(10000);
+        changeBook.setEmail("mong@mong.com");
+        
+        HttpEntity<Book> reqPutEntity = new HttpEntity<Book>(changeBook);
+        
+        restTemplate.put(putBooksUri, reqPutEntity);
+             
+        
+        String deleteBooksUri = "http://127.0.0.1:8080/wbt3-accnt-web/books/8";
+        restTemplate.delete(deleteBooksUri);
+        
+*/        
+	}
+
+}

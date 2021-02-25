@@ -1,0 +1,172 @@
+package com.wooribank.wbt3.sample.common.common.util;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+public class FileUtils {
+
+	public static void main(String[] args) {
+
+		/*
+		String rootDir = "C:/log/devicelog/1/2";
+
+		try {
+			////////////////////////////////////////////////////////////////
+			BufferedReader in = new BufferedReader(new FileReader(rootDir));
+			String tmp = null;
+			String res = null;
+
+			while ((tmp = in.readLine()) != null) {
+				if (res == null){					
+					res = tmp;
+				}else{					
+					res += "\n" + tmp;
+				}
+			}
+			in.close();
+
+			ObjectMapper mapper = new ObjectMapper();
+			LinkedHashMap map = mapper.readValue(res, LinkedHashMap.class);
+
+			System.out.println(map.get("header").toString());
+
+			////////////////////////////////////////////////////////////////
+		} catch (IOException e) {
+			System.err.println(e); // 에러가 있다면 메시지 출력
+			System.exit(1);
+		}
+		 */
+	}
+
+	/**
+	 * make directory
+	 * @param rootDir
+	 * @param addDir
+	 * @return
+	 */
+	public static void mkdir(String rootDir, String addDir){
+		File root = new File(rootDir);
+
+		if (!root.isDirectory()){
+			root.mkdirs();
+		}
+
+		File addition = new File(rootDir, addDir);
+
+		addition.mkdir();
+	}
+
+	/**
+	 * make directory
+	 * @param rootDir
+	 * @param addDir
+	 * @return
+	 */
+	public static void write(String rootDir, String fileName, String str){
+
+		BufferedWriter out = null;
+
+		try {			
+			StringBuffer fileFullPath = (new StringBuffer()).append(rootDir).append("/").append(fileName);			
+
+			out = new BufferedWriter(new FileWriter(fileFullPath.toString()));			
+			out.write(str);
+
+		} catch (IOException e) {
+
+		} finally {
+			if (out != null) try{ out.close(); } catch(Exception e){}
+		}
+	}
+
+	/**
+	 * file read
+	 * @param fileFullName
+	 * @return
+	 */
+	public static String read(String fileFullName){
+		
+		BufferedReader	in		= null;
+		String					res	= null;
+
+		try {
+			in = new BufferedReader(new FileReader(fileFullName));
+			String tmp = null;			
+
+			while ((tmp = in.readLine()) != null) {
+				if (res == null){					
+					res = tmp;
+				}else{					
+					res += "\n" + tmp;
+				}
+			}			
+		} catch (IOException e) {
+
+		} finally {
+			if (in != null) try{	in.close();}	catch(Exception e){}
+		}
+		return res;
+	}
+
+	/**
+	 * Direcotry List
+	 * @param rootDir
+	 * @return List<String>
+	 */
+	public static List dirList(String rootDir){
+
+		List<String> ret = new ArrayList<String>();
+
+		File root = new File(rootDir);
+
+		if (root.isDirectory()){			
+			String[] subList = root.list();
+			if (subList != null && subList.length > 0){
+				for(int i=0; i<subList.length; i++){
+					ret.add(subList[i]);
+				}
+			}			
+		}		
+		return ret;		
+	}
+
+	/**
+	 * Direcotry delete
+	 * @param dir	 
+	 */
+	public static boolean delete(String dir){
+
+		return delete(new File(dir));
+	}
+
+	/**
+	 * Direcotry delete
+	 * @param dir	 
+	 */
+	public static boolean delete(File dir){
+
+		if(!dir.exists()) return false;
+
+		File[] files = dir.listFiles();
+
+		for (File file : files) {
+			if (file.isDirectory()) {
+				delete(file);
+			} else {
+				file.delete();
+			}
+		}
+
+		return dir.delete();
+	}
+
+}

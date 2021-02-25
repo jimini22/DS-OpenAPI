@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.database;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.web.base.framework.database
+ *    |_ ContextHolder.java
+ * Multiple Datasource ContextHolder Class
+ * </pre>
+ *
+ * @author Han-Woong Lee, Bluedigm
+ * @date 2012. 5. 14. 오후 1:01:58
+ * @version 0.0.1
+ */
+public class ContextHolder {
+	private static final ThreadLocal<DataSourceType> contextHolder = new ThreadLocal<DataSourceType>();
+	public static void setDataSourceType(DataSourceType dataSourceType){
+		contextHolder.set(dataSourceType);
+	}
+	public static DataSourceType getDataSourceType(){
+		return contextHolder.get();
+	}
+	public static void clearDataSourceType(){
+		contextHolder.remove();
+	}
+}
+

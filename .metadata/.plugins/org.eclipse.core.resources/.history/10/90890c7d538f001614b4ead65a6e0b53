@@ -1,0 +1,45 @@
+package com.bluedigm.web.batch.sample.launcher;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
+
+public class MyFile2DBParamLauncher {
+	private static final Logger logger = LoggerFactory.getLogger(MyFile2DBParamLauncher.class);
+	
+	  private JobLauncher jobLauncher;
+
+	  private Job job;
+
+	  public JobLauncher getJobLauncher() {
+		return jobLauncher;
+	}
+
+	public void setJobLauncher(JobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
+	}
+
+	public Job getJob() {
+		return job;
+	}
+
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
+	public void launch() {
+		logger.info("*** Setting Job Parameter...");
+	    JobParameters jobParameters = new JobParametersBuilder().addString("inputFile", "yaong.dat").toJobParameters();
+	    try {
+	    	logger.info("*** Executing Job [" + job.getName() + "]...");
+	    	JobExecution execution = jobLauncher.run(job, jobParameters);
+	    	logger.info("*** Exitus : " + execution.getStatus());
+	    } catch (Exception e) {
+	    	logger.error("*** Unablexecute job : " + e.getLocalizedMessage());
+	    }
+	  }
+}

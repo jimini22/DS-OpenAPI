@@ -1,0 +1,119 @@
+package com.portal.common.model;
+
+public class CommonInfo extends BasicInfo {
+	
+	private String major_cod; 
+	private String sub_cod;
+	private String cod_value; 
+	private String kr_cod_name = ""; 
+	private String en_cod_name = ""; 
+	private String ja_cod_name = ""; 
+	private String cn_cod_name = ""; 
+	private String tw_cod_name = ""; 
+	private String cod_desc ="";
+	private String use_flag; 
+	private String del_flag;
+	private String code_name="";
+	private int sort_order;
+	
+	
+	public int getSort_order() {
+		return sort_order;
+	}
+	public void setSort_order(int sort_order) {
+		this.sort_order = sort_order;
+	}
+	public String getMajor_cod() {
+		return major_cod;
+	}
+	public void setMajor_cod(String major_cod) {
+		this.major_cod = major_cod;
+	}
+	public String getSub_cod() {
+		return sub_cod;
+	}
+	public void setSub_cod(String sub_cod) {
+		this.sub_cod = sub_cod;
+	}
+	public String getCod_value() {
+		return cod_value;
+	}
+	public void setCod_value(String cod_value) {
+		this.cod_value = cod_value;
+	}
+	public String getKr_cod_name() {
+		return kr_cod_name;
+	}
+	public void setKr_cod_name(String kr_cod_name) {
+		this.kr_cod_name = kr_cod_name;
+	}
+	
+	public String getJa_cod_name() {
+		return ja_cod_name;
+	}
+	public void setJa_cod_name(String ja_cod_name) {
+		this.ja_cod_name = ja_cod_name;
+	}
+	
+	public String getEn_cod_name() {
+		return en_cod_name;
+	}
+	public void setEn_cod_name(String en_cod_name) {
+		this.en_cod_name = en_cod_name;
+	}
+	public String getCn_cod_name() {
+		return cn_cod_name;
+	}
+	public void setCn_cod_name(String cn_cod_name) {
+		this.cn_cod_name = cn_cod_name;
+	}
+	public String getTw_cod_name() {
+		return tw_cod_name;
+	}
+	public void setTw_cod_name(String tw_cod_name) {
+		this.tw_cod_name = tw_cod_name;
+	}
+	public String getCod_desc() {
+		return cod_desc;
+	}
+	public void setCod_desc(String cod_desc) {
+		this.cod_desc = cod_desc;
+	}
+	public String getUse_flag() {
+		return use_flag;
+	}
+	public void setUse_flag(String use_flag) {
+		this.use_flag = use_flag;
+	}
+	public String getDel_flag() {
+		return del_flag;
+	}
+	public void setDel_flag(String del_flag) {
+		this.del_flag = del_flag;
+	}
+	public String getCode_name() {
+		return code_name;
+	}
+	public void setCode_name(String code_name) {
+		this.code_name = code_name;
+	}
+
+	@Override
+	public String toString() {
+		return "CommonInfo{" +
+				"major_cod='" + major_cod + '\'' +
+				", sub_cod='" + sub_cod + '\'' +
+				", cod_value='" + cod_value + '\'' +
+				", kr_cod_name='" + kr_cod_name + '\'' +
+				", en_cod_name='" + en_cod_name + '\'' +
+				", ja_cod_name='" + ja_cod_name + '\'' +
+				", cn_cod_name='" + cn_cod_name + '\'' +
+				", tw_cod_name='" + tw_cod_name + '\'' +
+				", cod_desc='" + cod_desc + '\'' +
+				", use_flag='" + use_flag + '\'' +
+				", del_flag='" + del_flag + '\'' +
+				", code_name='" + code_name + '\'' +
+				", sort_order=" + sort_order +
+				'}';
+	}
+}

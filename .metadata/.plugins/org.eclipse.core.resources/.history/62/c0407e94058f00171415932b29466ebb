@@ -1,0 +1,87 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+
+package com.wooribank.wbt3.sample.books.dao.impl;
+
+import java.math.BigInteger;
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.wooribank.wbt3.sample.books.dao.BookDao;
+import com.wooribank.wbt3.sample.books.model.Book;
+import com.wooribank.wbt3.web.base.framework.dao.impl.GenericDaoImpl;
+
+
+/**
+ * The Class BookDaoImpl.
+ */
+@Repository
+public class BookDaoImpl extends GenericDaoImpl<Book, BigInteger> implements BookDao {
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#selectBook(long)
+	 */
+	@Override
+	public Book selectBook(long key) {
+
+		// return (Book) super.getSqlSession().selectOne("BookDAO.selectBook",
+		// key);
+		return (Book) selectOne("selectBook", (Object) key);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#selectBook(com.wooribank.wbt3.sample.common.books.model.Book)
+	 */
+	@Override
+	public List<Book> selectBook(Book book){
+		
+		//return (Book) selectOne("selectBookEmail",book);
+		return (List<Book>)selectList("selectBookEmail",book);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#selectBookList()
+	 */
+	@Override
+	public List<Book> selectBookList() {
+		// return (List<Book>)
+		// super.getSqlSession().selectList("BookDAO.selectBookList");
+		return selectList("selectBookList");
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#insertBook(com.wooribank.wbt3.sample.common.books.model.Book)
+	 */
+	@Override
+	public void insertBook(Book book) {
+		// super.getSqlSession().insert("BookDAO.insertBook", book);
+		insert("insertBook", book);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#deleteBook(long)
+	 */
+	@Override
+	public void deleteBook(long key) {
+		// super.getSqlSession().delete("BookDAO.deleteBook", key);
+		delete("deleteBook", BigInteger.valueOf(key));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.books.dao.BookDao#updateBook(com.wooribank.wbt3.sample.common.books.model.Book)
+	 */
+	@Override
+	public void updateBook(Book book) {
+		// super.getSqlSession().update("BookDAO.updateBook", book);
+		update("updateBook", book);
+	}
+
+}

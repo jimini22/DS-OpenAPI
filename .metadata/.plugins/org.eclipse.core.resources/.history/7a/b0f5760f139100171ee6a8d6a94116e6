@@ -1,0 +1,73 @@
+package com.bluedigm.web.batch.sample.partitioner;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.partition.support.Partitioner;
+import org.springframework.batch.item.ExecutionContext;
+
+public class SamplePartitioner implements Partitioner{
+	   private final Logger log = LoggerFactory.getLogger(this.getClass());
+	   /*
+	   private String queryId;
+	   private SqlSessionFactory sqlSessionFactory;
+	   private SqlSessionTemplate sqlSessionTemplate;
+	   */
+	   private Map<String, Object> param;
+	   public Map<String, ExecutionContext> partition(int gridSize) {
+		   Map<String, ExecutionContext> result= new HashMap<>();
+		   /*
+	      int total = sqlSessionTemplate.<Integer> selectOne(queryId, param);
+	      int pageSize = (total / gridSize);
+	      int skipRows = 0;
+	      int loopSize = total % gridSize == 0 ? gridSize : gridSize + 1;
+	      for (int i = 1; i <= loopSize; i++) {
+	         ExecutionContext value = new ExecutionContext();
+
+	         if(pageSize == 0){
+	            value.putInt("skipRows", skipRows);
+	            value.putInt("pageSize", gridSize);
+	            value.putString("name", "Thread" + i);
+	            result.put("partition" + i, value);
+	            break;
+	         }
+	         
+	         value.putInt("skipRows", skipRows);
+	         value.putInt("pageSize", pageSize);
+	         value.putString("name", "Thread" + i);
+	         result.put("partition" + i, value);
+	         skipRows += pageSize;
+	      }
+	      */
+	        
+		  ExecutionContext value1 = new ExecutionContext();
+	      value1.putInt("skipRows", 100);
+	      value1.putInt("pageSize", 2);
+	      value1.putString("name", "Thread1");
+	      result.put("partition1", value1);	     
+		  
+	      ExecutionContext value2 = new ExecutionContext();
+	      value2.putInt("skipRows", 50);
+	      value2.putInt("pageSize", 2);
+	      value2.putString("name", "Thread2");
+	      result.put("partition2", value2);
+	      
+	      ExecutionContext value3 = new ExecutionContext();
+	      value3.putInt("skipRows", 200);
+	      value3.putInt("pageSize", 2);
+	      value3.putString("name", "Thread3");
+	      result.put("partition3", value3);
+	      
+	      
+	      log.info("*** SamplePartitioner :: result = {}" , result);
+	      
+	      return result;
+	   }
+	   /**
+	   이하 생략
+	  */
+	}

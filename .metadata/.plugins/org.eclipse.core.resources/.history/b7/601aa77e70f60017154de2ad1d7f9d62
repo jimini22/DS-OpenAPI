@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+
+package com.wooribank.wbt3.imm.user.model.response;
+
+import java.io.Serializable;
+import java.util.List;
+
+import com.wooribank.wbt3.imm.user.model.data.UserDailyStatisticListVO;
+import com.wooribank.wbt3.imm.user.model.data.UserMonthStatisticFlatVO;
+import com.wooribank.wbt3.imm.user.model.data.UserMonthStatisticListVO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+
+/**
+ * The Class UserStatisticRes.
+ */
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class UserDailyStatisticRes implements Serializable {
+
+
+    private static final long serialVersionUID = -5327608449280425538L;
+    private List<UserDailyStatisticListVO> dailyStaticList;
+  
+
+}

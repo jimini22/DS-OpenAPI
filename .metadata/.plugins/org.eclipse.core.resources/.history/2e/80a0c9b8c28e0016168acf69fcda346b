@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:batch="http://www.springframework.org/schema/batch"
+  xmlns:task="http://www.springframework.org/schema/task"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task-3.0.xsd
+    http://www.springframework.org/schema/batch
+    http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+  <import resource="applicationContext.xml" />
+
+  <bean id="mytasklet" class="javadigest.springbatch.SimpleTasklet" />
+
+  <batch:job id="simpleJob">
+    <batch:step id="simpleTaskletStep">
+      <batch:tasklet ref="mytasklet" />
+    </batch:step>
+  </batch:job>
+
+  <bean id="myLauncher" class="javadigest.springbatch.MyLauncher">
+    <property name="jobLauncher" ref="jobLauncher"></property>
+    <property name="job" ref="simpleJob"></property>
+  </bean>
+
+  <task:scheduled-tasks>
+    <task:scheduled ref="myLauncher" method="launch"
+      fixed-delay="60000" />
+  </task:scheduled-tasks>
+
+</beans>

@@ -1,0 +1,89 @@
+package com.wooribank.wbt3.common.i18n.service.impl;
+
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+
+import com.wooribank.wbt3.common.i18n.mapper.I18nMessageMapper;
+import com.wooribank.wbt3.common.i18n.model.I18nMessage;
+import com.wooribank.wbt3.common.i18n.model.I18nMessageMapVo;
+import com.wooribank.wbt3.common.i18n.model.ListVo;
+import com.wooribank.wbt3.common.i18n.service.I18nManageService;
+import com.wooribank.wbt3.common.i18n.service.I18nService;
+
+
+public class I18nRDBResourceManageServiceImpl implements I18nManageService {
+	private final Log log = LogFactory.getLog(this.getClass());
+	
+	@Autowired
+	private I18nMessageMapper i18nMessageMapper;
+
+	@Autowired
+	private I18nService i18nService;
+	
+	//@Cacheable(value="i18nMessageCache" , condition="")
+	public I18nMessage retriveMessage(String code, String language) {
+		log.debug(">>> execure inquireMessage ...");
+		
+		return  i18nService.retriveMessage(code, language);
+	}
+
+
+	//@Cacheable(value="i18nMessageListCache")
+	public ListVo<I18nMessage> retriveAllMessageList() {
+		log.debug(">>> execure inquireAllMessageList ...");
+		
+		return i18nService.retriveAllMessageList();
+	}
+
+	
+	public ListVo<I18nMessage> retriveMessageList(I18nMessageMapVo map) {
+		log.debug(">>> execure inquireMessageList ...");
+		
+		int page = map.getInt("page");
+
+		int limit = 10;
+		if (map.getInt("limit") == null) {
+			map.put("limit", limit);
+		}
+
+		int offset = (page - 1) * 10;
+
+		map.put("offset", offset);
+		map.put("limit", limit);
+
+		List<I18nMessage> list = i18nMessageMapper.selectByMap(map);
+		long total = i18nMessageMapper.countByMap(map);
+
+		return new ListVo<I18nMessage>(list, total);
+
+	}
+
+	
+	//@CachePut(value = "i18nMessageCache")
+	public void saveMessage(String code, String language, String message) {
+		log.debug(">>> execure saveMessage ...");
+		
+		I18nMessage i18nDtl = i18nMessageMapper.selectById(code, language);
+
+		if (i18nDtl == null) { // 등록
+			i18nMessageMapper.insert(code, language, message);
+		} else { // 수정
+			i18nDtl.setMessage(message);
+			i18nMessageMapper.update(code, language, message);
+		}
+	}
+	
+	//@CacheEvict(value = "i18nMessageCache")
+	public void removeMessage(String code, String language) {
+		log.debug(">>> execure removeMessage ...");
+		
+		i18nMessageMapper.delete(code, language);
+	}
+	
+}

@@ -1,0 +1,73 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.exception;
+
+import com.wooribank.wbt3.web.base.framework.core.ExceptionCodeBaseConstants;
+
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.exception
+*   |_ CommonModuleException.java
+* </pre>
+* 
+* 클래스 역할 설명 : Common Module에서 발생한 Exception
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 23. 오후 11:11:06
+* @Version : 
+*/
+
+public class CommonModuleException extends ApplicationException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Desc : Constructor of CommonModuleException.java class
+	 */
+
+	public CommonModuleException() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of CommonModuleException.java class
+	 * @param errorCode
+	 */
+
+	public CommonModuleException(String errorCode) {
+		super(ExceptionCodeBaseConstants.COMMON_BASE + errorCode);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of CommonModuleException.java class
+	 * @param throwable
+	 */
+
+	public CommonModuleException(Throwable throwable) {
+		super(throwable);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of CommonModuleException.java class
+	 * @param errorCode
+	 * @param throwable
+	 */
+
+	public CommonModuleException(String errorCode, Throwable throwable) {
+		super(ExceptionCodeBaseConstants.COMMON_BASE + errorCode, throwable);
+		// TODO Auto-generated constructor stub
+	}
+
+}

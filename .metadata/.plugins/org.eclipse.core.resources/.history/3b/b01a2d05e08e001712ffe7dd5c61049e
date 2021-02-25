@@ -1,0 +1,148 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.wooribank.wbt3.sample.web;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.wooribank.wbt3.web.base.framework.nosql.redis.support.RedisDataSupport;
+
+/**
+* <pre>
+* com.wooribank.wbt3.sample.web
+*   |_ RedisApiCall.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 25. 오후 10:16:40
+* @Version : 
+*/
+
+public class RedisApiCall {
+
+	/**
+	 * Desc : Constructor of RedisApiCall.java class
+	 */
+
+	public RedisApiCall() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 개요:
+	 * 처리내용 :
+	 *   1) 
+	 *   2)
+	 *   3)
+	 * @Method Name : main
+	 * @history
+	 * ---------------------------------------------------------------------------------
+	 *  변경일                    작성자                    변경내용
+	 * ---------------------------------------------------------------------------------
+	 *  2017. 8. 25.     yaong      최초 작성   
+	 * ---------------------------------------------------------------------------------
+	 * @param args
+	 */
+
+	public static void main(String[] args) {
+		
+		String confPathConfig = "classpath*:/conf/spring/applicationContext-redis.xml";		
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(confPathConfig);
+		RedisDataSupport redisDataSupport = applicationContext.getBean("redisDataSupport", RedisDataSupport.class);
+		
+		// Case : String 
+		String objectKey = "string_key";
+		String strValue = "StringValue";
+		
+		redisDataSupport.addStringEntry(objectKey, strValue);
+		
+		String resStrValue = (String) redisDataSupport.getValueObject(objectKey);
+		System.out.println("+++Added resStrValue=" + resStrValue);
+		
+		redisDataSupport.deleteStringEntry(objectKey, strValue);
+
+		resStrValue = (String) redisDataSupport.getValueObject(objectKey);
+		System.out.println("---Deleted resStrValue=" + resStrValue);
+		
+		// Case : Hash
+		objectKey = "hash_key";
+
+		redisDataSupport.addHashEntry(objectKey, "ko", "한국어");
+		redisDataSupport.addHashEntry(objectKey, "en", "영어");
+		redisDataSupport.addHashEntry(objectKey, "th", "태국어");
+		redisDataSupport.addHashEntry(objectKey, "ja", "일본어");
+		
+		HashMap resHashValue = (HashMap) redisDataSupport.getValueObject(objectKey);
+		System.out.println("+++Added resHashValue=" + resHashValue);
+		
+		redisDataSupport.deleteHashEntry(objectKey, "ja");
+		
+		resHashValue = (HashMap) redisDataSupport.getValueObject(objectKey);
+		System.out.println("---Deleted resHashValue=" + resHashValue);
+		
+		// Case : List
+		objectKey = "list_key";
+
+		redisDataSupport.addFirstListEntry(objectKey, "yaong-LF1");
+		redisDataSupport.addLastListEntry(objectKey, "yaong-LL1");
+		redisDataSupport.addLastListEntry(objectKey, "yaong-LL2");
+		redisDataSupport.addFirstListEntry(objectKey, "yaong-LF2");
+		
+		List resListValue = (List) redisDataSupport.getValueObject(objectKey);
+		System.out.println("+++Added resListValue=" + resListValue);
+		
+		redisDataSupport.deleteFirstListEntry(objectKey);
+		redisDataSupport.deleteLastListEntry(objectKey);
+
+		resListValue = (List) redisDataSupport.getValueObject(objectKey);
+		System.out.println("---Deleted resListValue=" + resListValue);
+		
+		// Case : Set
+		objectKey = "set_key";
+
+		Object [] values = new Object [] {"yaong-S11", "yaong-S12", "yaong-S13"};
+		
+		redisDataSupport.addSetEntry(objectKey, values);
+		redisDataSupport.addSetEntry(objectKey, "yaong-S01", "yaong-S02", "yaong-S03");
+		
+		
+		Set resSetValue = (Set) redisDataSupport.getValueObject(objectKey);
+		System.out.println("+++Added resSetValue=" + resSetValue);
+		
+		redisDataSupport.deleteSetEntry(objectKey, "yaong-S13");
+		
+		resSetValue = (Set) redisDataSupport.getValueObject(objectKey);
+		System.out.println("---Deleted resSetValue=" + resSetValue);
+		
+		// Case : SortedSet
+		objectKey = "sortedset_key";		
+		
+		redisDataSupport.addSortedSetEntry(objectKey, "yaong-ZS01", 0.09);
+		redisDataSupport.addSortedSetEntry(objectKey, "yaong-ZS02", 0.08);
+		redisDataSupport.addSortedSetEntry(objectKey, "yaong-ZS03", 1.02);
+		redisDataSupport.addSortedSetEntry(objectKey, "yaong-ZS04", 1.01);
+		
+		LinkedHashSet resZSetValue =  (LinkedHashSet) redisDataSupport.getValueObject(objectKey);
+		System.out.println("+++Added resZSetValue=" + resZSetValue);		
+		
+		redisDataSupport.deleteSortedSetEntry(objectKey, "yaong-ZS04");
+		
+		resZSetValue =  (LinkedHashSet) redisDataSupport.getValueObject(objectKey);
+		System.out.println("---Deleted resZSetValue=" + resZSetValue);		
+	}
+
+}

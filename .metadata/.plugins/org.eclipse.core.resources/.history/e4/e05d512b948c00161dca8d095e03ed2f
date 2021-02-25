@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"		
+		default-autowire="byName">
+
+	<context:annotation-config />
+		
+    <mvc:annotation-driven/>
+    
+	<mvc:default-servlet-handler />
+
+	<!-- 정규표현식을 이용하여 Web 관련 Controller만 적용한다. -->
+	<context:component-scan base-package="com.bluedigm.web">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+		<context:exclude-filter type="regex" expression="^com\.bluedigm\.web\.sample\.[a-zA-Z\.]*\.controller.*"/>
+	</context:component-scan>
+
+
+<!--  
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	    <property name="jobRepository" ref="jobRepository" />
+	</bean>
+-->		
+		
+	<!-- Workaround for INT-1831 -->
+	<bean id="dummy" class="java.util.Date"/>
+		
+    <!-- Spring Batch Admin Context: Additional context for Spring Batch Admin -->
+    <import resource="classpath*:/META-INF/spring/batch/servlet/resources/*.xml" />
+    <import resource="classpath*:/META-INF/spring/batch/servlet/manager/*.xml" />
+
+	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:/conf/property/${server.type}/batch-default.properties</value>
+			</list>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="ignoreUnresolvablePlaceholders" value="false" />
+		<property name="order" value="1" />
+	</bean>
+  		
+ 	
+ 	 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/manager/data-source-context.xml" /> 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/manager/jmx-context.xml" />
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/integration/jmx-context.xml" /> 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/integration/configuration-context.xml" /> 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/manager/execution-context.xml" /> 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/integration/file-context.xml" /> 
+ 	<!-- 
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/**/*.xml" />	
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/manager/execution-context.xml" /> 	
+ 	<import resource="classpath*:/META-INF/spring/batch/bootstrap/manager/jmx-context.xml" /> 	
+	-->
+
+
+ 	<import resource="classpath*:jobs/**/*.xml" />
+ 	
+ 	<bean id="parameterUnpackerFilter" class="org.springframework.batch.admin.web.filter.ParameterUnpackerFilter">
+ 		<property name="prefix" value="unpack_"/>
+ 		<property name="putEmptyParamsInPath" value="true"/>
+ 	</bean>
+ 		
+    <!-- For Spring Batch -->
+    <bean id="resourceService"
+        class="org.springframework.batch.admin.web.resources.DefaultResourceService">
+        <property name="servletPath" value="/" />
+        		        
+    </bean>
+ 	
+ 	
+</beans>

@@ -1,0 +1,118 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.filter;
+
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+//import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.web.base.framework.filter
+ *    |_ XSSRequestWrapper.java
+ * Cross-Site Script Request Wrapper
+ * </pre>
+ * 
+ * @author Han-Woong Lee, Bluedigm
+ * @date 2012. 8. 13. 오후 4:05:36
+ * @version 0.0.1
+ */
+public class XSSRequestWrapper extends HttpServletRequestWrapper {
+	/**
+	 * 모든 상속 클래스를 위한 로그
+	 */
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
+	@SuppressWarnings("unused")
+	private static Pattern[] patterns = new Pattern[] {
+			// Script fragments
+			Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE),
+			// src='...'
+			Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+					| Pattern.DOTALL),
+			Pattern.compile("src[\r\n]*=[\r\n]*\\\"(.*?)\\\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+					| Pattern.DOTALL),
+			// lonely script tags
+			Pattern.compile("</script>", Pattern.CASE_INSENSITIVE),
+			Pattern.compile("<script(.*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			// eval(...)
+			Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			// expression(...)
+			Pattern.compile("expression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
+			// javascript:...
+			Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE),
+			// vbscript:...
+			Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
+			// query % ...
+			//Pattern.compile("^%|[\\%]$", Pattern.CASE_INSENSITIVE),			
+			// onload(...)=...
+			Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL) };
+
+	public XSSRequestWrapper(HttpServletRequest servletRequest) {
+		super(servletRequest);
+	}
+
+	@Override
+	public String[] getParameterValues(String parameter) {
+		String[] values = super.getParameterValues(parameter);
+
+		if (values == null) {
+			return null;
+		}
+
+		int count = values.length;
+		String[] encodedValues = new String[count];
+		for (int i = 0; i < count; i++) {
+			encodedValues[i] = stripXSS(values[i]);
+		}
+
+		return encodedValues;
+	}
+
+	@Override
+	public String getParameter(String parameter) {
+		String value = super.getParameter(parameter);
+
+		return stripXSS(value);
+	}
+
+	@Override
+	public String getHeader(String name) {
+		String value = super.getHeader(name);
+		return stripXSS(value);
+	}
+
+	private String stripXSS(String value) {
+		if (value != null) {
+//			// NOTE: It's highly recommended to use the ESAPI library and
+//			// uncomment the following line to
+//			// avoid encoded attacks.
+//			//value = ESAPI.encoder().canonicalize(value);
+//			value = HtmlUtils.htmlEscape(value);
+//			//value = escapeHtml4(value);
+//			// Avoid null characters
+//			value = value.replaceAll("\0", "");
+//			value = Pattern.compile("^%|[\\%]$", Pattern.CASE_INSENSITIVE).matcher(value).replaceAll("&#37;");
+//			
+//			//log.debug(value);
+//			
+//			// Remove all sections that match a pattern
+//			for (Pattern scriptPattern : patterns) {
+//				value = scriptPattern.matcher(value).replaceAll("");
+//			}
+		}
+		return value;
+	}
+}

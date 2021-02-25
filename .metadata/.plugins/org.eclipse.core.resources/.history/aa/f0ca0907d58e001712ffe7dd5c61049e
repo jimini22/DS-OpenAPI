@@ -1,0 +1,199 @@
+/*
+ * Copyright (c) Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.bluedigm.web.base.framework.filter;
+
+import java.util.regex.Pattern;
+ // TODO: Auto-generated Javadoc
+
+ /**
+	 * <pre>
+	 * com.wooribank.wbt3.web.base.framework.filter
+	 * |_XSSUtil.java
+	 * The Class XSSUtil.
+	 * TODO : Javadoc주석작성
+	 * </pre>
+	 * 
+	 * @author [UserName], [Compony]
+	 * @date 2013. 7. 31 오전 10:33:02
+	 */
+public class XSSUtil {
+	
+	/**
+	 * Clear xss minimum.
+	 * 
+	 * @param value the value
+	 * @return the string
+	 */
+	public static String clearXSSMinimum(String value) {
+		if (value == null || value.trim().equals("")) {
+			return "";
+		}
+		
+		String returnValue = value;
+
+		returnValue = returnValue.replaceAll("&", "&amp;");
+		returnValue = returnValue.replaceAll("<", "&lt;");
+		returnValue = returnValue.replaceAll(">", "&gt;");
+		returnValue = returnValue.replaceAll("\"", "&#34;");
+		returnValue = returnValue.replaceAll("\'", "&#39;");
+		return returnValue;
+	}
+
+	/**
+	 * Clear xss maximum.
+	 * 
+	 * @param value the value
+	 * @return the string
+	 */
+	public static String clearXSSMaximum(String value) {
+		String returnValue = value;
+		returnValue = clearXSSMinimum(returnValue);
+
+		returnValue = returnValue.replaceAll("%00", null);
+
+		returnValue = returnValue.replaceAll("%", "&#37;");
+
+		// \\. => .
+
+		returnValue = returnValue.replaceAll("\\.\\./", ""); // ../
+		returnValue = returnValue.replaceAll("\\.\\.\\\\", ""); // ..\
+		returnValue = returnValue.replaceAll("\\./", ""); // ./
+		returnValue = returnValue.replaceAll("%2F", "");
+
+		return returnValue;
+	}
+
+	/**
+	 * File path black list.
+	 * 
+	 * @param value the value
+	 * @return the string
+	 */
+	public static String filePathBlackList(String value) {
+		String returnValue = value;
+		if (returnValue == null || returnValue.trim().equals("")) {
+			return "";
+		}
+
+		returnValue = returnValue.replaceAll("\\.\\./", ""); // ../
+		returnValue = returnValue.replaceAll("\\.\\.\\\\", ""); // ..\
+
+		return returnValue;
+	}
+
+	/**
+	 * File path replace all.
+	 * 
+	 * @param value the value
+	 * @return the string
+	 */
+	public static String filePathReplaceAll(String value) {
+		String returnValue = value;
+		if (returnValue == null || returnValue.trim().equals("")) {
+			return "";
+		}
+
+		returnValue = returnValue.replaceAll("/", "");
+		returnValue = returnValue.replaceAll("\\", "");
+		returnValue = returnValue.replaceAll("\\.\\.", ""); // ..
+		returnValue = returnValue.replaceAll("&", "");
+
+		return returnValue;
+	}
+
+	/**
+	 * File path white list.
+	 * 
+	 * @param value the value
+	 * @return the string
+	 */
+	public static String filePathWhiteList(String value) {
+		return value; // TODO
+	}
+	
+	 /**
+	 * Checks if is iP address.
+	 * 
+	 * @param str the str
+	 * @return true, if is iP address
+	 */
+ 	public static boolean isIPAddress(String str) {
+		Pattern ipPattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+		
+		return ipPattern.matcher(str).matches();
+    }
+	 
+	 /**
+	 * Removes the crlf.
+	 * 
+	 * @param parameter the parameter
+	 * @return the string
+	 */
+ 	public static String removeCRLF(String parameter) {
+		 return parameter.replaceAll("\r", "").replaceAll("\n", "");
+	 }
+	 
+	 /**
+	 * Removes the sql injection risk.
+	 * 
+	 * @param parameter the parameter
+	 * @return the string
+	 */
+ 	public static String removeSQLInjectionRisk(String parameter) {
+		 return parameter.replaceAll("\\p{Space}", "").replaceAll("\\*", "").replaceAll("%", "").replaceAll(";", "").replaceAll("-", "").replaceAll("\\+", "").replaceAll(",", "");
+	 }
+	 
+	 /**
+	 * Removes the os cmd risk.
+	 * 
+	 * @param parameter the parameter
+	 * @return the string
+	 */
+ 	public static String removeOSCmdRisk(String parameter) {
+		 return parameter.replaceAll("\\p{Space}", "").replaceAll("\\*", "").replaceAll("|", "").replaceAll(";", "");
+	 }
+	 
+	 
+    /*
+    public static void main(String[] args) {
+	String test = null;
+	
+	test = "<script language='javascript' encoding=\"utf-8\">q&a</script>";
+	System.out.println("clearXSSMinimum() Test");
+	System.out.println(test);
+	System.out.println("=>");
+	System.out.println(clearXSSMinimum(test));
+	System.out.println();
+	
+	test = "/a/b/c../..\\";
+	System.out.println("clearXSSMaximum() Test");
+	System.out.println(test);
+	System.out.println(" =>");
+	System.out.println(clearXSSMaximum(test));
+	System.out.println();
+	
+	test = "/a/b/c/../../../..\\..\\";
+	System.out.println("filePathBlackList() Test");
+	System.out.println(test);
+	System.out.println("=>");
+	System.out.println(filePathBlackList(test));
+	System.out.println();
+	
+	test = "192.168.0.1";
+	System.out.println("isIPAddress() test");
+	System.out.println("IP : " + test + " => " + isIPAddress(test));
+	
+	test = "abc def*%;-+,ghi";
+	System.out.println("removeSQLInjectionRisk() test");
+	System.out.println(test + " => " + removeSQLInjectionRisk(test));
+    }
+    //*/
+
+}

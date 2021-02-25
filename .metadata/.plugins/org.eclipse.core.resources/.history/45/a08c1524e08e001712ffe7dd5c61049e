@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ */
+package com.wooribank.wbt.sample.support.jsonp;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.sample.rest.base.framework.sample.support.jsonp
+ * 		|_JacksonObjectMapper.java
+ * TODO Javadoc주석작성
+ * </pre>
+ *
+ * @author [Hanwoong Lee], [Bluedigm]
+ * @date 2013. 9. 12. 오후 4:43:07
+ * @version $Id$
+ */
+public class JacksonObjectMapper extends ObjectMapper {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 7859580595946897659L;
+
+	/** TODO Javadoc주석작성
+	 * 
+	 */
+	public JacksonObjectMapper() {
+	    super();
+	    this.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+	    this.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+	    this.setSerializationInclusion(Include.NON_NULL);
+	}
+
+}

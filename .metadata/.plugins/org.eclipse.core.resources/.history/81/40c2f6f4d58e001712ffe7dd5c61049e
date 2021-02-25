@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) SK TELECOM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of SK TELECOM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with SK TELECOM.
+ */
+package com.bluedigm.web.sample.common.util;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.util.StopWatch;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.sample.common.common.util
+ *   |_ LoggingAspec.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : 손태진<son@bluedigm.com>
+ * @Date    : 2014. 6. 13. 오후 3:39:17
+ * @Version : 
+ */
+@Aspect
+public class LoggingAspec {
+	private static Log log = LogFactory.getLog(LoggingAspec.class);
+
+	@Before("within(@org.springframework.stereotype.Controller *)")
+	public void logBeforeController(JoinPoint.StaticPart jpsp){
+		if (log.isInfoEnabled()) {
+			log.info("[Log] RequestMapping Controller.. ClassName = " + jpsp.getSignature().getDeclaringType().getName() + ", MethodName = " + jpsp.getSignature().getName());
+		}
+	}
+
+	@Around("within(@org.springframework.stereotype.Service *)")
+	public Object invoke(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (log.isInfoEnabled()) {
+			log.info("[Log] Excute Service.. ClassName = " + joinPoint.getTarget().getClass().getName() + ", MethodName = " + joinPoint.getSignature().getName());
+		}
+
+		StopWatch sw = new StopWatch(joinPoint.toShortString());
+		sw.start();
+		try {
+			return joinPoint.proceed();
+		} finally {
+			sw.stop();
+			if (log.isInfoEnabled()) {
+				log.info("Service proceeding spending time is " + sw.getTotalTimeSeconds());
+			}
+		}
+	}
+
+
+}

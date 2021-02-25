@@ -1,0 +1,7 @@
+package com.bluedigm.web.batch.sample.domain;
+
+import java.io.Serializable;
+
+public class Data1 implements Serializable {
+
+}

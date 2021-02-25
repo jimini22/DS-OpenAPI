@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+externalMigrateFromAuthorizationDatabase/isMigrated=true
+migrateFromAuthorizationDatabase/isMigrated=true
+repositories/606ccb93af32001b1745c6cb050b2303=606ccb93af32001b1745c6cb050b2303;http\://172.21.5.52/svn/woori/WBT3_Common;http\://172.21.5.52/svn/woori/WBT3_Common;branches;tags;trunk;true;;;;false;;;0
+repositories/608adb8f8730001b18be9c67fa1dfe8d=608adb8f8730001b18be9c67fa1dfe8d;https\://106.240.233.210/svn/hanatourjp_program/hana;https\://106.240.233.210/svn/hanatourjp_program/hana;branches;tags;trunk;true;;;;false;;;0
+repositories/70ca9bad4f30001b1ad6db01cbcbd1c7=70ca9bad4f30001b1ad6db01cbcbd1c7;http\://bdaf.iptime.org/svn/BDAuth;http\://bdaf.iptime.org/svn/BDAuth;branches;tags;trunk;true;;;;false;;;0

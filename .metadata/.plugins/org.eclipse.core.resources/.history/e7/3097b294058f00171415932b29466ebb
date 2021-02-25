@@ -1,0 +1,333 @@
+/*
+ * Copyright (c) SK TELECOM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of SK TELECOM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with SK TELECOM.
+ */
+package com.wooribank.wbt3.sample.common.util.http;
+
+import java.io.InputStream;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.wooribank.wbt3.sample.common.util.IConnectionAdapter;
+import com.wooribank.wbt3.web.base.framework.core.FrameworkConstants;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.sample.common.util
+ *   |_ HttpConntionAdapter.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : 손태진<son@bluedigm.com>
+ * @Date    : 2014. 7. 7. 오후 3:48:05
+ * @Version : 
+ */
+public final class HttpConnectionAdapter implements IConnectionAdapter{
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
+	private static final class SingletonHoler{
+		static final HttpConnectionAdapter adapter = new HttpConnectionAdapter();	
+	}
+
+	private HttpConnectionAdapter(){}
+
+	public static HttpConnectionAdapter getInstance(){
+		return SingletonHoler.adapter;
+	}
+	
+	public String send(String requestUrl, String jsonData, String method){
+		log.debug("[nag]-------------------- send Start ---------------------");
+		log.debug("[nag]-------------------- requestUrl : " + requestUrl);
+		log.debug("[nag]-------------------- jsonData : " + jsonData);
+		log.debug("[nag]-------------------- method : " + method);
+			
+		StringBuilder sb = new StringBuilder();
+		try{
+			HttpPost httpPost = null;
+			HttpDelete httpDelete = null;
+			HttpPut httpPut = null;
+			HttpResponse response = null;
+			
+			HttpClient client = HttpClientBuilder.create().build();
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(3000).build();
+			StringEntity reqEntity = null;
+			
+			if(FrameworkConstants.Servlet.METHOD_POST.equals(method)){
+				httpPost = new HttpPost(requestUrl);
+				httpPost.setConfig(config);
+				reqEntity = new StringEntity(jsonData);
+				reqEntity.setContentEncoding("utf-8");
+				reqEntity.setContentType("application/json");
+				httpPost.setEntity(reqEntity);
+				response = client.execute(httpPost);
+			}else if(FrameworkConstants.Servlet.METHOD_DELETE.equals(method)){
+				httpDelete = new HttpDelete(requestUrl);
+				httpDelete.setConfig(config);
+				response = client.execute(httpDelete);
+			}else if(FrameworkConstants.Servlet.METHOD_PUT.equals(method)){
+				httpPut = new HttpPut(requestUrl);
+				httpPut.setConfig(config);					
+				reqEntity = new StringEntity(jsonData);	
+				reqEntity.setContentEncoding("utf-8");
+				reqEntity.setContentType("application/json");
+				httpPut.setEntity(reqEntity);
+				response = client.execute(httpPut);
+			}
+			
+			log.debug("[nag] execute");
+			log.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&[nag]" + response.getAllHeaders());
+			HttpEntity entity = response.getEntity();
+
+			if( entity != null ) {
+				InputStream in = null;
+				try {
+					in = entity.getContent();
+					byte[] resultData = new byte[1024]; // 응답데이터의 크기는 최대 1024bytes를 넘지않는다고 가정한다~!!(만약 그렇지 않다면 현재 읽어들인 content의 길이를 확인해서 그만큼 할당해야 함)
+					int readCnt = in.read(resultData);
+					sb.append(new String(resultData));
+					log.debug("[nag] \n\n ==== responseData readCnt["+ readCnt +"] data["+ new String(resultData) +"====\n\n");
+					//return null;
+				}catch(Exception e) {
+					e.printStackTrace();
+					//return null;
+				}finally {
+					if( in != null ) {    	    		  
+						in.close();
+						in = null;
+					}
+					if(FrameworkConstants.Servlet.METHOD_POST.equals(method)){
+						if( httpPost != null ) {
+							httpPost.releaseConnection();
+							httpPost = null;
+						}
+					}else if(FrameworkConstants.Servlet.METHOD_DELETE.equals(method)){
+						if( httpDelete != null ) {
+							httpDelete.releaseConnection();
+							httpDelete = null;
+						}
+					}else if(FrameworkConstants.Servlet.METHOD_PUT.equals(method)){
+						if( httpPut != null ) {
+							httpPut.releaseConnection();
+							httpPut = null;
+						}
+					}
+					
+				}
+			} 
+
+
+		}
+		catch(Exception ex){
+			log.debug("[nag] : " + ex.getMessage());
+			ex.printStackTrace();
+		}
+		
+		return sb.toString();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.util.IConnectionAdapter#httpRequest(java.lang.String, java.lang.String, boolean, java.lang.String)
+	 */
+	/*public String send(String requestUrl, String param, boolean usePost, String method){
+		log.debug("-------------------- send Start ---------------------");
+		log.debug("-------------------- requestUrl : " + requestUrl);
+		log.debug("-------------------- param : " + param);
+		log.debug("-------------------- usePost : " + usePost);
+		log.debug("-------------------- method : " + method);
+		if(requestUrl == null){
+			return null;
+		}
+		String sParam =  param;
+		String sURL = requestUrl;
+		boolean isPost = usePost;
+		URL url = null;
+		HttpURLConnection huc = null;     
+		BufferedWriter bw = null;
+		BufferedReader br = null;
+		String readLine = null;
+		StringBuilder sb = new StringBuilder();
+		try {
+			if (StringUtils.isEmpty(method) && StringUtils.isNotBlank(sParam)) {
+				sParam = StringUtils.trimToNull(sParam);
+				isPost = true;
+			}
+
+			url = new URL(sURL);
+			if(url.getProtocol().toLowerCase().equals("https")){
+				trustAllHosts();
+				HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+				https.setHostnameVerifier(DO_NOT_VERIFY);
+				huc = https;
+			}else{
+				huc = (HttpURLConnection) url.openConnection();
+			}
+
+			//test
+			//huc.setRequestProperty("projectId", "1");
+
+			huc.setConnectTimeout(3000);
+			huc.setReadTimeout(10000);
+			huc.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			if (isPost && method == null) {
+				huc.setRequestMethod(FrameworkConstants.Servlet.METHOD_POST);
+				huc.setDoOutput(true);
+			}else if (isPost && method != null) {
+				huc.setRequestMethod(method);
+				huc.setDoOutput(true);
+			}else if(method != null){
+				huc.setRequestMethod(method);
+			}else{
+				huc.setRequestMethod(FrameworkConstants.Servlet.METHOD_GET);
+			}
+			log.debug("-------------------- isPost : " + isPost);
+			log.debug("-------------------- RequestMethod : " + huc.getRequestMethod());
+
+			huc.connect();
+			
+			if (isPost) {
+				// OutputStream os = huc.getOutputStream();
+				// os.write(sParam.getBytes("UTF-8"));
+				// os.flush();
+				// os.close();
+				// os = null;
+				bw = new BufferedWriter(new OutputStreamWriter(huc.getOutputStream()));
+				bw.write(sParam);
+				bw.flush();
+				bw.close();
+				bw = null;
+			}
+//			if (huc.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				log.debug("============== HTTP_OK ================");
+				br = new BufferedReader(new InputStreamReader(huc.getInputStream()));
+				while ((readLine = br.readLine()) != null) {
+					log.debug("==============================");
+					sb.append(readLine);
+				}
+				br.close();
+				br = null;
+				
+				
+//			}else{
+//				br = new BufferedReader(new InputStreamReader(huc.getInputStream()));
+//				while ((readLine = br.readLine()) != null) {
+//					log.debug("==============================");
+//					sb.append(readLine);
+//				}
+//				br.close();
+//				br = null;
+//				log.debug("============== HTTP_Fail ================");
+//			}
+			huc.disconnect();
+			huc = null;
+			url = null;
+		} catch (MalformedURLException mue) {
+			mue.printStackTrace();
+		} catch (IOException ie) {
+			ie.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException ie1) {
+					ie1.printStackTrace();
+				}
+				br = null;
+			}
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException ie2) {
+					ie2.printStackTrace();
+				}
+				bw = null;
+			}
+			if (huc != null) {
+				huc.disconnect();
+				huc = null;
+			}
+			if (url != null) {
+				url = null;
+			}
+
+		}
+		log.debug("---------- send Result Data : " + sb.toString());
+		log.debug("-------------------- send End ---------------------");
+		return sb.toString();
+	}*/
+
+	private static void trustAllHosts() {        
+		// Create a trust manager that does not validate certificate chains        
+		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {                
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {                        
+				return new java.security.cert.X509Certificate[] {};                
+			} 
+
+			@Override                
+			public void checkClientTrusted(
+					java.security.cert.X509Certificate[] chain, 
+					String authType) throws java.security.cert.CertificateException { 
+				// TODO Auto-generated method stub 
+			}
+
+			@Override                
+			public void checkServerTrusted(                        
+					java.security.cert.X509Certificate[] chain, 
+					String authType) throws java.security.cert.CertificateException {                    
+				// TODO Auto-generated method stub						      
+			} 
+		}};        
+
+		// Install the all-trusting trust manager        
+		try {                
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(null, trustAllCerts, new java.security.SecureRandom());                
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (Exception e) {                
+			e.printStackTrace();        
+		}    
+	}
+	
+	final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {        
+		@Override        
+		public boolean verify(String hostname, SSLSession session) {            
+			return true;        
+		}    
+	};
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.util.IConnectionAdapter#send(java.lang.String, java.lang.String, boolean, java.lang.String)
+	 */
+	@Override
+	public String send(String requestUrl, String param, boolean usePost,
+			String method) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
+
+

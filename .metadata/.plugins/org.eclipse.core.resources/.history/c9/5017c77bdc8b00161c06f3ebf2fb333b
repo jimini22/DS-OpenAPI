@@ -1,0 +1,42 @@
+package com.bluedigm.web.batch.sample.domain;
+
+import java.io.Serializable;
+
+public class Data1 implements Serializable {
+
+	private String id;
+	
+	private String name;
+	
+	private Date date;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
+}

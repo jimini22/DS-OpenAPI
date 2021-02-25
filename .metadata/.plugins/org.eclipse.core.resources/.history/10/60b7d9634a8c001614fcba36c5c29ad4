@@ -1,0 +1,26 @@
+# Common properties for bootstrapping placeholders in an application context.
+# Users override these values by providing classpath:/batch-default.properties
+# or classpath:/batch-${ENVIRONMENT}.properties
+
+# Properties that are not database specific, or have sensible 
+# platform independent defaults:
+batch.jdbc.testWhileIdle=false
+batch.jdbc.validationQuery=
+batch.data.source.init=true
+batch.job.configuration.file.dir=classpath*:/batchjobs
+batch.job.service.reaper.interval=60000
+
+batch.jdbc.driver=net.sf.log4jdbc.DriverSpy
+
+batch.jdbc.url=jdbc:hsqldb:hsql://localhost:9001/BDWebSampleDB
+batch.jdbc.user=sa
+batch.jdbc.password=
+batch.schema.script=classpath:/org/springframework/batch/core/schema-hsql.sql
+batch.drop.script=classpath:/org/springframework/batch/core/schema-drop-hsql.sql
+batch.business.schema.script=classpath:/schema/business-schema-hsql.sql
+
+# Default placeholders for database platform independent features 
+batch.remote.base.url=http://localhost:6080/bdweb-batch
+
+# Non-platform dependent settings that you might like to change
+#batch.job.configuration.file.dir=conf

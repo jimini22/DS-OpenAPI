@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.wooribank.wbt3.imm.user.mapper.UserStatisticMapper">
+ 
+ 
+ 
+ 
+	<!-- 일반회원조회 -->	
+	<select id="selectCommonMember" parameterType="com.wooribank.wbt3.imm.user.model.request.UserStatisticReq" resultType="com.wooribank.wbt3.imm.user.model.data.UserStatisticVO">
+		SELECT A.* ,
+		       (SELECT B.MNAC_MBH_IDX_NO
+		         FROM WBT3_IMM001TM B
+		        WHERE A.mbhIdxNo = B.MNAC_MBH_IDX_NO LIMIT 1
+		       )  as mnacMbhIdxNo
+		  FROM
+		       (SELECT COUNT( A.MBH_IDX_NO) as friendCnt,
+		              A.MBH_IDX_NO as mbhIdxNo,
+		              A.HP_NLNO as hpNlno,
+		              A.HP_NO as hpNo,
+		              A.MBH_EML_ADR as mbhEmlAdr,
+		              A.WBBT_MBH_TPCD as wbbtMbhTpcd,
+		              A.MBH_JNNG_DTM as joinyear,
+		               IFNULL( IFNULL( IF(C.FRND_ALS_NM='', NULL, C.FRND_ALS_NM) ,C.FRND_NM ) , A.PRFL_ALS ) prflAls,
+		              A.MBH_CI_TEXT as mbhClText,
+		              DATE_FORMAT(A.MBH_JNNG_DTM,'%Y-%m-%d %H:%i') as mbhJnngDtm,
+		              IF( B.WBBT_OS_DSCD IS NULL ,'미사용','사용') as wbbtOsDscd
+		         FROM WBT3_IMM001TM AS A
+		            LEFT JOIN WBT3_IMM008TS AS B
+		                ON (
+		                A.MBH_IDX_NO = B.MBH_IDX_NO
+		                AND B.WBBT_OS_DSCD = 2
+		              )
+		            LEFT JOIN WBT3_IMM002TM C
+		                ON (
+		                A.MBH_IDX_NO = C.MBH_IDX_NO
+		              )
+		        WHERE A.MBH_ACC_STS_TPCD = '0' /* 0 일반 8 휴먼 9 탈퇴 */
+		              AND A.MBH_JNNG_DTM LIKE CONCAT(#{joinDate},'%')
+		          GROUP BY A.MBH_IDX_NO ,
+		              A.HP_NLNO,
+		              A.HP_NO,
+		              A.MBH_EML_ADR,
+		              A.WBBT_MBH_TPCD,
+		              A.MBH_JNNG_DTM ,
+		           IFNULL( IFNULL( IF(C.FRND_ALS_NM='', NULL, C.FRND_ALS_NM) ,C.FRND_NM ) , A.PRFL_ALS ),
+		              A.MBH_CI_TEXT ,
+		              B.WBBT_OS_DSCD
+		       ) A
+		ORDER BY A.joinyear
+		LIMIT #{nowRowIndex},#{limit}
+	</select>
+
+
+	  
+	<!-- 휴먼회원조회 -->    
+	<select id="selectSleepMember" parameterType="com.wooribank.wbt3.imm.user.model.request.UserStatisticReq" resultType="com.wooribank.wbt3.imm.user.model.data.UserStatisticVO">
+		SELECT 
+		       A.MBH_IDX_NO as mbhIdxNo,
+		       A.MBH_EML_ADR as mbhEmlAdr,
+		       A.WBBT_MBH_TPCD as wbbtMbhTpcd ,
+		       DATE_FORMAT(MAX(B.LGIN_DTM),'%Y-%m-%d %H:%i') as  lginDtm  ,
+		       DATE_FORMAT(A.MBH_JNNG_DTM,'%Y-%m-%d %H:%i') as mbhJnngDtm
+		  FROM WBT3_IMM001TM AS A
+		     LEFT OUTER JOIN WBT3_IMM008TS AS B
+		         ON (
+		         A.MBH_IDX_NO = B.MBH_IDX_NO
+		       )
+		 WHERE A.MBH_ACC_STS_TPCD = '8'  
+		       AND B.LGIN_DTM IS NOT NULL
+		   GROUP BY A.MBH_IDX_NO ,
+		       A.MBH_EML_ADR,
+		       A.WBBT_MBH_TPCD,
+		       A.MBH_JNNG_DTM
+		ORDER BY A.MBH_JNNG_DTM
+		LIMIT #{nowRowIndex},#{limit}
+	</select>
+	
+	
+	<!-- 탈퇴회원조회 -->    
+	<select id="selectWithdrawalMember" parameterType="com.wooribank.wbt3.imm.user.model.request.UserStatisticReq" resultType="com.wooribank.wbt3.imm.user.model.data.UserStatisticVO">
+		SELECT
+		       A.MBH_IDX_NO  as mbhIdxNo ,
+		       A.MBH_EML_ADR as mbhEmlAdr ,
+		       A.WBBT_MBH_TPCD as wbbtMbhTpcd,
+		       DATE_FORMAT(A.MBH_SCSS_DTM,'%Y-%m-%d %H:%i') as mbhScssDtm  ,
+		       DATE_FORMAT(A.MBH_JNNG_DTM,'%Y-%m-%d %H:%i') as mbhJnngDtm  ,
+		       (SELECT B.DVC_KVL_TEXT
+		         FROM WBT3_IMM008TS B
+		        WHERE B.MBH_IDX_NO = A.MBH_IDX_NO LIMIT 1
+		       )  as dvcKvlText
+		  FROM WBT3_IMM001TM AS A
+		 WHERE A.MBH_ACC_STS_TPCD = '9'
+		 ORDER BY A.MBH_JNNG_DTM
+		LIMIT #{nowRowIndex},#{limit}
+	</select>
+	
+		<!-- 현재일자로 최근 가입/탈퇴회원 조회 -->    
+	<select id="selectNowPeriodStatic" parameterType="com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq" resultType="com.wooribank.wbt3.imm.user.model.data.UserNowStatisticVO">
+			SELECT 
+		       CASE WHEN level = 1 THEN todayJoin ELSE 
+		           CASE WHEN level = 2 THEN beforeDayJoin ELSE beforeMonthJoin END END as insMember, 
+		       CASE     WHEN level = 1 THEN todayDraw     ELSE 
+		           CASE WHEN level = 2 THEN beforeDayDraw ELSE beforeMonthDraw END END as drawMember 
+		  FROM 
+		       (SELECT SUM(IF(today = drawDate,1,0)) todayDraw, 
+		              SUM(IF(today = joinDate,1,0)) todayJoin, 
+		              SUM(IF(beforeDay &lt;= joinDate,1,0)) beforeDayJoin, 
+		              SUM(IF(beforeDay &lt;= drawDate,1,0))beforeDayDraw, 
+		              SUM(IF(beforeMonth &lt;= joinDate,1,0)) beforeMonthJoin, 
+		              SUM(IF(beforeMonth &lt;= drawDate,1,0))beforeMonthDraw 
+		         FROM 
+		              (SELECT DATE_FORMAT( CURDATE(),'%Y%m%d') today, 
+		                     DATE_FORMAT(DATE_ADD(now(), INTERVAL -1 month),'%Y%m%d') beforeMonth, 
+		                     DATE_FORMAT(DATE_ADD(now(), INTERVAL -7 day),'%Y%m%d') beforeDay, 
+		                     SUBSTR(MBH_SCSS_DTM,1,8) drawDate, 
+		                     SUBSTR(MBH_JNNG_DTM,1,8) joinDate 
+		                FROM WBT3_IMM001TM 
+		               WHERE MBH_JNNG_DTM BETWEEN CONCAT( DATE_FORMAT(DATE_ADD(now(), INTERVAL -1 month),'%Y%m%d'),'%') AND CONCAT(DATE_FORMAT( CURDATE(),'%Y%m%d'),'%') 
+		              ) a 
+		       ) a  
+		     CROSS JOIN 
+		       (SELECT 1 as level 
+		             UNION ALL SELECT 2 as level UNION ALL SELECT 3 as level ) b  
+	</select>
+	
+		<!-- 기준년월로 가입/탈퇴 조회 리스트형 -->    
+	<select id="selectMonthPeriodStaticList" parameterType="com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq" resultType="com.wooribank.wbt3.imm.user.model.data.UserMonthStatisticListVO">
+	
+		SELECT mon as month,
+	       ifnull(cnt,0) cnt
+				  FROM
+				       (SELECT a.mon
+				         FROM
+				              (SELECT 1 as mon
+				                    UNION ALL
+				              SELECT 2
+				                    UNION ALL
+				              SELECT 3
+				                    UNION ALL
+				              SELECT 4
+				                    UNION ALL
+				              SELECT 5
+				                    UNION ALL
+				              SELECT 6
+				                    UNION ALL
+				              SELECT 7
+				                    UNION ALL
+				              SELECT 8
+				                    UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 ) a
+				        WHERE mon &lt;= #{searchMonth}
+				       ) a
+				     LEFT OUTER JOIN
+				       (SELECT count(insMon) cnt,
+				              insMon
+				         FROM
+				          <if test='searchType != null and searchType.equals("A") '>
+				              (SELECT CONVERT(SUBSTR(MBH_JNNG_DTM,5,2),UNSIGNED) insMon,
+				                     SUBSTR(MBH_JNNG_DTM,1,6) mon
+				                FROM WBT3_IMM001TM
+				               WHERE MBH_JNNG_DTM BETWEEN CONCAT( #{searchYear},'0101','%') AND CONCAT('2017',#{searchMonth}, '31','%')
+				              )
+				         </if>
+				          <if test='searchType != null and searchType.equals("B") '>
+				              (SELECT
+				              CONVERT(SUBSTR(MBH_SCSS_DTM,5,2),UNSIGNED) insMon,
+				              SUBSTR(MBH_SCSS_DTM,1,6) mon
+				              FROM WBT3_IMM001TM
+				               WHERE MBH_SCSS_DTM BETWEEN CONCAT( #{searchYear},'0101','%') AND CONCAT('2017',#{searchMonth}, '31','%')
+				              )
+				           </if>
+				              a
+				          GROUP BY insMon
+				       ) b
+				         ON a.mon = b.insMon
+				ORDER BY mon desc
+	</select>
+ 
+ 
+</mapper>    

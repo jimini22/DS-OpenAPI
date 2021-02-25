@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//END" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wooribank.wbt3.sample.common.i18n.mapper.I18nMessageMapper">
+
+	<insert id="insert" parameterType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		insert into i18n_msg 
+		(
+			code
+			, language
+			, message
+		) values (
+			#{code, 		jdbcType=VARCHAR}
+			, #{language, 	jdbcType=VARCHAR}
+			, #{message, 	jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		update
+			i18n_msg
+		set
+			message 	= #{message, 	jdbcType=VARCHAR}
+		where
+			code 		= #{code, 		jdbcType=VARCHAR}
+		and
+			language 	= #{language, 	jdbcType=VARCHAR}	
+	</update>
+	
+	<delete id="delete" parameterType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		delete from
+			i18n_msg
+		where
+			code 		= #{code, jdbcType=VARCHAR}
+		and
+			language 	= #{language, 	jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectById"  resultType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		select
+			code 		as code
+			, language 	as language
+			, message 	as message
+		from
+			i18n_msg
+		where
+			code 		= #{code, jdbcType=VARCHAR}
+		and
+			language	= #{language, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectAll" resultType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		select
+			code 		as code
+			, language 	as language
+			, message 	as message
+		from
+			i18n_msg
+	</select>
+				
+	<select id="selectByMap" resultType="com.wooribank.wbt3.sample.common.i18n.model.I18nMessage">
+		select
+			code 		as code
+			, language 	as language
+			, message 	as message
+		from
+			i18n_msg
+		<include refid="whereClause"/>
+		limit 	${map.limit}
+		offset 	${map.offset} 
+	</select>
+
+	<select id="countByMap" resultType="long">
+		select
+			count(*)
+		from
+			i18n_msg
+		<include refid="whereClause"/>
+	</select>
+
+	<sql id="whereClause">
+		<where>
+			<if test="map.code != null">
+				<trim prefix="and">
+					code like '%' || #{map.code, jdbcType=VARCHAR} || '%'
+				</trim>
+			</if>
+			<if test="map.language != null">
+				<trim prefix="and">
+					language like '%' || #{map.language, jdbcType=VARCHAR} || '%'
+				</trim>
+			</if>
+		</where>
+	</sql>
+
+</mapper>

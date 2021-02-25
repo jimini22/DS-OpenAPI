@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+  <script src="/resources/js/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<button onclick="test()">test</button>
+
+<script type="text/javascript">
+function test(){
+  var data= {"aaa":[{"id":"1","data":"aaa1data"},
+                  {"id":"2","data":"aaa2data"}
+                 ]
+           }
+ $.each(data, function(i, item) {
+	 $.each(item, function(index,tt)
+	    {
+		 alert(tt.data);
+	    });
+       
+   });
+ }
+
+
+</script>
+</body>
+</html>

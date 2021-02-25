@@ -1,0 +1,74 @@
+##################################################################################
+# Title, Text (UI Title or Text)
+##################################################################################
+sample.title.test=\uad00\ub9ac\uc790 \ud654\uba74 \uc2a4\ud504\ub9c1 Web MVC
+
+Length.book.title = book.title \uba54\uc138\uc9c0
+Length.title = Length.title \uba54\uc138\uc9c0
+#NotEmpty.newContact.address = \uc8fc\uc18c\uac12\uc774 \ud2c0\ub9bd\ub2c8\ub2e4.
+NotEmpty.address = \uc8fc\uc18c\uac12\uc774 \ud2c0\ub9bd\ub2c8\ub2e4.
+##################################################################################
+# Validation Message (UI Validation)
+##################################################################################
+sample.validation.required.name = Name\uc740 \ud544\uc218 \ud56d\ubaa9\uc785\ub2c8\ub2e4.
+sample.validation.required.email = Email is required!
+sample.validation.required.address = Address is required!
+sample.validation.required.password = Password is required!
+sample.validation.required.confirmPassword = Confirm password is required!
+sample.validation.required.favFrameworks = Please select at least a web frameworks!
+sample.validation.required.sex = Please select a sex!
+sample.validation.required.favNumber = Please select a number!
+sample.validation.notmatch.password = Password and Conform password is not match!
+sample.validation.required.mobile=Mobile\uc740 \ud544\uc218 \ud56d\ubaa9\uc785\ub2c8\ub2e4.
+
+##################################################################################
+# Notification Message (UI Notification)
+##################################################################################
+sample.noti.info={0}\uc5d0 \ub300\ud55c \uc815\ubcf4\uc785\ub2c8\ub2e4.
+
+
+##################################################################################
+# Error Message
+##################################################################################
+error.service.guide.NonAvailableManager = \ud604\uc7ac \uac00\uc6a9\ud55c \ub2f4\ub2f9\uc790\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.
+error.application.common.MandatoryMissing = \ud544\uc218 \uc785\ub825\ud56d\ubaa9\uc774 \ub204\ub77d\ub418\uc5c8\uc2b5\ub2c8\ub2e4.
+error.application.io.FileNotFound = {0} \ud30c\uc77c\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.
+error.application.io.StreamNotClose = \uc2a4\ud2b8\ub9bc\uc744 \ub2eb\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.
+error.application.sql
+error.application.sample.TxRollbackTest = \ud2b8\ub79c\uc7ad\uc158 \ud14c\uc2a4\ud2b8 \uc5d0\ub7ec\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.
+error.application.common.NoAuthPage=\uc811\uadfc\uad8c\ud55c\uc774 \uac70\ubd80\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uad00\ub9ac\uc790\uc5d0\uac8c \ubb38\uc758 \ud558\uc138\uc694.\n[{0}]
+error.application.common.NoSession=\uc138\uc158\uc774 \uc885\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \ub85c\uadf8\uc778\ud558\uc138\uc694.\n[{0}]
+error.framework.common.ResourceClose = \uc790\uc6d0\uc744 \ub2eb\ub294\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. 
+error.framework.util.BeanHandling = \uc790\ubc14\ube48\uc744 \ucc98\ub9ac\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.
+error.framework.util.KoreanNotEncode = \ud55c\uae00 \uc778\ucf54\ub529 \uc624\ub958\uc785\ub2c8\ub2e4.
+error.framework.jdbc.Database = \ub370\uc774\ud130\ubca0\uc774\uc2a4 \uc624\ub958\uc785\ub2c8\ub2e4.
+error.framework.web.Print = \uc6f9\uc73c\ub85c \ucd9c\ub825 \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.
+error.framework.web.viewhelper.ComboHandling = \ucf54\ub4dc \ucc98\ub9ac\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.
+error.framework.spring.validation.Validation = \uc785\ub825\uac12\uc774 \uc720\ud6a8\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.
+error.system.unknownerror = \uc2dc\uc2a4\ud15c\uc5d0\ub7ec\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.  
+error.system.passWord = \ube44\ubc00\ubc88\ud638\uac00 \uc77c\uce58\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.
+error.system.userid = \uc785\ub825\ud558\uc2e0 ID\ub294 \uc774\ubbf8 \uc0ac\uc6a9\uc911\uc785\ub2c8\ub2e4. 
+error.system.useridchk = ID \uc911\ubcf5\uccb4\ud06c \ud6c4 \ub4f1\ub85d \uac00\ub2a5\ud569\ub2c8\ub2e4.
+error.system.elemNm = \uc5d8\ub9ac\uba3c\ud2b8\uba85 \uc911\ubcf5\uccb4\ud06c \ud6c4 \ub4f1\ub85d \uac00\ub2a5\ud569\ub2c8\ub2e4.
+error.system.program.prgmTpCd = \ud504\ub85c\uadf8\ub7a8 \uc720\ud615\uc744 \uc120\ud0dd\ud558\uc5ec \uc8fc\uc2ed\uc2dc\uc624.  
+error.system.contentfile.content = \ube48 \ucee8\ud150\uce20 \ud30c\uc77c\uc815\ubcf4\uac00 \uc788\uc2b5\ub2c8\ub2e4.
+error.system.contentfile.meta = \ube48 \ud30c\uc77c \ud655\uc7a5\uba54\ud0c0\uac00 \uc788\uc2b5\ub2c8\ub2e4.
+error.system.contentfile.samcheck = \uac19\uc740 \uc6d0\ubcf8\ud30c\uc77c\uc774 \uc788\uc2b5\ub2c8\ub2e4.
+handle.system.unknownerror = \uad00\ub9ac\uc790\uc5d0\uac8c \ubb38\uc758\ud558\uc138\uc694.
+
+
+##################################################################################
+# Sample \uba54\uc138\uc9c0
+##################################################################################
+App.Title=Open Platform
+typeMismatch.java.util.Date={0} is Invalid Date.
+dob=DOB
+
+# for SpringBatch Admin
+site.name=BDWeb Spring Batch Admin Tool
+company.name=BD, INC.<img src="http://www.bluedigm.com/resources/images/common/h1_logo.gif">
+company.url=http://www.bluedigm.com
+copyright=Copyright@2016 by BD Inc. All Rights Reserved.
+company.contact.url=http://www.bluedigm.com
+company.contact=BD, INC.
+product.name=BD Web Dev Frame (Spring Batch Admin Integrated)

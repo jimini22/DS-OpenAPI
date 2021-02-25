@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+updateCheck="false" monitoring="autodetect" dynamicConfig="true">
+
+	<diskStore path="java.io.tmpdir" />
+	<!-- 분산설정 -->
+	<!-- <cacheManagerEventListenerFactory class="net.sf.ehcache.event.TestCacheManagerEventListenerFactory"
+	properties="type=counting" /> -->
+	<!--  
+	<cacheManagerPeerProviderFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+	properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1, multicastGroupPort=1236, timeToLive=1" />
+	
+	<cacheManagerPeerListenerFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
+	properties="port=40003, socketTimeoutMillis=60000" />
+	-->
+	
+	<!-- http://www.ehcache.org/ehcache.xml 참고 -->
+	<defaultCache eternal="false" maxElementsInMemory="10000" overflowToDisk="true" maxElementsOnDisk="1000000" diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="0" memoryStoreEvictionPolicy="LRU">
+		<!-- 분산설정 -->
+		<!--  
+		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" properties="replicateAsynchronously=true, asynchronousReplicationIntervalMillis=10000, replicatePuts=true, replicateUpdates=true, replicateUpdatesViaCopy=true, replicateRemovals=true " />
+		-->
+	</defaultCache>
+	<cache name="books" eternal="false" maxElementsInMemory="100" overflowToDisk="false" diskPersistent="false" timeToIdleSeconds="0" timeToLiveSeconds="30000" memoryStoreEvictionPolicy="LRU">
+		<!-- 분산설정 -->
+		<!--  
+		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" properties="replicateAsynchronously=true, asynchronousReplicationIntervalMillis=10000, replicatePuts=true, replicateUpdates=true, replicateUpdatesViaCopy=true, replicateRemovals=true " />
+		<bootstrapCacheLoaderFactory class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory" properties="bootstrapAsynchronously=true,maximumChunkSizeBytes=5000000" />
+		-->
+	</cache>
+	<cache name="contact" eternal="false" maxElementsInMemory="100" overflowToDisk="false" diskPersistent="false" timeToIdleSeconds="0"	timeToLiveSeconds="30000" memoryStoreEvictionPolicy="LRU">
+		<!-- 분산설정 -->
+		<!--  
+		<cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" properties="replicateAsynchronously=true, asynchronousReplicationIntervalMillis=10000, replicatePuts=true, replicateUpdates=true, replicateUpdatesViaCopy=true, replicateRemovals=true " />
+		<bootstrapCacheLoaderFactory class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory" properties="bootstrapAsynchronously=true,maximumChunkSizeBytes=5000000" />
+		-->
+	</cache>
+</ehcache>

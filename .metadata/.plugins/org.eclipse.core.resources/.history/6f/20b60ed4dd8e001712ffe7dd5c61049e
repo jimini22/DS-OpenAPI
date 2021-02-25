@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.user.dao;
+
+import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
+import org.springframework.data.repository.CrudRepository;
+
+import com.bluedigm.web.sample.user.model.User;
+
+
+/**
+* <pre>
+* com.wooribank.wbt3.sample.common.user.dao
+*   |_ UserRepository.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 26. 오후 10:42:49
+* @Version : 
+*/
+
+@EnableScan
+public interface UserRepository extends CrudRepository<User, String> { }

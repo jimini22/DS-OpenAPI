@@ -1,0 +1,102 @@
+package com.portal.common.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hanaone.basicInfo.mapper.CommonCodeMapper;
+import com.hanaone.basicInfo.mapper.MemberMapper;
+import com.hanaone.basicInfo.model.CommonCodeMapping;
+import com.hanaone.basicInfo.model.CommonInfo;
+import com.hanaone.basicInfo.model.MemberInfo;
+
+
+@Service("commonCodeService")
+public class CommonCodeServiceImple implements CommonCodeService {
+	private static final Logger logger = LoggerFactory.getLogger(CommonCodeServiceImple.class);
+	@Autowired
+	private MemberMapper memberMapper;
+	@Autowired
+	private CommonCodeMapper commonCodeMapper;
+	@Override
+	public MemberInfo selectUserInfo(MemberInfo member) throws Exception {
+		logger.info("-------------selectUserInfo --------------------");
+		return memberMapper.selectMemberInfo(member);
+		
+	}
+	@Override
+	public Map<String,Object> selectCommonCodeList(CommonInfo commonInfo)
+			throws Exception {
+		Map<String,Object> returnMap = new HashMap<String,Object>();
+		List<CommonInfo> majorList = null;
+		List<CommonInfo> codeList = null;
+		
+		majorList = commonCodeMapper.selectMajorCodeList(commonInfo);//Î©îÏù¥??ÏΩîÎìú
+		codeList = commonCodeMapper.selectCommonCodeList(commonInfo);//?†ÑÏ≤¥Ï°∞?öå
+		
+		returnMap.put("majorList", majorList);
+		returnMap.put("codeList", codeList);
+		
+		return returnMap;
+	}
+	@Override
+	public int insertCommonCode(CommonInfo commonInfo) throws Exception {
+		return commonCodeMapper.insertCommonCode(commonInfo);
+	}
+	@Override
+	public int updateCommonCode(CommonInfo commonInfo) throws Exception {
+		return commonCodeMapper.updateCommonCode(commonInfo);
+		
+	}
+	@Override
+	public List<CommonInfo>  selectCommonCodeDetail(CommonInfo commonInfo)
+			throws Exception {
+
+		List<CommonInfo> codeList = null;
+		codeList = commonCodeMapper.selectCommonCodeDetail(commonInfo);//?†ÑÏ≤¥Ï°∞?öå
+	
+		return codeList;
+		
+	}
+	@Override
+	public CommonCodeMapping selectMappingCode(CommonCodeMapping mapping)
+			throws Exception {
+		return commonCodeMapper.selectMappingCode(mapping);
+	}
+	@Override
+	public List<CommonInfo> selectRelativeSubCodeByParam(
+			CommonCodeMapping mapping) throws Exception {
+		return commonCodeMapper.selectRelativeSubCodeByParam(mapping);
+	}
+	
+	@Override
+	@Transactional(readOnly=false, rollbackFor={Exception.class})
+	public int insertMappingCode(CommonCodeMapping mapping) throws Exception {
+		//1.Í∏∞Ï°¥ Îß§Ìïë data ?Ç≠?†ú
+		int insertResult = 0;
+		commonCodeMapper.deleteMappingCode(mapping);
+		String relativeSubCodeArr = mapping.getRel_sub_cod_arr();
+		logger.info("relativeSubCodeArr >>>>>>>>>> " + relativeSubCodeArr);
+		mapping.setMapp_major_cod("M01");
+		String[] arr_code = relativeSubCodeArr.split(",");
+		for(int ii = 0; ii < arr_code.length ; ii++){
+			mapping.setRel_sub_cod(arr_code[ii]);
+			insertResult = commonCodeMapper.insertMappingCode(mapping);
+			insertResult++;
+		}
+		
+		return insertResult;
+	}
+	
+
+	
+	
+	
+	
+}

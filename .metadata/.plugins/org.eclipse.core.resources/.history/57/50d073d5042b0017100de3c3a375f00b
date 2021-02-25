@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.book.service;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.bluedigm.web.sample.books.service.BookService;
+
+/**
+ * <pre>
+ * com.bluedigm.web.sample.book.service
+ *   |_ BookServiceTest.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : Jeon, Gilsu<youmahil@bluedigm.com>
+ * @Date    : 2017. 4. 27. 오후 1:28:19
+ * @Version : 
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:resources/conf/spring/*.xml"})
+public class BookServiceTest {
+	private static final Logger log = Logger.getLogger(BookServiceTest.class);
+	
+    @Resource(name = "bookService")
+    private BookService bookService;
+	
+	@Test
+	public void test() {
+		log.info("--------------- bookService Test ---------------");
+		
+		Book book = new Book();
+		
+		bookService.createBook(book);
+	}
+
+}

@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.wooribank.wbt3.sample.common.i18n.support;
+
+import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.cache.interceptor.KeyGenerator;
+
+/**
+* <pre>
+* com.wooribank.wbt3.common.i18n.support
+*   |_ SimpleKeyGenerator.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 20. 오후 9:58:25
+* @Version : 
+*/
+
+public class SimpleKeyGenerator implements KeyGenerator {
+	private final Log log = LogFactory.getLog(this.getClass());
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.cache.interceptor.KeyGenerator#generate(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+	 */
+	@Override
+	public Object generate(Object target, Method method, Object... params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(target.getClass().getName());
+        sb.append(method.getName());
+        for (Object param : params) {
+        	log.debug("param=" + param);
+        	sb.append(param.toString());
+        }
+        log.debug("sb=" + sb.toString());
+        return sb.toString();
+	}
+
+}

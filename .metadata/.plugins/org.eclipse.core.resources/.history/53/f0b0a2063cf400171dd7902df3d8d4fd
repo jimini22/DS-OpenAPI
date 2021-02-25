@@ -1,0 +1,82 @@
+package com.wooribank.wbt3.imm.user.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wooribank.wbt3.imm.user.mapper.UserStatisticMapper;
+import com.wooribank.wbt3.imm.user.model.data.UserNowStatisticVO;
+import com.wooribank.wbt3.imm.user.model.data.UserStatisticVO;
+import com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq;
+import com.wooribank.wbt3.imm.user.model.request.UserStatisticReq;
+import com.wooribank.wbt3.imm.user.model.response.UserMonthStatisticRes;
+import com.wooribank.wbt3.imm.user.model.response.UserNowStatisticRes;
+import com.wooribank.wbt3.imm.user.model.response.UserStatisticRes;
+import com.wooribank.wbt3.imm.user.service.UserStatisticService;
+import com.wooribank.wbt3.web.base.framework.util.string.StringUtil;
+
+@Service
+public class UserStatisticServiceImpl implements UserStatisticService {
+    
+    @Autowired
+    UserStatisticMapper userStatisticMapper;
+
+    /**
+     *일반회원조회
+     */
+    @Override
+    public UserStatisticRes retriveCommonMember(UserStatisticReq req) {
+        // TODO Auto-generated method stub
+        List<UserStatisticVO> commonList =  userStatisticMapper.selectCommonMember(req);
+        UserStatisticRes res = new UserStatisticRes();
+        res.setUserList(commonList);
+        return res;
+    }
+    /**
+     *휴먼회원조회
+     */
+    @Override
+    public UserStatisticRes retriveSleepMember(UserStatisticReq req) {
+        // TODO Auto-generated method stub
+        List<UserStatisticVO> sleepList =  userStatisticMapper.selectSleepMember(req);
+        UserStatisticRes res = new UserStatisticRes();
+        res.setUserList(sleepList);
+        return res;
+    }
+    /**
+     *탈퇴회원조회
+     */
+    @Override
+    public UserStatisticRes retriveWithdrawalMember(UserStatisticReq req) {
+        // TODO Auto-generated method stub
+        List<UserStatisticVO> withdrawalList =  userStatisticMapper.selectWithdrawalMember(req);
+        UserStatisticRes res = new UserStatisticRes();
+        res.setUserList(withdrawalList);
+        return res;
+    }
+    
+    /**
+     * 현재일자 기준으로 가입/탈퇴회원 내역조회
+     */
+    @Override
+    public UserNowStatisticRes nowPeriodStatic(UserPeriodStatisticReq req) {
+        // TODO Auto-generated method stub
+        
+        List<UserNowStatisticVO> nowStaticList = userStatisticMapper.selectNowPeriodStatic(req);
+        UserNowStatisticRes res = new UserNowStatisticRes();
+        res.setNowStaticList(nowStaticList);
+        return res;
+    }
+    
+    /**
+     * 현재일자 기준으로 가입/탈퇴회원 내역조회
+     */
+    @Override
+    public UserMonthStatisticRes monthPeriodStatic(UserPeriodStatisticReq req) {
+        // TODO Auto-generated method stub
+        String month = StringUtil.lPad(req.getSearchMonth(),2,'0');
+        return null;
+    }
+
+}

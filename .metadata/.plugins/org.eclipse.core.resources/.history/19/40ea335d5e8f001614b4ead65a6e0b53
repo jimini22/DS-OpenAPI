@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:task="http://www.springframework.org/schema/task"	
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- Contact Flat File Item Reader -->
+	<bean id="contactItemFileReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<!-- Setting Non Strict Mode (no Classpath only, include File system Path) -->
+		<property name="strict" value="false"/>	
+	    <property name="resource" value="/BDweb/FileData/contactlist.txt" />
+	    <property name="lineMapper">
+	        <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+		     <property name="lineTokenizer">
+			  <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+			       <property name="delimiter" value=";"/>
+			       <property name="names" value="id,name,address,gender,email,phone" />
+			  </bean>
+		     </property>
+		     <property name="fieldSetMapper">
+			  <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+			       <property name="targetType" value="com.bluedigm.web.sample.contact.model.Contact" />	
+			  </bean>
+		     </property>
+		</bean>
+	    </property>
+	</bean>
+	
+	<bean id="contactService" class="com.bluedigm.web.sample.contact.service.impl.ContactServiceImpl" />
+
+	<!-- Contact Item DB Writer use Service Class -->
+	<bean id="contactItemDBWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+	    <property name="targetObject" ref="contactService" />
+	    <property name="targetMethod" value="createContact" />
+	</bean>
+
+	<!-- Custom Job 2 -->
+	<batch:job id="flat2dbContactLoad" >
+		<batch:step id="f2d_step1">
+			<tasklet start-limit="100">
+				<chunk commit-interval="1" reader="contactItemFileReader" writer="contactItemDBWriter" />
+			</tasklet>
+		</batch:step>
+	</batch:job>
+
+	<!--  
+	<bean id="f2dParamLauncher" class="com.bluedigm.web.batch.sample.launcher.MyFile2DBParamLauncher">
+    	<property name="jobLauncher" ref="jobLauncher"></property>
+    	<property name="job" ref="flat2dbContactLoad"></property>
+  	</bean>	
+  	-->
+ 	<!-- Scheduling For Custom Job 2 -->
+    <bean id="myScheduler2" class="com.bluedigm.web.batch.sample.scheduler.MyScheduler">
+        <property name="job" ref="flat2dbContactLoad" />
+        <property name="launcher" ref="jobLauncher"/>
+    </bean>
+
+	<!-- Custom Scheduling 2 for Custom Job 2 -->
+	<task:scheduled-tasks>
+		<task:scheduled ref="myScheduler2" method="runJob" cron="*/10 * * * * *"/>
+	</task:scheduled-tasks>
+	    
+	<!-- Custom Scheduling 2 for Custom Job 2 
+	<task:scheduled-tasks>
+		<task:scheduled ref="f2dParamLauncher" method="launch" cron="*/10 * * * * *"/>
+	</task:scheduled-tasks>
+	-->
+</beans>

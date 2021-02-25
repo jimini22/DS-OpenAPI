@@ -1,0 +1,41 @@
+###########################################################################################################
+# Validation Message
+###########################################################################################################
+validate.param.notEmpty=notEmpty
+validate.param.notNum=notNum
+validate.param.notAlpha=notAlpha
+validate.param.notAlphaNumber=notAlphaNumber
+validate.param.notHangul=notHangul
+validate.param.notEmail=notEmail
+
+validate.param.arg.notEmpty={0} notEmpty
+validate.param.arg.notNum={0} notNum
+validate.param.arg.notAlpha={0} notAlpha
+validate.param.arg.notAlphaNumber={0} notAlphaNumber
+validate.param.arg.notHangul={0} notHangul
+validate.param.arg.notEmail={0} notEmail
+
+
+AssertFalse = must be false
+AssertTrue  = must be true
+DecimalMax  = must be less than or equal to {value}
+DecimalMin  = must be greater than or equal to {value}
+Digits      = numeric value out of bounds (<{integer} digits>.<{fraction} digits> expected)
+Future      = must be in the future
+Max         = must be less than or equal to {value}
+Min         = must be greater than or equal to {value}
+NotNull     = may not be null
+Null        = must be null
+Past        = must be in the past
+Pattern     = must match "{regexp}"
+Size        = size must be between {min} and {max}
+
+CreditCardNumber = invalid credit card number
+Email            = not a well-formed email address
+Length           = length must be between {min} and {max}
+NotBlank         = may not be empty
+NotEmpty         = may not be empty
+Range            = must be between {min} and {max}
+SafeHtml         = may have unsafe html content
+ScriptAssert     = script expression "{script}" didn't evaluate to true
+URL              = must be a valid URL

@@ -1,0 +1,5 @@
+package com.bluedigm.web.batch.sample.processor;
+
+public class Job1Processor {
+
+}

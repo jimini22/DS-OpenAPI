@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.i18n.service.impl;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.wooribank.wbt3.sample.common.i18n.model.I18nMessage;
+import com.wooribank.wbt3.sample.common.i18n.model.I18nMessageMapVo;
+import com.wooribank.wbt3.sample.common.i18n.model.ListVo;
+import com.wooribank.wbt3.sample.common.i18n.service.I18nManageService;
+import com.wooribank.wbt3.sample.common.i18n.service.I18nService;
+import com.wooribank.wbt3.sample.common.i18n.support.MessageSource;
+import com.wooribank.wbt3.web.base.framework.nosql.redis.support.RedisDataSupport;
+
+/**
+* <pre>
+* com.wooribank.wbt3.sample.common.i18n.service.impl
+*   |_ I18nRedisResourceManageServiceImpl.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 15. 오후 2:33:27
+* @Version : 
+*/
+
+public class I18nRedisResourceManageServiceImpl implements I18nManageService, MessageSource {
+
+	private I18nService i18nService;
+	
+	private RedisDataSupport redisDataSupport;
+	
+	public void setRedisDataSupport(RedisDataSupport redisDataSupport) {
+		this.redisDataSupport = redisDataSupport;
+	}
+
+	
+	@Override
+	public String getMessage(String code, String locale) {
+		I18nMessage i18nDtl = inquireMessage(code, locale);
+		if (i18nDtl == null) {
+			return null;
+		}
+
+		return i18nDtl.getMessage();
+	}
+
+	@Override
+	public I18nMessage inquireMessage(String code, String language) {
+		return i18nService.inquireMessage(code, language);
+	}
+
+	@Override
+	public ListVo<I18nMessage> inquireAllMessageList() {
+		return i18nService.inquireAllMessageList();
+	}
+	
+	@Override
+	public ListVo<I18nMessage> inquireMessageList(@Param("map") I18nMessageMapVo map) {
+		return inquireAllMessageList();
+	}
+
+
+	@Override
+	public void saveMessage(String code, String language, String message) {
+		//redisTemplate.opsForHash().put(code, language, message);
+		redisDataSupport.addHashEntry(code, language, message);
+	}
+
+	@Override
+	public void removeMessage(String code, String language) {
+		//redisTemplate.opsForHash().delete(code, language);
+		redisDataSupport.deleteHashEntry(code, language);
+	}
+
+}

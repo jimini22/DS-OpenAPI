@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2013 Bluedigm.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of Bluedigm.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with Bluedigm.
+ * ==============================================================================
+ * Copyright 2002-2009 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.bluedigm.web.base.framework.service.impl;
+
+import java.io.Serializable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wooribank.wbt3.web.base.framework.dao.GenericDao;
+import com.wooribank.wbt3.web.base.framework.service.GenericService;
+
+
+/**
+ * This class serves as the Generic class for all other Services - namely to
+ * hold common CRUD methods that they might all use. You should only need to
+ * extend this class when your require custom CRUD logic. The original code of
+ * this class comes from Appfuse framework.
+ * <p>
+ * 
+ * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
+ * @author Giljae Joo(giljae@gmail.com)
+ * @param <T> a type variable
+ * @param <PK> the primary key for that type
+ * @date 2012. 1. 13. 오후 7:47:22
+ * @version $Id$
+ */
+@Transactional
+public class GenericServiceImpl<T, PK extends Serializable> implements GenericService<T, PK> {
+	/**
+	 * 모든 상속 클래스를 위한 로그
+	 */
+	protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
+	/**
+	 * GenericDao instance, set by constructor of child classes
+	 */
+	protected GenericDao<T, PK> dao;
+
+	public GenericServiceImpl() {}
+
+	public GenericServiceImpl(GenericDao<T, PK> genericDao) {
+		this.dao = genericDao;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.service.GenericService#get(java.io.Serializable)
+	 */
+	public T get(PK id) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.service.GenericService#exists(java.io.Serializable)
+	 */
+	public boolean exists(PK id) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.service.GenericService#create(java.lang.Object)
+	 */
+	public int create(T object) {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.service.GenericService#modify(java.lang.Object)
+	 */
+	public void modify(T object) {
+
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.web.base.framework.service.GenericService#remove(java.io.Serializable)
+	 */
+	public void remove(PK id) {
+
+		
+	}
+
+	
+	
+}

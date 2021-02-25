@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="flat2dbUseServiceLoad" xmlns="http://www.springframework.org/schema/batch">
+		<step id="f2d_svc_step1" xmlns="http://www.springframework.org/schema/batch">
+			<tasklet start-limit="100" xmlns="http://www.springframework.org/schema/batch">
+				<chunk commit-interval="1" reader="contactItemFileReader" writer="contactItemDBWriter" />
+			</tasklet>
+		</step>
+	</job>
+
+	<!-- Contact Flat File Item Reader -->
+	<bean id="contactItemFileReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	    <property name="resource" value="#{jobParameters[inputFile]}" />
+	    <property name="lineMapper">
+	        <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+		     <property name="lineTokenizer">
+			  <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+			       <property name="delimiter" value=";"/>
+			       <property name="names" value="id,name,address,gender,email,phone" />
+			  </bean>
+		     </property>
+		     <property name="fieldSetMapper">
+			  <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+			       <property name="targetType" value="com.sktelecom.itsm.web.sample.contact.model.Contact" />	
+			  </bean>
+		     </property>
+		</bean>
+	    </property>
+	</bean>
+
+	<!-- Contact Item DB Writer use Mybatis SQLMap Only-->
+	<bean id="contactItemDBWriter"
+		class="org.mybatis.spring.batch.MyBatisBatchItemWriter">
+		<property name="statementId" value="insertContact" />
+		<property name="sqlSessionTemplate" ref="batchSqlSession" />
+	</bean>
+
+</beans>

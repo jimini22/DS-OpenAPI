@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.sample.user.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.wooribank.wbt3.sample.user.dao.UserRepository;
+import com.wooribank.wbt3.sample.user.model.User;
+import com.wooribank.wbt3.sample.user.service.UserService;
+
+/**
+* <pre>
+* com.wooribank.wbt3.sample.common.user.service.impl
+*   |_ DynamoDBUserServiceImpl.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 26. 오후 10:48:38
+* @Version : 
+*/
+
+public class DynamoDBUserServiceImpl implements UserService {
+
+	@Autowired
+	UserRepository userRepository;
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void saveUser(User user) {
+		userRepository.save(user);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.sample.common.user.service.UserService#findUsers()
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<User> findUsers() {
+		List<User> result = (List<User>) userRepository.findAll();
+		return result;
+	}
+/*
+	@Override
+	public User findUserByLastName(String lastName) {
+		User user = (User) userRepository.findByLastName(lastName);
+		return user;
+	}
+*/
+
+}

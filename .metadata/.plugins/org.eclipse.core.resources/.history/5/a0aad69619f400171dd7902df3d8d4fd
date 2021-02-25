@@ -1,0 +1,21 @@
+package com.wooribank.wbt3.imm.user.model.data;
+
+import java.io.Serializable;
+
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class UserNowStatisticVO implements Serializable{
+    
+
+    
+    private int friendCnt; //친구수
+    private String mbhIdxNo; //useridx
+    
+  
+ 
+
+}

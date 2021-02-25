@@ -1,0 +1,117 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+
+package com.wooribank.wbt3.sample.books.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wooribank.wbt3.sample.books.dao.BookDao;
+import com.wooribank.wbt3.sample.books.dao.MagazineDao;
+import com.wooribank.wbt3.sample.books.model.Book;
+import com.wooribank.wbt3.sample.books.model.Magazine;
+import com.wooribank.wbt3.sample.books.service.BookService;
+import com.wooribank.wbt3.web.base.framework.database.DataSource;
+import com.wooribank.wbt3.web.base.framework.database.DataSourceType;
+
+
+/**
+ * The Class BookServiceImpl.
+ */
+@Service
+public class BookServiceImpl implements BookService {
+
+	/** The book dao. */
+	@Autowired
+	private BookDao bookDao;
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#setBookDao(com.wooribank.wbt3.common.books.dao.BookDao)
+	 */
+	@Autowired
+	public void setBookDao(BookDao bookDao) {
+		this.bookDao = bookDao;
+	}
+
+	/** The magazine dao. */
+	@Autowired
+	private MagazineDao magazineDao;
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#createBook(com.wooribank.wbt3.common.books.model.Book)
+	 */
+	@Override
+	@Transactional
+	public void registerBook(Book book) {
+		bookDao.insertBook(book);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#modifyBook(com.wooribank.wbt3.common.books.model.Book)
+	 */
+	@Override
+	@CachePut(value = "books", key = "#book.bookId")
+	@Transactional
+	public void modifyBook(Book book) {
+		bookDao.updateBook(book);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#removeBook(long)
+	 */
+	@Override
+	@CacheEvict(value = "books", key = "#key")	
+	@Transactional
+	public void removeBook(long key) {
+		bookDao.deleteBook(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#getBook(long)
+	 */
+	@Override
+	@Cacheable(value = "books", key = "#key")
+	@DataSource(DataSourceType.FIRST)
+	public Book retriveBook(long key) {
+		return bookDao.selectBook(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#getBook(com.wooribank.wbt3.common.books.model.Book)
+	 */
+	@Override
+	public List<Book> retriveBook(Book book) {
+		// TODO Auto-generated method stub
+		return bookDao.selectBook(book);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#getBookList()
+	 */
+	@Override
+	public List<Book> retriveBookList() {
+		return bookDao.selectBookList();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.wooribank.wbt3.common.books.service.BookService#getMagazine(java.lang.Integer, java.lang.String)
+	 */
+	@Override
+	public Magazine getMagazine(Integer magazineId, String category) {
+		return magazineDao.selectMagazine(magazineId, category);
+	}
+
+}

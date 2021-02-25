@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) BLUEDIGM.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BLUEDIGM.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BLUEDIGM.
+ */
+
+package com.wooribank.wbt3.imm.user.service;
+
+import com.wooribank.wbt3.hom.emoticoncenter.model.response.ECInquiryDetailVORes;
+import com.wooribank.wbt3.imm.user.model.request.UserPeriodStatisticReq;
+import com.wooribank.wbt3.imm.user.model.request.UserStatisticReq;
+import com.wooribank.wbt3.imm.user.model.response.UserStatisticRes;
+
+
+/**
+* <pre>
+* com.wooribank.wbt3.imm.statistic.service
+*   |_ UserStatisticService.java
+* </pre>
+* 
+* 1. 업무명         :
+* 2. 단위 업무명  : 
+* @Class     : UserStatisticService
+* @Author    : unionman
+* @Since     : 2017. 12. 19. 오후 7:39:21
+* @Version   : 1.0 
+* Copyright (c) WOORI BANK.
+* -------------------------------------------------------------------
+* Modification Information
+* -------------------------------------------------------------------
+* 수정일                                                     수정자                                         수정 내용
+* -------------------------------------------------------------------
+* 2017. 12. 19.                    unionman              [WBT3] 최초 생성
+*/
+
+public interface UserStatisticService {
+    
+    /**
+     * 일반회원관리
+     * 
+     * @param UserStatisticReq
+     * @return UserStatisticRes
+     */
+    public UserStatisticRes retriveCommonMember(UserStatisticReq req);
+    
+    /**
+     * 휴먼회원관리
+     * 
+     * @param UserStatisticReq
+     * @return UserStatisticRes
+     */
+    public UserStatisticRes retriveSleepMember(UserStatisticReq req);
+    
+    
+    /**
+     * 탈퇴회원관리
+     * 
+     * @param UserStatisticReq
+     * @return UserStatisticRes
+     */
+    public UserStatisticRes retriveWithdrawalMember(UserStatisticReq req);
+    
+    
+    /**
+     * 현재기준으로 오늘/최근일주일/최근 한달 가입/탈퇴현황
+     * 
+     * @param UserStatisticReq
+     * @return UserStatisticRes
+     */
+    public UserStatisticRes nowPeriodStatic(UserPeriodStatisticReq req);
+}

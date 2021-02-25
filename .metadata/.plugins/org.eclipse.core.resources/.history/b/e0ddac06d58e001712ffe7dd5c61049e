@@ -1,0 +1,73 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.exception;
+
+import com.wooribank.wbt3.web.base.framework.core.ExceptionCodeBaseConstants;
+
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.exception
+*   |_ BatchModuleException.java
+* </pre>
+* 
+* 클래스 역할 설명 : Batch Module에서 발생한 Exception
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 23. 오후 11:09:03
+* @Version : 
+*/
+
+public class BatchModuleException extends ApplicationException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Desc : Constructor of BatchModuleException.java class
+	 */
+
+	public BatchModuleException() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of BatchModuleException.java class
+	 * @param errorCode
+	 */
+
+	public BatchModuleException(String errorCode) {
+		super(ExceptionCodeBaseConstants.BATCH_BASE + errorCode);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of BatchModuleException.java class
+	 * @param throwable
+	 */
+
+	public BatchModuleException(Throwable throwable) {
+		super(throwable);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Desc : Constructor of BatchModuleException.java class
+	 * @param errorCode
+	 * @param throwable
+	 */
+
+	public BatchModuleException(String errorCode, Throwable throwable) {
+		super(ExceptionCodeBaseConstants.BATCH_BASE + errorCode, throwable);
+		// TODO Auto-generated constructor stub
+	}
+
+}

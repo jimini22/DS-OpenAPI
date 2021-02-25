@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOG4J//DTD LOG4J//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<!-- Default -->
+	<!-- Console view -->
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] [%p] - %C{1}.%M(%L) | %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="APPLICATION" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="/tmp/logs/rest/rest-app.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%5p [%d{HH:mm:ss}] %F %M %L line - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SQL" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="/tmp/logs/rest/rest-sql.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%5p [%d{HH:mm:ss}] %F %M %L line - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="ERROR_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Threshold" value="ERROR"/>
+		<param name="file" value="/tmp/logs/rest/rest-error.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%5p [%d{HH:mm:ss}] %F %M %L line - %m%n" />
+		</layout>
+	</appender>
+
+	<category name="org.apache" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="APPLICATION" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ERROR_LOG" />
+	</category>
+	
+	<category name="org.codehaus" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="CONSOLE" />
+	</category>	
+ 
+	<category name="org.springframework" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="APPLICATION" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ERROR_LOG" />
+	</category>
+
+	<category name="com.mybatis" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<category name="java.sql" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	
+    <!-- log SQL (pre-execution) plus exceptions caused by SQL -->
+    <!--  
+	<category name="jdbc.sqlonly" additivity="false">
+		<priority value="DEBUG" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	-->
+	<!-- log SQL with timing ERRORrmation, post execution -->
+	<category name="jdbc.sqltiming" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<!-- only use the two logs below to trace ALL JDBC ERRORrmation,
+		NOTE:  This can be very voluminous!  -->
+	<!-- log all jdbc calls except ResultSet calls -->
+	<category name="jdbc.audit" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<!--  
+    <category name="jdbc.resultsettable" additivity="false">
+		<priority value="DEBUG" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+    </category>
+    -->
+    
+	<!-- log the jdbc ResultSet calls -->
+	<category name="jdbc.resultset" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+
+	<!-- this log is for internal debugging of log4jdbc, itself -->
+	<!-- debug logging for log4jdbc itself -->
+	<category name="log4jdbc.debug" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	
+	<!-- ehCache logging -->
+	<category name="net.sf.ehcache" additivity="false" >
+		<level value="ERROR" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	<category name="net.sf.ehcache.config" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	<category name="net.sf.ehcache.distribution" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	<category name="net.sf.ehcache.code" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="CONSOLE" />
+	</category>
+	<!-- BDWEB -->
+	<category name="com.bluedigm.web" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="APPLICATION" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ERROR_LOG" />
+	</category>	
+	
+	<logger name="org.springframework.jndi">
+		<level value="ERROR" />
+	</logger>
+	
+    <!-- Query Loggers -->
+    <logger name="jdbc.sqlonly" additivity="false">  
+        <level value="debug"/>  
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+    </logger>
+     
+    <logger name="jdbc.resultsettable" additivity="false">  
+        <level value="debug"/>  
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+    </logger> 
+    
+    <logger name="org.springframework.test.context.junit4.SpringJUnit4ClassRunner" additivity="false">  
+        <level value="debug"/>  
+        <appender-ref ref="APPLICATION" />
+		<appender-ref ref="SQL" />
+		<appender-ref ref="CONSOLE" />
+    </logger> 
+        
+	<root>
+		<level value="INFO"></level>
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="APPLICATION" />
+		<appender-ref ref="SQL" />		
+		<appender-ref ref="ERROR_LOG" />		
+	</root>
+</log4j:configuration>

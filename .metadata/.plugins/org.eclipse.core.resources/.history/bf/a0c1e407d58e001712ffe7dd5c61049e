@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.nosql.redis.model;
+
+import java.io.Serializable;
+
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.nosql.redis.model
+*   |_ RedisKeyTypeVO.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 19. 오후 10:04:44
+* @Version : 
+*/
+
+public class RedisKeyTypeVO implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String key;
+	private String redisType;
+	
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+	public String getRedisType() {
+		return redisType;
+	}
+	public void setRedisType(String redisType) {
+		this.redisType = redisType;
+	}
+	
+	@Override
+	public String toString() {
+		return "RedisKeyTypeVO [key=" + key + ", redisType=" + redisType + "]";
+	}
+	
+}

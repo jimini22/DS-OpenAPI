@@ -1,0 +1,61 @@
+package com.wooribank.wbt.sample.rest.aop;
+
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
+
+public class LogAspect {
+	
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired(required=true) private HttpServletRequest request;
+	
+	String LINE = "─────────────────────────────────────────────────────────────────────────────";
+	
+	public void beforeLogger(JoinPoint joinPoint) {
+
+		log.debug(LINE);
+		log.debug("###Aspectj before proceed :: RequestURI = " + request.getRequestURI());
+		log.debug("###Aspectj before proceed :: RequestMethod = " + request.getMethod());
+		log.debug("###Aspectj before proceed :: RequestHeader = ");
+				
+		Enumeration<String> header=request.getHeaderNames();
+		while (header.hasMoreElements()) {
+			String headerName=header.nextElement();
+			log.debug("                                                   " 
+					+ request.getHeader(headerName));
+		}
+		
+		//To do : request body Data
+		log.info(LINE);
+	}
+	
+	public Object aroundLogger(ProceedingJoinPoint joinPoint) throws Throwable {
+		log.info(LINE);
+		log.info("### Aspectj around proceed before :: Target = " + joinPoint.getTarget().toString());
+		log.info("### Aspectj around proceed before :: Method = " + joinPoint.getSignature().toShortString());
+		Object[] args = joinPoint.getArgs();
+//		log.info("### Aspectj around proceed before :: Request Body = " + args[2]);
+		log.info(LINE);
+		
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		Object retVal = joinPoint.proceed(args);
+		stopWatch.stop();
+		
+		log.info(LINE);
+		log.info("### Aspectj around proceed after :: execution time: " + stopWatch.getTotalTimeMillis() + " ms");
+//		log.info("### Aspectj around proceed after :: "+ retVal);
+		log.info(LINE);
+
+		return retVal;
+	}
+		
+}

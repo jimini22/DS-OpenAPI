@@ -1,0 +1,35 @@
+package com.wooribank.wbt3.imm.user.model.data;
+
+import java.io.Serializable;
+
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class UserNowStatisticVO implements Serializable{
+    
+    private static final long serialVersionUID = -7673049134618899935L;
+    
+    private int friendCnt; //친구수
+    private String mbhIdxNo; //useridx
+    
+    private String hpNlno; //핸드폰 국가번호
+    private String hpNo; // 핸드폰번호
+    private String mbhEmlAdr; // 이메일번호
+    private String wbbtMbhTpcd; // 회원유형코드
+    private String mbhJnngDtm; // 회원가입일시
+    private String mbhScssDtm; // 회원탈퇴일시
+    private String lginDtm; // 최종접속일시
+    private String prflAls; // 프로파일별칭
+    private String mbhClText; //회원CL 내용
+    private String joinYear; // 회원가입일시 변환
+    private String wbbtOsDscd; //위비톡 운영체계 구분코드
+    private String mnacMbhIdxNo; //주계정 회원 인덱스 번호
+    
+    private String dvcKvlText; //디바이스키
+    
+ 
+
+}

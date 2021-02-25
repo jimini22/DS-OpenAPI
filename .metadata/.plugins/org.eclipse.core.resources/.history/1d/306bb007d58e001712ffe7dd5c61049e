@@ -1,0 +1,58 @@
+/**
+ * 
+ */
+package com.bluedigm.web.base.framework.nosql.cassandra.dao.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.cassandra.core.CassandraOperations;
+
+import com.wooribank.wbt3.web.base.framework.nosql.cassandra.dao.CassandraDataAccessDao;
+
+/**
+ * Common Data Access Object Implementation for Cassandra Data Access
+ * with spring-data-cassandra
+ * @author Gilsu.jeon<youmahil@bluedigm.com>
+ *
+ */
+//@Repository
+public class CassandraDataAccessDaoImpl<T extends Object> implements CassandraDataAccessDao<T> {
+	
+	@Autowired
+	@Qualifier("cassandraTemplate")
+	private CassandraOperations cassandraOperations;
+	
+	@Override
+	public void insert(T obj) {
+		cassandraOperations.insert(obj);
+	}
+
+	@Override
+	public Object selectOne(String cqlOne, Class<?> clazz) {
+		return cassandraOperations.selectOne(cqlOne, clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object> selectList(String cqlMulti,  Class<?> clazz) {
+		return  (List<Object>)cassandraOperations.select(cqlMulti, clazz);
+	}
+	
+	@Override
+	public void update(T key) {
+		cassandraOperations.update(key);
+	}
+
+	@Override
+	public void delete(T key) {
+		cassandraOperations.delete(key);
+	}
+
+	@Override
+	public void execute(String cql) {
+		cassandraOperations.execute(cql);
+	}
+
+}

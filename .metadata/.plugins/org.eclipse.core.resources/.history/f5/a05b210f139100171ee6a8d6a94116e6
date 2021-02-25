@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+ 	<!-- Your Simple Job's Reader / Writer / Processor Implementations -->
+	<bean id="yaongJob1Reader" class="com.bluedigm.web.batch.sample.reader.Job1Reader" scope="step">
+		<property name="id" value="YAONG.1" />
+	</bean>
+	<bean id="yaongJob2Reader" class="com.bluedigm.web.batch.sample.reader.Job1Reader" scope="step">
+		<property name="id" value="YAONG.2" />
+	</bean>
+	<bean id="yaongJob3Reader" class="com.bluedigm.web.batch.sample.reader.Job1Reader" scope="step">
+		<property name="id" value="YAONG.3" />
+	</bean>
+	<bean id="yaongJob4Reader" class="com.bluedigm.web.batch.sample.reader.Job1Reader" scope="step">
+		<property name="id" value="YAONG.4" />
+	</bean>			
+	<bean id="yaongJobProcessor" class="com.bluedigm.web.batch.sample.processor.Job1Processor" scope="step" />
+	<bean id="yaongJobWriter" class="com.bluedigm.web.batch.sample.writer.Job1Writer" scope="step" />
+	
+	<bean id="yaongTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+	
+	<bean id="yaongPartitioner" class="com.bluedigm.web.batch.sample.partitioner.SamplePartitioner"/>
+	
+	<!-- Master Job -->
+	<batch:job id="parallelStep" xmlns="http://www.springframework.org/schema/batch">
+		<batch:split id="split1" task-executor="yaongTaskExecutor" next="step4">
+			<batch:flow>
+				<batch:step id="step1" next="step2">
+					<batch:tasklet>
+						<batch:chunk reader="yaongJob1Reader" writer="yaongJobWriter" commit-interval="1" />
+					</batch:tasklet>
+				</batch:step>
+				<batch:step id="step2">
+					<batch:tasklet>
+						<chunk reader="yaongJob2Reader" writer="yaongJobWriter" commit-interval="2" />
+					</batch:tasklet>
+				</batch:step>
+			</batch:flow>
+			<batch:flow>
+				<batch:step id="step3">
+					<!--  
+					<batch:tasklet>
+						<batch:chunk reader="yaongJob3Reader" writer="yaongJobWriter" commit-interval="2" />
+					</batch:tasklet>
+					-->
+		            <batch:partition step="yaongStep3Slave" partitioner="yaongPartitioner">
+		            	<batch:handler grid-size="4" task-executor="yaongTaskExecutor" />
+		           	</batch:partition>					
+				</batch:step>
+			</batch:flow>
+		</batch:split>
+	        <batch:step id="step4">
+			<batch:tasklet>
+				<batch:chunk reader="yaongJob4Reader" writer="yaongJobWriter" commit-interval="2" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<!-- Remote Step -->
+	<batch:step id="yaongStep3Slave">
+	    <batch:tasklet>
+	        <batch:chunk reader="yaongJob3Reader" writer="yaongJobWriter" commit-interval="1"/>
+	     </batch:tasklet>
+	</batch:step>
+</beans>

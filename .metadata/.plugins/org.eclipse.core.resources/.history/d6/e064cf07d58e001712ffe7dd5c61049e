@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.bluedigm.web.base.framework.nosql.redis.constants;
+
+/**
+* <pre>
+* com.wooribank.wbt3.web.base.framework.nosql.redis.support
+*   |_ RedisDataTypes.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 19. 오전 1:04:03
+* @Version : 
+*/
+
+public class RedisDataTypes {
+	public static final String REDIS_TYPE_STRING = "string";
+	public static final String REDIS_TYPE_LIST = "list";
+	public static final String REDIS_TYPE_SET = "set";
+	public static final String REDIS_TYPE_SORTEDSET = "zset";
+	public static final String REDIS_TYPE_HASH = "hash";
+	
+}

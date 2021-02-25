@@ -1,0 +1,54 @@
+package com.bluedigm.web.sample.batch;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+/**
+ * <pre>
+ * com.wooribank.wbt3.sample.common.batch
+ *   |_ LaunchTestCase.java
+ * </pre>
+ * 
+ * 클래스 역할 설명 : 
+ * @Company : BD. Inc
+ * @Author  : Jeon, Gilsu<youmahil@bluedigm.com>
+ * @Date    : 2017. 4. 28. 오후 1:28:19
+ * @Version : 
+ */
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+
+@ContextConfiguration(locations = {"classpath*:conf/spring/test-context.xml"} )
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+public class LaunchTestCase {
+	private static final Logger log = Logger.getLogger(LaunchTestCase.class);
+	
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+
+	@Test
+	public void test() throws Exception {
+		log.info("--------------- LaunchTestCase Test : Start ---------------");
+		//testing a job
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
+        log.info("*** jobExecution=" + jobExecution);
+        //Testing a individual step
+        //JobExecution jobExecution = jobLauncherTestUtils.launchStep("step1");
+
+        //assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        log.info("--------------- LaunchTestCase Test : End ---------------");
+	}
+
+}

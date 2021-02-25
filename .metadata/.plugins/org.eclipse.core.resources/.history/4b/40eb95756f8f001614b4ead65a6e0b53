@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bluedigm.web.sample.contact.dao.ContactDao">
+	
+	<resultMap type="Contact" id="contactResult">
+		<result property="id" column="id"/>
+		<result property="name" column="name" />
+		<result property="address" column="address" />
+		<result property="gender" column="gender" />		
+		<result property="dob" column="dob" />
+		<result property="email" column="email" />
+		<result property="phone" column="phone" />
+	</resultMap>
+	
+	<select id="selectContactCount" parameterType="SearchContact" resultType="int">
+		<![CDATA[
+			SELECT	/* Contact.selectContactCount | Hanwoong Lee | 2012-01-30 */
+					count(*) totcnt
+			FROM	CONTACTS
+		]]>
+		<where>
+			<if test="searchKeyword != null and searchKeyword != ''">
+				name like '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+	</select>
+
+	<select id="selectContactList" parameterType="SearchContact" resultMap="contactResult">
+		<![CDATA[
+			SELECT	/* Contact.selectContactList | Hanwoong Lee | 2012-01-30 */
+					id,
+					name,
+					address,
+					gender,
+					dob,
+					email,
+					phone
+			FROM	CONTACTS
+		]]>
+		<where>
+			<if test="searchKeyword != null and searchKeyword != ''">
+				name like '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+		order by id
+	</select>
+
+	<select id="selectContact" parameterType="integer" resultMap="contactResult">
+		<![CDATA[
+			SELECT	/* Contact.selectContact | Hanwoong Lee | 2012-01-30 */  
+					id,
+					name,
+					address,
+					gender,
+					dob,
+					email,
+					phone
+			FROM	CONTACTS
+		]]>
+		<where>
+				id = #{id}
+		</where>
+	</select>
+
+	<insert id="insertContact" parameterType="Contact" useGeneratedKeys="true" keyProperty="id">
+		<!--  [CDATA[ -->
+			INSERT /* Contact.insertContact | Hanwoong Lee | 2012-01-30 */ 
+			INTO CONTACTS (
+					  id,
+					  name,
+					  address,
+					  gender,
+					  dob,
+					  email,
+					  phone
+			) VALUES (
+					<selectKey keyProperty="id" resultType="Integer">
+            			SELECT NVL(MAX(id), 0) FROM CONTACTS as id
+        			</selectKey>	
+					  #{name},
+					  #{address},
+					  #{gender},
+					  #{dob},
+					  #{email},
+					  #{phone}
+			) 
+		<!--  ]]> -->
+	</insert>
+
+	<update id="updateContact" parameterType="Contact">
+		<![CDATA[
+			UPDATE /* Contact.updateContact | Hanwoong Lee | 2012-01-30 */ 	
+				CONTACTS
+			SET		name = #{name},
+					address = #{address},
+					gender = #{gender},
+					dob = #{dob},
+					email = #{email},
+					phone = #{phone} 
+			WHERE	id = #{id}
+		]]>
+	</update>
+
+	<delete id="deleteContact" parameterType="integer">
+		<![CDATA[
+			DELETE /* Contact.deleteContact | Hanwoong Lee | 2012-01-30 */ 	
+			FROM CONTACTS     
+			WHERE	id = #{id}
+		]]>
+	</delete>
+</mapper>

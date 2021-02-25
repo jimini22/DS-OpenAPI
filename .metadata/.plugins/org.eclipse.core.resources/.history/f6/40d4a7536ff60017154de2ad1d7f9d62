@@ -1,0 +1,20 @@
+package com.wooribank.wbt3.imm.user.model.data;
+
+import java.io.Serializable;
+
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper=false)
+public class UserDailyStatisticListVO implements Serializable{
+    
+
+    private int month; // 가입/탈퇴 월
+    private int cnt; // 가입/탈퇴 인원 수
+    
+  
+ 
+
+}

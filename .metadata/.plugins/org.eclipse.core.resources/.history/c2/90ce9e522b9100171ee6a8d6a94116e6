@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) BD CO,.LTD.
+ * All right reserved.
+ *
+ * This software is the confidential and proprietary information of BD CO,.LTD.
+ * You shall not disclose such Confidential Information and
+ * shall use it only in accordance with the terms of the license agreement
+ * you entered into with BD CO,.LTD.
+ */
+package com.wooribank.wbt3.sample.user.service;
+
+import java.util.List;
+
+import com.wooribank.wbt3.sample.user.model.User;
+
+/**
+* <pre>
+* com.wooribank.wbt3.common.user.service
+*   |_ UserService.java
+* </pre>
+* 
+* 클래스 역할 설명 : 
+* @Company : BD. Inc
+* @Author  : yaong
+* @Date    : 2017. 8. 26. 오후 10:47:06
+* @Version : 
+*/
+
+public interface UserService {
+	public void saveUser(User user);
+	
+	//public User findUserByLastName(String lastName);
+	
+	public List<User> retriveUsers();
+}

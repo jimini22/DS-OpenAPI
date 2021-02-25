@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.portal.common.mapper.CommonCodeMapper">
+
+	<select id="topPage">
+		SELECT A.* 
+		  FROM 
+		       (SELECT @ROWNUM:=@ROWNUM + 1 AS ROW , 
+		              A.* 
+		         FROM  
+		              (
+	</select>
+	
+	<select id="bottomPage">
+	             ) A,(SELECT @ROWNUM := 0) B 
+		       ) A 
+		 WHERE A.ROW BETWEEN ${fistIndex} AND ${lastIndex}
+	</select>
+
+
+	<select id="selectCommonCodeList" resultType="com.hanaone.basicInfo.model.CommonInfo" parameterType="com.hanaone.basicInfo.model.CommonInfo">
+		SELECT /*SQL-ID=selectCommonCodeList*/
+			MAJOR_COD, 
+			SUB_COD, 
+			COD_VALUE, 
+			KR_COD_NAME, 
+			EN_COD_NAME, 
+			JA_COD_NAME, 
+			CN_COD_NAME, 
+			TW_COD_NAME, 
+			COD_DESC, 
+			USE_FLAG, 
+			DEL_FLAG, 
+			date_format(REG_DATE,'%Y%m%d') REG_DATE,
+			CASE #{locale}
+				WHEN 'ko' THEN KR_COD_NAME
+				WHEN 'en' THEN EN_COD_NAME
+				WHEN 'ja' THEN JA_COD_NAME
+				WHEN 'cn' THEN CN_COD_NAME
+				WHEN 'tw' THEN Tw_COD_NAME
+			END CODE_NAME 
+		FROM COMMON_CODE
+		WHERE DEL_FLAG = '0'
+		<if test="major_cod != null and major_cod !=''" >
+ 			AND MAJOR_COD = #{major_cod}
+		</if>
+		<if test="sub_cod != null and sub_cod !=''" >
+			AND SUB_COD = #{sub_cod}
+		</if>
+		<if test="sub_cod = null and sub_cod =''" >
+			AND SUB_COD &lt;&gt; '000'
+		</if>
+		<if test="keyword != null and keyword !=''" >
+			AND (
+				KR_COD_NAME LIKE CONCAT(#{keyword},'%') 
+		     OR EN_COD_NAME LIKE CONCAT(#{keyword},'%') 
+		     OR JA_COD_NAME LIKE CONCAT(#{keyword},'%') 
+		     OR CN_COD_NAME LIKE CONCAT(#{keyword},'%') 
+		     OR TW_COD_NAME LIKE CONCAT(#{keyword},'%')
+		     )
+		</if>
+		<if test="use_flag != null and use_flag !=''" >
+			AND USE_FLAG = #{use_flag}
+		</if>
+		order by major_cod,sub_cod  
+	</select>
+	
+	
+	
+	
+</mapper>

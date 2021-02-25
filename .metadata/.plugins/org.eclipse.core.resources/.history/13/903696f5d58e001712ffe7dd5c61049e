@@ -1,0 +1,43 @@
+package com.bluedigm.web.sample.i18n.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Repository;
+
+import com.wooribank.wbt3.sample.common.i18n.model.I18nMessage;
+import com.wooribank.wbt3.sample.common.i18n.model.I18nMessageMapVo;
+
+@Repository
+public interface I18nMessageMapper {
+
+	
+	public void insert(
+				@Param("code") String code, 
+				@Param("language") String language,
+				@Param("message") String message
+			);
+
+	public void update(
+				@Param("code") String code, 
+				@Param("language") String language,
+				@Param("message") String message
+			);
+
+	
+	public void delete(@Param("code") String code, @Param("language") String language);
+
+	
+	
+	public I18nMessage selectById(@Param("code") String code, @Param("language") String language);
+
+	public List<I18nMessage> selectByMap(@Param("map") I18nMessageMapVo map);
+	
+	public List<I18nMessage> selectAll();
+
+	public long countByMap(@Param("map") I18nMessageMapVo map);
+
+}

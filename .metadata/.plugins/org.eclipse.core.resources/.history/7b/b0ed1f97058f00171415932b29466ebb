@@ -1,0 +1,82 @@
+package com.wooribank.wbt3.sample.common.i18n.model;
+
+import java.io.Serializable;
+
+public class I18nMessage implements Serializable {
+
+	private static final long serialVersionUID = -7991591472377954525L;
+
+	private String code;
+	private String language;
+	private String message;
+
+	public I18nMessage() {
+
+	}
+
+	public I18nMessage(String code) {
+		this.code = code;
+	}
+	
+	public I18nMessage(String code, String language, String message) {
+		this.code = code;
+		this.language = language;
+		this.message = message;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((code == null) ? 0 : code.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		I18nMessage other = (I18nMessage) obj;
+		if (code == null) {
+			if (other.code != null)
+				return false;
+		} else if (!code.equals(other.code))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "I18nMessage [code=" + code + ", language=" + language + ", message=" + message
+				+ "]";
+	}
+
+}
