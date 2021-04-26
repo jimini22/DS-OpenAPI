@@ -25,7 +25,7 @@ public class BoardRestController extends BaseRestController {
 	@Autowired
 	private BoardService boardService;
 	
-	@GetMapping(value = "/all/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/all/{id}")
 	public RestResultVO<BoardVO> getBoardList ( @Valid BoardVO vo,
 												@PathVariable("id") int brdId ) throws Exception {
 		
