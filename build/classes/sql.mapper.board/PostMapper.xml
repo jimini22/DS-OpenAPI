@@ -1,1 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shinhan.portal.board.mapper.PostMapper">
+
+	<select id="selectPostList">
+		SELECT *
+		FROM (
+			SELECT
+				post.id					AS id,
+				post.created_by 		AS created_by,
+				post.created_date		AS created_date,
+				post.content			AS content,
+				post.title				AS title,
+				post.view_count			AS view_count,
+				post.board_id			AS board_id,
+				post.parent_id			AS parent_id,
+				post.organization_id	AS organization_id,
+				post.writer_id			AS writer_id,
+				post.is_priority		AS is_priority,	
+				board.board_type		AS board_type,
+				board.title				AS board_title,
+				board.description		AS board_description,
+				org.id					AS org_id,
+				org.name				AS org_name,
+				u.id					AS user_id,
+				u.login_id				AS user_login_id,
+				u.email					AS user_email,
+				u.full_name				AS user_full_name
+				,(	SELECT count(*)
+					FROM tb_attach_file att
+					WHERE att.attach_type = 'board'
+					AND att.post_id = post.id
+				) AS attachFileTotCnt
+				,(	SELECT count(*)
+					FROM tb_post p
+					WHERE p.parent_id = post.id
+				) AS replyTotCnt
+				<if test='boardType == "qna" or boardType == "business"'>
+				,(	SELECT CASE WHEN COUNT(*) > 0 THEN "y"
+								ELSE "n" END
+					FROM tb_post A
+					INNER JOIN tb_user B	ON A.writer_id = B.id
+					WHERE A.parent_id = post.id
+						  AND (CASE WHEN post.organization_id is null THEN B.organization_id is null
+									ELSE post.organization_id = B.organization_id END)
+				) AS replyState
+				</if>
+			FROM tb_post post
+			LEFT OUTER JOIN tb_board board		ON post.board_id = board.id
+			LEFT OUTER JOIN tb_organization org		ON post.organization_id = org.id
+			LEFT OUTER JOIN 
+								
+								
+								
+								
+								
+		)
+		
+	</select>
+
+
+
+</mapper>

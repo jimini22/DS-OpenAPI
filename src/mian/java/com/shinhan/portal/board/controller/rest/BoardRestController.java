@@ -14,8 +14,11 @@ import com.shinhan.portal.board.service.BoardService;
 import com.shinhan.portal.comm.constants.ResCode;
 import com.shinhan.portal.comm.controller.BaseRestController;
 import com.shinhan.portal.comm.model.RestResultVO;
+import com.sun.org.slf4j.internal.Logger;
 
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import sun.util.logging.resources.logging;
 
 @RestController
 @Slf4j

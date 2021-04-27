@@ -1,5 +1,22 @@
 package com.shinhan.portal.board.model;
 
-public class PostResponseVO {
+import java.util.List;
 
+import lombok.Data;
+
+@Data
+public class PostResponseVO {
+	
+	private List<PostVO> postList;
+	
+	private List<PostVO> fixedList;
+	
+	private List<PostVO> replyList;
+	
+	private PostVO post;
+	
+	private int totCnt;
+	
+	private PageInfoVO pageInfo;
+	
 }
