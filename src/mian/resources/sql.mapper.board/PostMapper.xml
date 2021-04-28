@@ -3,7 +3,7 @@
 
 <mapper namespace="com.mini.portal.board.mapper.PostMapper">
 
-	<select id="selectPostList">
+	<select id="selectPostList" parameterType="com.mini.portal.board.model.PostSearchVO" resultType="com.mini.portal.board.model.PostVO">
 		SELECT *
 		FROM (
 			SELECT
@@ -47,18 +47,286 @@
 				) AS replyState
 				</if>
 			FROM tb_post post
-			LEFT OUTER JOIN tb_board board		ON post.board_id = board.id
+			LEFT OUTER JOIN tb_board board			ON post.board_id = board.id
 			LEFT OUTER JOIN tb_organization org		ON post.organization_id = org.id
-			LEFT OUTER JOIN 
-								
-								
-								
-								
-								
-		)
-		
+			LEFT OUTER JOIN tb_user u				ON post.writer_id = u.id
+			WHERE 1=1
+				AND post.parent_id IS NULL
+				AND post.board_id IS NOT NULL
+				<include refid="listSearch"></include>
+			ORDER BY post.id DESC
+		) a
+		WHERE 1=1
+			<if test='replyState != null and replyState != ""'>AND replyState = #{replyState}</if>
+		LIMIT #{startNo}, #{pageSize}
 	</select>
 
-
+	<select id="listTotalCount" parameterType="com.mini.portal.board.model.PostSearchVO" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+			SELECT
+				post.id					AS id,
+				post.created_by 		AS created_by,
+				post.created_date		AS created_date,
+				post.content			AS content,
+				post.title				AS title,
+				post.view_count			AS view_count,
+				post.board_id			AS board_id,
+				post.parent_id			AS parent_id,
+				post.organization_id	AS organization_id,
+				post.writer_id			AS writer_id,
+				post.is_priority		AS is_priority,	
+				board.board_type		AS board_type,
+				board.title				AS board_title,
+				board.description		AS board_description,
+				org.id					AS org_id,
+				org.name				AS org_name,
+				u.id					AS user_id,
+				u.login_id				AS user_login_id,
+				u.email					AS user_email,
+				u.full_name				AS user_full_name
+				,(	SELECT count(*)
+					FROM tb_attach_file att
+					WHERE att.attach_type = 'board'
+					AND att.post_id = post.id
+				) AS attachFileTotCnt
+				,(	SELECT count(*)
+					FROM tb_post p
+					WHERE p.parent_id = post.id
+				) AS replyTotCnt
+				<if test='boardType == "qna" or boardType == "business"'>
+				,(	SELECT CASE WHEN COUNT(*) > 0 THEN "y"
+								ELSE "n" END
+					FROM tb_post A
+					INNER JOIN tb_user B	ON A.writer_id = B.id
+					WHERE A.parent_id = post.id
+						  AND (CASE WHEN post.organization_id is null THEN B.organization_id is null
+									ELSE post.organization_id = B.organization_id END)
+				) AS replyState
+				</if>
+			FROM tb_post post
+			LEFT OUTER JOIN tb_board board			ON post.board_id = board.id
+			LEFT OUTER JOIN tb_organization org		ON post.organization_id = org.id
+			LEFT OUTER JOIN tb_user u				ON post.writer_id = u.id
+			WHERE 1=1
+				AND post.parent_id IS NULL
+				AND post.board_id IS NOT NULL
+				<include refid="listSearch"></include>
+		) a
+		WHERE 1=1
+			<if test='replyState != null and replyState != ""'>AND replyState = #{replyState}</if>
+	</select>
+	
+	<sql id="listSearch">	<!-- and 가 아닌 것 같은 느낌........ -->
+		<if test='organizationId != null and organizationId != ""'>AND organization_id = #{organizationId}</if>
+		<if test='organizationId == 0'>AND organization_id IS NULL</if>
+		<if test='boardType != null and boardType != ""'>AND boar_type = #{boardType}</if>
+		<if test='userFullName != null and userFullName != ""'>AND user_full_name LIKE CONCAT('%', #{userFullName}, '%')</if>
+		<if test='writerId != null and writerId != ""'>AND writer_id = #{writerId}</if>
+		<if test='title != null and title != ""'>AND title LIKE CONCAT('%', #{title}, '%')</if>
+		<if test='keyword != null and keyword != ""'>AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))</if>
+	</sql>
+	
+	<select id="selectFixedList" parameterType="com.mini.portal.board.model.PostSearchVO" resultType="com.mini.portal.board.model.PostVO">
+		SELECT
+			post.id					AS id,
+			post.created_by 		AS created_by,
+			post.created_date		AS created_date,
+			post.content			AS content,
+			post.title				AS title,
+			post.view_count			AS view_count,
+			post.board_id			AS board_id,
+			post.parent_id			AS parent_id,
+			post.organization_id	AS organization_id,
+			post.writer_id			AS writer_id,
+			post.is_priority		AS is_priority,	
+			board.board_type		AS board_type,
+			board.title				AS board_title,
+			board.description		AS board_description
+			,(	SELECT count(*)
+					FROM tb_attach_file att
+					WHERE att.attach_type = 'board'
+					AND att.post_id = post.id
+				) AS attachFileTotCnt
+		FROM tb_post post
+		LEFT OUTER JOIN tb_board board	ON post.board_id = board.id
+		WHERE 1=1
+			AND post.parent_id IS NULL
+			AND post.board_id IS NOT NULL
+			AND post.is_priority = 1
+			<include refid="listSearch"></include>
+		ORDER BY post.id DESC
+		LIMIT 3
+	</select>
+	
+	<select id="selectPostDetail" parameterType="com.mini.portal.board.model.PostVO" resultType="com.mini.portal.board.model.PostVO">
+		SELECT
+			post.id					AS id,
+			post.created_by 		AS created_by,
+			post.created_date		AS created_date,
+			post.content			AS content,
+			post.title				AS title,
+			post.view_count			AS view_count,
+			post.board_id			AS board_id,
+			post.parent_id			AS parent_id,
+			post.organization_id	AS organization_id,
+			post.writer_id			AS writer_id,
+			post.is_priority		AS is_priority,	
+			board.board_type		AS board_type,
+			board.title				AS board_title,
+			board.description		AS board_description,
+			org.id					AS org_id,
+			org.name				AS org_name,
+			u.id					AS user_id,
+			u.login_id				AS user_login_id,
+			u.email					AS user_email,
+			u.full_name				AS user_full_name
+			,(	SELECT count(*)
+				FROM tb_attach_file att
+				WHERE att.attach_type = 'board'
+				AND att.post_id = post.id
+			) AS attachFileTotCnt
+			,(	SELECT count(*)
+				FROM tb_post p
+				WHERE p.parent_id = post.id
+			) AS replyTotCnt
+		FROM tb_post post
+		LEFT OUTER JOIN tb_board board		ON post.board_id = board.id
+		LEFT OUTER JOIN tb_organization_id	ON post.organization_id = org.id
+		LEFT OUTER JOIN tb_user u			ON post.writer_id = u.id
+		WHERE post.id = #{id}
+	</select>
+	
+	<insert id="createPost" parameterType="com.mini.portal.board.model.PostVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tb_post (
+			title,
+			content,
+			view_count,
+			board_id,
+			parent_id,
+			organization_id,
+			writer_id,
+			is_priority,
+			created_by,			<!-- created_by 없애도 될 거 같음 -->
+			created_date
+		) VALUES (
+			#{title},
+			#{content},
+			0,
+			(	SELECT id
+				FROM tb_board
+				WHERE board_type = #{boardType}
+			),
+			null,
+			#{organizationId},
+			#{writerId},
+			#{isPriority},
+			#{createdBy},
+			NOW()
+		);
+	</insert>
+	
+	<update id="hitPlus" parameterType="com.mini.portal.board.model.PostVO">
+		UPDATE	tb_post
+		SET		view_count = view_count + 1
+		WHERE	id = #{id}
+	</update>
+	
+	<update id="updatePost" parameterType="com.mini.portal.board.model.PostVO">
+		UPDATE	tb_post
+		SET		last_modified_by = #{},
+				last_modified_date = NOW(),
+				title = #{title},
+				content = #{content},
+				is_priority = #{isPriority}
+		WHERE	id = #{id}
+	</update>
+	
+	<delete id="deletePost" parameterType="com.mini.portal.board.model.PostVO">
+		DELETE
+		FROM	tb_post
+		WHERE	id = #{id}
+	</delete>
+	
+	
+	<select id="selectReplyList" parameterType="com.mini.portal.board.model.PostVO" resultType="com.mini.portal.board.model.PostVO">
+		SELECT	post.*,
+				u.id			AS user_id,
+				u.login_id		AS user_login_id,
+				u.full_name		AS user_full_name,
+				u.role_code		AS user_role_code
+		FROM	tb_post post,
+				tb_user u
+		WHERE post.parent_id = #{id}
+			AND	post.writer_id = u.id
+		ORDER BY post.id
+	</select>
+	
+	<select id="replyTotalCount" parameterType="com.mini.portal.board.model.PostVO" resultType="int">
+		SELECT COUNT(*)
+		FROM tb_post post
+		WHERE post.parent_id = #{id}
+	</select>
+	
+	<insert id="createReply" parameterType="com.mini.portal.board.model.PostVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tb_post (
+			content,
+			board_id,
+			parent_id,
+			organization_id,
+			writer_id,
+			created_by,
+			created_date
+		) VALUES (
+			#{content},
+			(	SELECT id
+				FROM tb_board
+				WHERE board_type = #{boardType}
+			),
+			#{parentId},
+			#{organizationId},
+			#{writerId},
+			#{createdBy},
+			NOW()
+		);
+	</insert>
+	
+											<!-- long vs Long ....??? -->
+	<select id="selectProviderInfoForSms" parameterType="long" resultType="com.mini.portal.board.model.PostReceiverVO">
+		SELECT
+			u.id				AS id,
+			u.cell_phone		AS cell_phone,
+			u.email				AS email,
+			u.full_name			AS full_name,
+			u.login_id			AS login_id,
+			u.state				AS state,
+			u.organization_id	AS organization_id,
+			u.role_code			AS role_code,
+			u.is_sms			AS is_sms,
+			org.id				AS organization_id,
+			org.name			AS organization_name
+		FROM tb_user u,
+			 tb_organization org
+		WHERE u.organization_id = org.id
+			AND u.state = 'ACTIVE'
+			AND u.is_sms = 1
+			AND org.id = #{organizationId}
+		ORDER BY u.id
+	</select>
+	
+	<select id="selectUserInfoForSms" resultType="com.mini.portal.board.model.PostReceiverVO">
+		SELECT
+			u.id				AS id,
+			u.cell_phone		AS cell_phone,
+			u.email				AS email,
+			u.full_name			AS full_name,
+			u.login_id			AS login_id,
+			u.state				AS state,
+			u.organization_id	AS organization_id,
+			u.role_code			AS role_code,
+			u.is_sms			AS is_sms
+		FROM tb_user u
+		WHERE u.id = #{id}
+	</select>
 
 </mapper>
