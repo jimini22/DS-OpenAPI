@@ -3,6 +3,7 @@ package com.mini.portal.board.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mini.portal.board.mapper.PostMapper;
 import com.mini.portal.board.model.PostResponseVO;
 import com.mini.portal.board.model.PostSearchVO;
 import com.mini.portal.board.model.PostVO;
