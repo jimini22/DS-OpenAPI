@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.mini.portal.comm.model.AttachFileVO;
+
 /**
  * com.mini.portal.comm.mapper
  *		>> AttachFileMapper.java

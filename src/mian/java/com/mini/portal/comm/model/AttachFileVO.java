@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mini.portal.comm.utils.FileUtil;
+import com.mini.portal.comm.utils.StringUtil;
+
 import lombok.Data;
 
 @Data
