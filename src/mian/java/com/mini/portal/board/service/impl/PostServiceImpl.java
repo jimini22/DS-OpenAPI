@@ -1,19 +1,25 @@
 package com.mini.portal.board.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mini.portal.board.mapper.PostMapper;
+import com.mini.portal.board.model.PostReceiverVO;
 import com.mini.portal.board.model.PostResponseVO;
 import com.mini.portal.board.model.PostSearchVO;
+import com.mini.portal.board.model.PostSendVO;
 import com.mini.portal.board.model.PostVO;
 import com.mini.portal.board.service.PostService;
+import com.mini.portal.comm.model.PageInfoVO;
 
 @Service
 public class PostServiceImpl implements PostService {
 
 	@Autowired
 	private PostMapper postMapper;
+	
 	
 	@Override
 	public PostResponseVO selectPostDetail(PostVO vo) throws Exception {
@@ -91,7 +97,7 @@ public class PostServiceImpl implements PostService {
 		
 		PostSendVO sendVO = new PostSendVO();
 		
-		PostReceiverVO receiver = postMapper.selectUserInfoForSms();
+		PostReceiverVO receiver = postMapper.selectUserInfoForSms(id);
 		sendVO.setReceiver(receiver);
 		
 		return sendVO;
@@ -107,11 +113,11 @@ public class PostServiceImpl implements PostService {
 		resVO.setPostList(postList);
 		
 		//게시물 총 갯수
-		int totCnt = postMapper.listTotCnt(svo);
+		int totCnt = postMapper.listTotalCount(svo);
 		resVO.setTotCnt(totCnt);
 		
 		//페이징 정보
-		PageInfoVO pageInfo = new PageInfoVo(svo.getPageNo(), svo.getPageSize(), totCnt);
+		PageInfoVO pageInfo = new PageInfoVO(svo.getPageNo(), svo.getPageSize(), totCnt);
 		resVO.setPageInfo(pageInfo);
 		
 		return resVO;
@@ -127,7 +133,7 @@ public class PostServiceImpl implements PostService {
 		resVO.setPostList(postList);
 		
 		//게시물 총 갯수
-		int totCnt = postMapper.listTotCnt(svo);
+		int totCnt = postMapper.listTotalCount(svo);
 		resVO.setTotCnt(totCnt);
 		
 		//상단고정 리스트
@@ -135,7 +141,7 @@ public class PostServiceImpl implements PostService {
 		resVO.setFixedList(fixedList);
 		
 		//페이징 정보
-		PageInfoVO pageInfo = new PageInfoVo(svo.getPageNo(), svo.getPageSize(), totCnt);
+		PageInfoVO pageInfo = new PageInfoVO(svo.getPageNo(), svo.getPageSize(), totCnt);
 		resVO.setPageInfo(pageInfo);
 		
 		return resVO;

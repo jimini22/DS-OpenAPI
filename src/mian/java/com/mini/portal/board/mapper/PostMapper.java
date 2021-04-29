@@ -105,6 +105,14 @@ public interface PostMapper {
 	public List<PostReceiverVO> selectProviderInfoForSms(Long organizationId) throws Exception;
 	
 	/**
+	 * @description : SMS 수신 대상 (어드민)
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public PostReceiverVO selectAdminInfoForSms() throws Exception;
+	
+	/**
 	 * @description : SMS 수신 대상 (유저 정보)
 	 * @param id
 	 * @return

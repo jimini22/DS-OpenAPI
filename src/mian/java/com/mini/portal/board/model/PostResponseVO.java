@@ -2,6 +2,8 @@ package com.mini.portal.board.model;
 
 import java.util.List;
 
+import com.mini.portal.comm.model.PageInfoVO;
+
 import lombok.Data;
 
 @Data

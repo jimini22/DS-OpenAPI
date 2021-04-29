@@ -42,4 +42,5 @@ public class PostVO {
 	private String userRoleCode;
 	
 	
+	
 }

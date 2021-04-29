@@ -2,9 +2,6 @@ package com.mini.portal.comm.model;
 
 import com.miniportal.comm.constants.ResCode;
 
-import lombok.Data;
-
-@Data
 public class RestResultVO<T> {
 	
 	private int code;

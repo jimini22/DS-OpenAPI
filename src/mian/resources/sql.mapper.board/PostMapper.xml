@@ -314,6 +314,22 @@
 		ORDER BY u.id
 	</select>
 	
+	<select id="selectAdminInfoForSms">
+		SELECT
+			u.id				AS id,
+			u.cell_phone		AS cell_phone,
+			u.email				AS email,
+			u.full_name			AS full_name,
+			u.login_id			AS login_id,
+			u.state				AS state,
+			u.organization_id	AS organization_id,
+			u.role_code			AS role_code,
+			u.is_sms			AS is_sms
+		FROM tb_user u
+		WHERE u.login_id = 'admin'	<!-- is_admin(어드민여부) 컬럼이 있으면 그걸로 써 -->
+			
+	</select>
+	
 	<select id="selectUserInfoForSms" resultType="com.mini.portal.board.model.PostReceiverVO">
 		SELECT
 			u.id				AS id,
