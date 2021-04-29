@@ -1,6 +1,6 @@
 package com.mini.portal.comm.model;
 
-import com.miniportal.comm.constants.ResCode;
+import com.mini.portal.comm.constants.ResCode;
 
 public class RestResultVO<T> {
 	

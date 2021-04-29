@@ -1,5 +1,7 @@
 package com.mini.portal.comm.model;
 
+import java.io.Serializable;
+
 /**
  * com.mini.portal.comm.model
  *		>> PageInfoVO.java
@@ -11,7 +13,7 @@ package com.mini.portal.comm.model;
  * 	----------------------------------
  * 		2021. 4. 29		최초 생성
  */
-public class PageInfoVO {
+public class PageInfoVO implements Serializable {
 	
 	private static final long serialVersionUID = 4996663737643690932L; /* 이거 왜 쓰는거임??? */
 	

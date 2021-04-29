@@ -1,4 +1,4 @@
-package com.miniportal.comm.constants;
+package com.mini.portal.comm.constants;
 
 public enum ResCode {
 

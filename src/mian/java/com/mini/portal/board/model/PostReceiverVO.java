@@ -1,7 +1,5 @@
 package com.mini.portal.board.model;
 
-import java.util.List;
-
 import lombok.Data;
 
 @Data
