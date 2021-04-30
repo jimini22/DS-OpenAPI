@@ -16,6 +16,7 @@ import com.mini.portal.board.service.PostService;
 import com.mini.portal.comm.constants.ResCode;
 import com.mini.portal.comm.controller.BaseRestController;
 import com.mini.portal.comm.mapper.AttachFileMapper;
+import com.mini.portal.comm.model.AttachFileReqVO;
 import com.mini.portal.comm.model.RestResultVO;
 import com.mini.portal.comm.support.annotaion.ActiveUser;
 import com.mini.portal.user.model.UserAuthVO;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.mini.portal.comm.model.AttachFileReqVO;
 import com.mini.portal.comm.model.AttachFileVO;
 
 /**
