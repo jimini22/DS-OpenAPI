@@ -12,7 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileContent;
@@ -408,10 +411,175 @@ public class FileUtil {
 		}
 	}
 	
+	/**
+	 * @description : 파일의 크기를 가져온다
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public static long getFileSize(String fileName) throws Exception {
+		File file = new File(fileName);
+		if (!file.exists()) {
+			return Long.valueOf("0");
+		}
+		return file.length();
+	}
+	
+	
+	/**
+	 * @description : 파일의 확장자명을 추출한다
+	 * @param strFileName
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getFileExt(String strFileName) throws Exception {
+		
+		/* 값의 null 체크 */
+		if (StringUtil.isEmpty(strFileName)) {
+			return null;
+		}
+		
+		/* 결과값 */
+		String result = null;
+		
+		/* path가 없으므로 바로 반환한다 */
+		if (strFileName.lastIndexOf(".") == -1) {
+			return result;
+		}
+		
+		/* 파일명만 추출 */
+		result = strFileName.substring(strFileName.lastIndexOf(".") + 1);
+		
+		return result;
+	}
+	
 
-	public static String createTempFileName(String fileName) {
+	/**
+	 * @description : 임시 파일명을 생성하여 반환한다
+	 * @param originalFileName
+	 * @return
+	 * @throws Exception
+	 */
+	public static String createTempFileName(String originalFileName) throws Exception {
+		
+		if (StringUtil.isEmpty(originalFileName)) {
+			return null;
+		}
+		
+		String ext = getFileExt(originalFileName);
+		
+		/* 파일명 생성 */
+		long cTime = System.currentTimeMillis();
+		String cTimeStr = Long.valueOf(cTime).toString();
+		int rNum = FileUtil.roledice();
+		String rNumStr = Integer.valueOf(rNum).toString();
+		
+		StringBuffer tempFileName = new StringBuffer(cTimeStr);
+		tempFileName.append(rNumStr);
+		tempFileName.append(".");
+		tempFileName.append(ext);
 		
 		return null;
 	}
 	
+	private static int roledice() {
+		Random r = new Random();
+		// setSeed() 메소드를 사용해서 r을 예측 불가능한 long타입으로 설정한다
+		r.setSeed(new Date().getTime());
+		// 난수 생성
+		return (r.nextInt()%6) + 1;
+	}
+	
+	/**
+	 * @description : make directory
+	 * @param rootDir
+	 */
+	public static void mkdir(String rootDir) {
+		File root = new File(rootDir);
+		
+		if (!root.isDirectory()) {
+			root.mkdirs();
+		}
+	}
+	
+	/**
+	 * @description : 파일을 다른 파일로 복사한다
+	 * @param srcFilePath
+	 * @param desFilePath
+	 * @return
+	 */
+	public static boolean copyFile(String srcFilePath, String desFilePath) {
+		boolean res = false;
+		
+		File srcFile = new File(srcFilePath);
+		File desFile = new File(desFilePath);
+		
+		res = copyFile(srcFile, desFile);
+		
+		return res;
+	}
+	
+	public static boolean copyFile(File srcFile, File desFile) {
+		
+		boolean res = false;
+		FileInputStream istream = null;
+		FileOutputStream ostream = null;
+		FileChannel input = null;
+		FileChannel output = null;
+		
+		try {
+			istream = new FileInputStream(srcFile);
+		} catch (FileNotFoundException e) {
+			return res;
+		}
+		
+		File p = desFile.getParentFile();
+		if (p.exists() == false) {
+			p.mkdirs();
+		}
+		try {
+			ostream = new FileOutputStream(desFile);
+			
+			input = istream.getChannel();
+			output = ostream.getChannel();
+			
+			// copy
+			input.transferTo(0, input.size(), output);
+			res = true;
+		} catch (FileNotFoundException e) {
+			
+		} catch (IOException e) {
+			
+		} finally {
+			if (istream != null) {
+				try {
+					istream.close();
+				} catch (Exception e2) {
+					
+				}
+			}
+			if (ostream != null) {
+				try {
+					ostream.close();
+				} catch (Exception e) {
+					
+				}
+			}
+			if (input != null) {
+				try {
+					input.close();
+				} catch (Exception e) {
+					
+				}
+			}
+			if (output != null) {
+				try {
+					output.close();
+				} catch (Exception e) {
+					
+				}
+			}
+		}
+		return res;
+	}
 }

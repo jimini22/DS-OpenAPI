@@ -1,5 +1,7 @@
 package com.mini.portal.board.controller.rest;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,9 @@ import com.mini.portal.comm.constants.ResCode;
 import com.mini.portal.comm.controller.BaseRestController;
 import com.mini.portal.comm.mapper.AttachFileMapper;
 import com.mini.portal.comm.model.AttachFileReqVO;
+import com.mini.portal.comm.model.AttachFileVO;
 import com.mini.portal.comm.model.RestResultVO;
+import com.mini.portal.comm.service.AttachFileService;
 import com.mini.portal.comm.support.annotaion.ActiveUser;
 import com.mini.portal.user.model.UserAuthVO;
 
@@ -110,6 +114,13 @@ public class PostRestController extends BaseRestController {
 		return resultVO;
 	}
 	
+	/**
+	 * @description : 게시글 삭제 실행
+	 * @param vo
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	@PostMapping(value = "/delete/{id}")
 	public RestResultVO<PostResponseVO> deletePost ( @Valid PostVO vo,
 													@PathVariable("id") Long id ) throws Exception {
@@ -117,6 +128,23 @@ public class PostRestController extends BaseRestController {
 		AttachFileReqVO avo = new AttachFileReqVO();
 		avo.setPostId(vo.getId());
 		int fileCnt = attachFileMapper.selectAttachFileListCount(avo);
+		
+		if (fileCnt > 0) {
+			AttachFileVO attachFileVO = new AttachFileVO();
+			attachFileVO.setPostId(vo.getId());
+			List<AttachFileVO> attachList = attachFileService.selectAttachFileListAll(attachFileVO);
+			attachList.forEach(attachDeleteFile -> {
+				attachFileService.deleteAttachFile(attachDeleteFile);
+			});
+			log.info(":::::::::::::::: 게시글에 포함된 첨부파일 삭제 완료");
+		}
+		
+		vo.setId(id);
+		postService.deletePost(vo);
+		log.info(":::::::::::::::: 게시글 삭제 완료");
+		
+		RestResultVO<PostResponseVO> resultVO = new RestResultVO<PostResponseVO>(ResCode.CD2000.getCode(), ResCode.CD2000.getMessage());
+		return resultVO;
 		
 	}
 	
