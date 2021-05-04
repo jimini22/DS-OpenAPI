@@ -26,5 +26,5 @@ public class UserVO implements Serializable {
 	
 	protected Long organizationId;
 	
-	//maskin util 관련 추가
+	//masking util 관련 추가
 }

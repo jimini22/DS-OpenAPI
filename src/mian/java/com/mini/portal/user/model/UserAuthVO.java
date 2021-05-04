@@ -52,5 +52,4 @@ public class UserAuthVO extends UserVO implements Serializable {
 	private String roleCode;
 	
 	
-	
 }
