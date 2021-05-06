@@ -148,4 +148,15 @@ public class StringUtil {
 		return pwd;
 	}
 	
+	public static String replaceXssFilter(String str) {
+		
+		String codeRegex = "(\\/)?(script|applet|iframe|meta|svg|object|frameset|embed|link)(.*?)>";
+		str = str.replaceAll(codeRegex, "&lt;$1$2$3&gt;");
+		
+		String imgRegx = "(?i)<(body|frame|img|input|link|style)(.*?)(onerror|onload|onclick)(.*?)>";
+		str = str.replaceAll(imgRegx, "<$1$2no-$3$4>");
+		
+		return str;
+	}
+	
 }

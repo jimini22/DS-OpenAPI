@@ -14,8 +14,8 @@ package com.mini.portal.comm.constants;
  */
 public class SmsType {
 
-	public static final String BOARD_QUESTION_AND_ASK_POST 		= "BOARD_QUESTION_AND_ASK_POST";
-	public static final String BOARD_QUESTION_AND_ASK_REPLY 	= "BOARD_QUESTION_AND_ASK_REPLY";
+	public static final String BOARD_QUESTION_AND_ANSWER_POST 	= "BOARD_QUESTION_AND_ANSWER_POST";
+	public static final String BOARD_QUESTION_AND_ANSWER_REPLY 	= "BOARD_QUESTION_AND_ANSWER_REPLY";
 	public static final String BOARD_ONE_TO_ONE_QUESTION_POST 	= "BOARD_ONE_TO_ONE_QUESTION_POST";
 	public static final String BOARD_ONE_TO_ONE_QUESTION_REPLY 	= "BOARD_ONE_TO_ONE_QUESTION_REPLY";
 	public static final String BOARD_BUSINESS_PROPOSAL_POST 	= "BOARD_BUSINESS_PROPOSAL_POST";

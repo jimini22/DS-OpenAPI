@@ -17,6 +17,10 @@ public class PostVO {
 	private Boolean isPrivate;
 	private Long viewCount;
 	
+	private String password;
+	private String email;
+	private String cellPhone;
+	
 	private Long boardId;
 	private String boardType;
 	private Long parentId;
@@ -24,7 +28,6 @@ public class PostVO {
 	private Long writerId;
 	
 	private String fullName;
-	private String email;
 	private String division;
 	private Boolean isPriority = false;
 	
@@ -40,7 +43,7 @@ public class PostVO {
 	private Long userId;
 	private String userFullName;
 	private String userRoleCode;
-	
-	
+	private String userEmail;
+	private String userCellPhone;
 	
 }

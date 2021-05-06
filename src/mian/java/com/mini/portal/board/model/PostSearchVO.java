@@ -19,7 +19,7 @@ public class PostSearchVO {
 	
 	private Long boardId;
 	private String boardType;
-	private Long targetOrganizationId;
+	private Long organizationId;
 	
 	private String keyword;
 	private String replyState;
