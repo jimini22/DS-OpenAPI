@@ -17,6 +17,7 @@
 				post.parent_id			AS parent_id,
 				post.organization_id	AS organization_id,
 				post.writer_id			AS writer_id,
+				post.writer				AS writer,
 				post.is_priority		AS is_priority,	
 				board.board_type		AS board_type,
 				board.title				AS board_title,
@@ -139,6 +140,7 @@
 			post.parent_id			AS parent_id,
 			post.organization_id	AS organization_id,
 			post.writer_id			AS writer_id,
+			post.writer				AS writer,
 			post.is_priority		AS is_priority,	
 			board.board_type		AS board_type,
 			board.title				AS board_title,
@@ -171,6 +173,7 @@
 			post.parent_id			AS parent_id,
 			post.organization_id	AS organization_id,
 			post.writer_id			AS writer_id,
+			post.writer				AS writer,
 			post.is_priority		AS is_priority,	
 			board.board_type		AS board_type,
 			board.title				AS board_title,
@@ -206,6 +209,7 @@
 			parent_id,
 			organization_id,
 			writer_id,
+			writer,
 			is_priority,
 			created_by,			<!-- created_by 없애도 될 거 같음 -->
 			created_date
@@ -220,6 +224,7 @@
 			null,
 			#{organizationId},
 			#{writerId},
+			#{writer},
 			#{isPriority},
 			#{createdBy},
 			NOW()
@@ -275,6 +280,7 @@
 			parent_id,
 			organization_id,
 			writer_id,
+			writer,
 			created_by,
 			created_date
 		) VALUES (
@@ -286,6 +292,7 @@
 			#{parentId},
 			#{organizationId},
 			#{writerId},
+			#{writer},
 			#{createdBy},
 			NOW()
 		);

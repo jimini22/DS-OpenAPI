@@ -2,15 +2,19 @@ package com.mini.portal.board.controller.rest;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mini.portal.board.model.PostReceiverVO;
@@ -92,7 +96,7 @@ public class PostRestController extends BaseRestController {
 					svo.setOrganizationId(activeUser.getOrganizationId());
 				}
 			}
-		} else if (boardType == "qna") {
+		} else if (boardType == "qna" || boardType == "question") {
 			if (activeUser != null) {
 				if (activeUser.getAuthorities().contains(AuthoritiesConstants.MANAGER_PROVIDER) || activeUser.getAuthorities().contains(AuthoritiesConstants.USER_PROVIDER)) {
 					/* 로그인한 사용자가 제공기관 >>> 본인의 기관으로 등록된 글만 조회 */
@@ -148,16 +152,91 @@ public class PostRestController extends BaseRestController {
 		} else {
 			postService.hitPlus(id);
 		}
-		/* question */
-		if (resVO.getPost().getBoardType().equals("question")) {
-			/* 해당 권한을 가진 로그인 사용자의 경우 password check 안함 */
-			if (activeUser.getAuthorities().contains(AuthoritiesConstants.ADMIN) || activeUser.getAuthorities().contains(AuthoritiesConstants.MANAGER_PROVIDER) || activeUser.getAuthorities().contains(AuthoritiesConstants.USER_PROVIDER)) {
-				resVO.getPost().setPassword(null);
-			}
-		}
 		
 		RestResultVO<PostResponseVO> resultVO = new RestResultVO<PostResponseVO>(ResCode.CD2000.getCode(), ResCode.CD2000.getMessage(), resVO);
 		return resultVO;
+	}
+	
+	/**
+	 * @description : 1:1문의글 상세조회 - 제공기관, 어드민
+	 * @param vo
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@Secured({"ROLE_ADMIN", "ROLE_MANAGER_PROVIDER", "ROLE_USER_PROVIDER"})
+	@GetMapping(value = "/question/detail/{id}")
+	public RestResultVO<PostResponseVO> getPostQuestionDetail ( @Valid PostVO vo,
+																@PathVariable("id") Long id ) throws Exception {
+		
+		vo.setId(id);
+		PostResponseVO resVO = postService.selectPostDetail(vo);
+		resVO.getPost().setPassword(null);
+		
+		RestResultVO<PostResponseVO> resultVO = new RestResultVO<PostResponseVO>(ResCode.CD2000.getCode(), ResCode.CD2000.getMessage(), resVO);
+		return resultVO;
+	}
+	
+	/**
+	 * @description : 1:1문의글 상세조회 - 비회원
+	 * @param vo
+	 * @param activeUser
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/question/detail")
+	public RestResultVO<PostResponseVO> getPostQuestionUserDetail ( @Valid @RequestBody PostVO vo,
+																	@ActiveUser UserAuthVO activeUser,
+																	HttpServletRequest request ) throws Exception {
+		
+		HttpSession session = request.getSession();
+		Long post_id = (Long) session.getAttribute("post_num");
+		
+		PostResponseVO resVO = postService.selectPostDetail(vo);
+		resVO.getPost().setPassword(null);
+		
+		activeUser = SecurityUserUtils.getCurrentUserInfo();
+		if (post_id == null || !resVO.getPost().getId().equals(post_id)) {
+			if (activeUser != null && activeUser.getId().equals(resVO.getPost().getWriterId())) {
+				postService.selectPostDetail(vo);
+			} else {
+				return new RestResultVO<PostResponseVO>(ResCode.CD9000.getCode(), ResCode.CD9000.getMessage());
+			}
+		}
+		
+		return new RestResultVO<PostResponseVO>(ResCode.CD2000.getCode(), ResCode.CD2000.getMessage());
+	}	
+	
+	/**
+	 * @description : 1:1문의글 상세조회 - 비밀번호 확인
+	 * @param id
+	 * @param password
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/check")
+	public RestResultVO<?> getPostPasswordCheck ( @RequestParam(name = "id") Long id,
+												  @RequestParam(name = "password") String password,
+												  HttpServletRequest request ) throws Exception {
+		
+		PostVO vo = new PostVO();
+		vo.setId(id);
+		vo.setPassword(password);
+		
+		HttpSession session = request.getSession();
+		
+		PostResponseVO resVO = postService.selectPostDetail(vo);
+		
+		if (!resVO.getPost().getPassword().equals(vo.getPassword())) {
+			// 게시글 비밀번호와 일치하지 않음
+			return new RestResultVO<PostResponseVO>(ResCode.CD9020.getCode(), ResCode.CD9020.getMessage());
+		}
+		
+		session.setAttribute("post_num", vo.getId());
+		
+		return new RestResultVO<>(ResCode.CD2000.getCode(), ResCode.CD2000.getMessage());
 	}
 	
 	/**
@@ -171,8 +250,14 @@ public class PostRestController extends BaseRestController {
 	public RestResultVO<Long> createPost ( @Valid @RequestBody PostVO vo,
 											@ActiveUser UserAuthVO activeUser ) throws Exception {
 		
-		vo.setWriterId(activeUser.getId());		
-		vo.setCreatedBy(activeUser.getLoginId());
+		if (SecurityUserUtils.isAuthenticated() == true) {
+			vo.setWriterId(activeUser.getId());
+			vo.setWriter(activeUser.getFullName());
+			vo.setCreatedBy(activeUser.getLoginId());
+		} else {
+			vo.setWriterId(null);
+		}
+		
 		vo.setContent(StringUtil.replaceXssFilter(vo.getContent()));
 		
 		Long postId = postService.createPost(vo);

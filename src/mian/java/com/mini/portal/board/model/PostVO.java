@@ -24,8 +24,9 @@ public class PostVO {
 	private Long boardId;
 	private String boardType;
 	private Long parentId;
-	private Long targetOrganizationId;
+	private Long organizationId;
 	private Long writerId;
+	private String writer;
 	
 	private String fullName;
 	private String division;
