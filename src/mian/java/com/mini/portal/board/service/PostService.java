@@ -5,6 +5,18 @@ import com.mini.portal.board.model.PostSearchVO;
 import com.mini.portal.board.model.PostSendVO;
 import com.mini.portal.board.model.PostVO;
 
+/**
+ * com.mini.portal.board.service
+ *		>> PostService.java
+ * @author	: 지민희
+ * @since	: 2021. 5. 10
+ * @description : 게시글 관련 service interface
+ * @version :
+ * 	----------------------------------
+ * 		수정일			수정내용
+ * 	----------------------------------
+ * 		2021. 5. 10		최초 생성
+ */
 public interface PostService {
 
 	/**

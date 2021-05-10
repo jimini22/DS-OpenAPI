@@ -14,7 +14,19 @@ import com.mini.portal.board.model.PostVO;
 import com.mini.portal.board.service.PostService;
 import com.mini.portal.comm.model.PageInfoVO;
 
-@Service
+/**
+ * com.mini.portal.board.service.impl
+ *		>> PostServiceImpl.java
+ * @author	: 지민희
+ * @since	: 2021. 5. 10
+ * @description : 게시글 관련 서비스 구현
+ * @version :
+ * 	----------------------------------
+ * 		수정일			수정내용
+ * 	----------------------------------
+ * 		2021. 5. 10		최초 생성
+ */
+@Service("PostService")
 public class PostServiceImpl implements PostService {
 
 	@Autowired

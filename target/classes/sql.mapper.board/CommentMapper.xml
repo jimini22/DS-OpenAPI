@@ -1,1 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mini.portal.board.mapper.CommentMapper">
+
+	<select id="getAllComments" parameterType="com.mini.portal.board.model.CommentVO" resultMap="com.mini.portal.board.model.CommentVO">
+		SELECT	c.id				AS id,
+				c.post_id			AS postId,
+				c.content			AS content,
+				c.writer			AS writer,
+				c.writer_id			AS writerId,
+				c.created_date		AS createdDate,
+				post.writer_id		AS postWriterId,
+				u.role_code			AS userRoleCode,
+				u.organization_id	AS userOrganizationId
+		FROM	tb_comment	c
+		LEFT OUTER JOIN	tb_post post	ON c.post_id = post.id
+		LEFT OUTER JOIN tb_user	u		ON c.writer_id = u.id
+		WHERE	c.post_id = #{postId}
+	</select>
+	
+	<select id="getCommentTotalCount" parameterType="com.mini.portal.board.model.CommentVO" resultType="int">
+		SELECT	COUNT(*)
+		FROM	tb_comment	c,
+				tb_post		post
+		WHERE	c.post_id = post.id
+				AND c.post_id = #{postId}
+	</select>
+	
+	<insert id="createComment" parameterType="com.mini.portal.board.model.CommentVO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tb_comment (
+			post_id,
+			content,
+			writer,
+			writer_id,
+			created_date
+		) VALUES (
+			#{postId},
+			#{content},
+			#{writer},
+			#{writerId},
+			NOW()
+		);
+	</insert>
+
+</mapper>
