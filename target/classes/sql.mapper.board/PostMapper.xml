@@ -55,10 +55,10 @@
 				AND post.parent_id IS NULL
 				AND post.board_id IS NOT NULL
 				<include refid="listSearch"></include>
-			ORDER BY post.id DESC
 		) a
 		WHERE 1=1
 			<if test='replyState != null and replyState != ""'>AND replyState = #{replyState}</if>
+		ORDER BY id DESC
 		LIMIT #{startNo}, #{pageSize}
 	</select>
 
@@ -149,7 +149,7 @@
 					FROM tb_attach_file att
 					WHERE att.attach_type = 'board'
 					AND att.post_id = post.id
-				) AS attachFileTotCnt
+			) AS attachFileTotCnt
 		FROM tb_post post
 		LEFT OUTER JOIN tb_board board	ON post.board_id = board.id
 		WHERE 1=1
@@ -333,7 +333,7 @@
 			u.role_code			AS role_code,
 			u.is_sms			AS is_sms
 		FROM tb_user u
-		WHERE u.login_id = 'admin'	<!-- is_admin(어드민여부) 컬럼이 있으면 그걸로 써 -->
+		WHERE u.is_admin = 1
 			
 	</select>
 	
