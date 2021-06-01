@@ -49,7 +49,7 @@ $(document).ready(function() {
 	BoardCommon.setAttachDropFile($fileList);
 	
 	<%-- 업로드할 목록 보여주기 (첨부파일 업로드 > 업로드할 파일 삭제) --%>
-	BoardCommo.attachFileRemove($fileList);
+	BoardCommon.attachFileRemove($fileList);
 	
 	<%-- 약관동의 --%>
 	getContent("privacy-policy", "term-agree-text");
